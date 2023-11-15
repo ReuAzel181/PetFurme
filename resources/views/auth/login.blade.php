@@ -1,10 +1,13 @@
 @extends('layouts.auth')
 
+@section('head')
+    <link rel="stylesheet" href="{{ asset('public/styles1.css') }}">
+
 @section('content')
 
 <div class="side-bar" style="background-color: rgba(180, 212, 255, 0.5); display: flex; justify-content: center; align-items: center; flex-direction: column; position: fixed; top: 0px; left: 0px; width: calc(100vw - 1000px); height: 100vh;"> 
     <div>
-        <h1 style="line-height: 1.1; font-size: 100px; position:relative; font-weight: bold; color: white; padding: 0 110px 10px 110px;"> Customize your pet based on your preferences
+        <h1 class="main-title"> Customize your pet based on your preferences
         </h1>
     </div>
     <div><img src="assets/img2/login_icon.png" alt="Login Icon" style="width: 300px;"></div>
