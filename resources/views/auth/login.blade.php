@@ -13,7 +13,7 @@
     <div><img src="assets/img2/login_icon.png" alt="Login Icon" style="width: 300px;"></div>
 </div>
 
-<div class="background-wrapper" style="background-color: rgba(180, 212, 255, 0.5); position: fixed; z-index: 0; top: 0; right: 0; bottom: 0; width: 1000px; height: 100vh;">
+<div class="background-wrapper">
 
     <div class="card card-md" style="padding: 50px; height: 100vh; border-radius: 70px 0 0 70px; align-items: center; justify-content: center;">
         <div class="card-body">

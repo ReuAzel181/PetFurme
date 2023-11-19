@@ -28,3 +28,14 @@
     width: calc(100vw - 1000px); 
     height: 100vh;
 }
+
+.background-wrapper{
+    background-color: rgba(180, 212, 255, 0.5); 
+    position: fixed; 
+    z-index: 0; 
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    width: 1000px; 
+    height: 100vh;
+}
