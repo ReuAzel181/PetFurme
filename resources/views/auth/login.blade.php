@@ -5,7 +5,7 @@
 
 @section('content')
 
-<div class="side-bar" style="background-color: rgba(180, 212, 255, 0.5); display: flex; justify-content: center; align-items: center; flex-direction: column; position: fixed; top: 0px; left: 0px; width: calc(100vw - 1000px); height: 100vh;"> 
+<div class="side-bar"> 
     <div>
         <h1 class="main-title"> Customize your pet based on your preferences
         </h1>

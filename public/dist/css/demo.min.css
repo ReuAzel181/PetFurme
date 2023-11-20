@@ -17,3 +17,14 @@
     padding: 10px 110px 10px 110px;
     margin-bottom: 0px;
 }
+
+.side-bar{
+    background-color: rgba(180, 212, 255, 0.5); 
+    display: flex; justify-content: center; 
+    align-items: center; 
+    flex-direction: column; 
+    position: fixed; 
+    top: 0px; left: 0px; 
+    width: calc(100vw - 1000px); 
+    height: 100vh;
+}
