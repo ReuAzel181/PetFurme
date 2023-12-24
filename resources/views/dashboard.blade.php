@@ -348,25 +348,27 @@
                     <div class="card-body" style="height: 300px;">
                         <div class="card" style="width: 100%;">
                             <div class="row">
-                                <div class="col">
-                                    <div>
+                                
+                                <div class="col" id="date">
+                                    <div class="col" id="date">
                                         <a href="#">Appointments</a>
                                     </div>    
-                               
                                 </div>
-                                <div class="col" style="display: flex;">
-                                    <p>From</p>
+
+                                <div class="col" id="date">
+                                    <p class="fromTo">From</p>
                                     <div class="input-group">
                                         <input type="date" name="from_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
                                     </div>
-                                    
                                 </div>
-                                <div class="col" style="display: flex;">
-                                    <p>To</p>
+
+                                <div class="col" id="date">
+                                    <p class="fromTo">To</p>
                                     <div class="input-group">
                                         <input type="date" name="to_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
                                     </div>
                                 </div>
+
                             </div>
                             </div>
                             </div>
