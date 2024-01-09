@@ -358,7 +358,7 @@
                                     </div>
                                     
                                 </div>
-                                <div class="col">
+                                <div class="col" style="display: flex;">
                                     <p>To</p>
                                     <input type="date" name="to_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
                                 </div>
