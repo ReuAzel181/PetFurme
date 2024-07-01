@@ -39,3 +39,11 @@
     width: 1000px; 
     height: 100vh;
 }
+
+.card.card-md{
+    padding: 50px; 
+    height: 100vh; 
+    border-radius: 70px 0 0 70px; 
+    align-items: center; 
+    justify-content: center;
+}

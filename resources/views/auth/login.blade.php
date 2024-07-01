@@ -15,7 +15,7 @@
 
 <div class="background-wrapper">
 
-    <div class="card card-md" style="padding: 50px; height: 100vh; border-radius: 70px 0 0 70px; align-items: center; justify-content: center;">
+    <div class="card card-md">
         <div class="card-body">
             <h2 class="h2 text-center mb-4">
                 Login to your account
