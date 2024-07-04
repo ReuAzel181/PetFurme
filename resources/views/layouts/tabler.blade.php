@@ -243,8 +243,8 @@
                                     </a>
                                 </li>
 
-                                {{-- 
-                                PAG MAY LAMAN NA YUNG NOTIF!!!
+
+                               
 
                                 <li class="nav-item {{ request()->is('notification*') ? 'active' : null }}">
                                     <a class="nav-link" href="{{ route('notification') }}">
@@ -265,8 +265,9 @@
                                         </span>
                                     </a>
                                 </li>
-                                --}}
-
+                                
+                                {{-- 
+                                    PAG MAY LAMAN NA YUNG NOTIF!!!
                                 <li class="nav-item">
                                     <a class="nav-link" href="#" onclick="return false;">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -281,7 +282,7 @@
                                         </span>
                                     </a>
                                 </li>
-
+                                --}}
 
                                 {{--   MESSAGES & APPOINTMENTS NO routes/web.php && Http/Controllers  --}}
                                 <li class="nav-item">
