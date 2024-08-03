@@ -194,9 +194,7 @@
             </div>
           </div>
         </div>
-      </section>
-    </main>
-    <div class="reminder-recent-activities">
+        <div class="reminder-recent-activities">
       <div class="reminder-parent">
         <h1 class="reminder">REMINDER</h1>
         <div class="reminders-content">
@@ -257,6 +255,9 @@
         <RABOX />
       </div>
     </div>
+      </section>
+    </main>
+    
   </div>
 </template>
 <script lang="ts">
@@ -1069,7 +1070,7 @@ export default defineComponent({
   color: #b3b3b3;
 }
 .graph-f {
-  height: 521px;
+
   flex: 1;
   box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.1);
   border-radius: var(--br-xl);
@@ -1427,7 +1428,7 @@ export default defineComponent({
   height: 1080px;
   position: relative;
   background-color: var(--color-whitesmoke-100);
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -1452,8 +1453,6 @@ export default defineComponent({
 
   .frame-main {
     height: auto;
-    padding-left: var(--padding-xl);
-    padding-right: var(--padding-xl);
     box-sizing: border-box;
   }
 

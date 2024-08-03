@@ -221,6 +221,7 @@ export default defineComponent({
 .navbar {
   position: absolute;
   top: 0px;
+  height: 100vh;
   left: 0px;
   background-color: var(--color-darkslategray);
   width: 327px;

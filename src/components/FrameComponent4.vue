@@ -232,6 +232,7 @@ export default defineComponent({
   position: absolute;
   top: 0px;
   left: 0px;
+  height: 100vh;
   background-color: var(--color-darkslategray);
   width: 327px;
   display: flex;

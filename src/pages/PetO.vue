@@ -44,6 +44,7 @@ export default defineComponent({
   max-width: 100%;
 }
 .dashboard-content-parent {
+  height: 100vh;
   align-self: stretch;
   display: flex;
   flex-direction: row;
@@ -73,7 +74,6 @@ export default defineComponent({
 }
 .peto {
   width: 100%;
-  height: 1080px;
   position: relative;
   background-color: var(--color-whitesmoke-100);
   overflow: hidden;

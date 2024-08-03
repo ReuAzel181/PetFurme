@@ -534,7 +534,7 @@ export default defineComponent({
 }
 .a-up {
   width: 100%;
-  height: 1080px;
+  height: 100vh;
   position: relative;
   background-color: var(--color-whitesmoke-100);
   overflow: hidden;

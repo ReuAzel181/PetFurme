@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="menu-options1">
-      <div class="notification2" @click="onAppointmentTextClick">
+      <div class="notification2" @click="onAppointmentTextClick">S
         Appointment
       </div>
     </div>
@@ -249,6 +249,7 @@ export default defineComponent({
   z-index: 1;
 }
 .navigation {
+  height: 100vh;
   width: 327px;
   background-color: var(--color-darkslategray);
   display: flex;

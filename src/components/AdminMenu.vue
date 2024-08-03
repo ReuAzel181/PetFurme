@@ -184,6 +184,7 @@ export default defineComponent({
 }
 .admin-menu {
   width: 327px;
+  height: 100vh;
   background-color: var(--color-darkslategray);
   display: flex;
   flex-direction: column;

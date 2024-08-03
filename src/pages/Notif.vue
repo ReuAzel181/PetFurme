@@ -208,7 +208,7 @@
                                 src="/mdicalendarcheck.svg"
                               />
                               <div class="frame-wrapper4">
-                                <div class="lobotomize-for-fluffy-octo-parent">
+                                <div class="lobotomize  -for-fluffy-octo-parent">
                                   <h3 class="lobotomize-for-fluffy">
                                     Lobotomize for ‘Fluffy’ - October 2 - 2:25
                                     PM
@@ -1115,6 +1115,7 @@ export default defineComponent({
   height: 671px;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -1150,7 +1151,6 @@ export default defineComponent({
   flex-shrink: 0;
 }
 .pp-f {
-  height: 784px;
   flex: 1;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
   overflow-y: auto;
@@ -1174,14 +1174,14 @@ export default defineComponent({
   max-width: 100%;
 }
 .navigation-items {
-  width: 1571px;
+  flex: 1;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   justify-content: flex-end;
   padding: 0px var(--padding-24xl);
   box-sizing: border-box;
-  max-width: 100%;
+  max-width: calc(100% - 327px);
   flex-shrink: 0;
   text-align: left;
   font-size: var(--font-size-11xl);
@@ -1189,14 +1189,12 @@ export default defineComponent({
   font-family: var(--font-inter);
 }
 .header-group {
-  position: absolute;
-  top: 0px;
+  position: relative;
   left: 327px;
-  width: 1593px;
   height: 1080px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: flex-start;
   padding: 0px 0px var(--padding-901xl);
   box-sizing: border-box;
@@ -1251,7 +1249,7 @@ export default defineComponent({
 }
 .notif {
   width: 100%;
-  height: 1080px;
+  height: 100vh;
   position: relative;
   background-color: var(--color-whitesmoke-100);
   overflow: hidden;

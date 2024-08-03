@@ -12,7 +12,7 @@
         <a class="dashboard" @click="onDashboardTextClick">Dashboard</a>
       </div>
       <div class="dashboard-wrapper">
-        <div class="notification" @click="onNotificationTextClick">
+        <div class="notification" @click="onNotificationTextClick"> 
           Notification
         </div>
       </div>

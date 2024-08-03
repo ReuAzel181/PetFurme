@@ -175,6 +175,7 @@ export default defineComponent({
   z-index: 1;
 }
 .dashboard-content {
+  height: 100vh;
   width: 327px;
   background-color: var(--color-darkslategray);
   display: flex;

@@ -531,7 +531,7 @@ export default defineComponent({
 }
 .scroll-m {
   align-self: stretch;
-  height: 792px;
+  height: 100%;
   overflow-y: auto;
   flex-shrink: 0;
   display: flex;
@@ -1083,6 +1083,7 @@ export default defineComponent({
 }
 .mes {
   width: 100%;
+  height: 100vh;
   position: relative;
   background-color: var(--color-whitesmoke-100);
   overflow: hidden;

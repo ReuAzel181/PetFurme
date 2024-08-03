@@ -244,6 +244,9 @@ export default defineComponent({
 }
 .rectangle-parent20 {
   width: 327px;
+  position: relative;
+  height: 100vh;
+  left: 0px;
   background-color: var(--color-darkslategray);
   display: flex;
   flex-direction: column;

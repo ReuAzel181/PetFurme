@@ -855,13 +855,12 @@ export default defineComponent({
   justify-content: flex-start;
   padding: var(--padding-24xl) var(--padding-83xl) var(--padding-1194xl) 0px;
   box-sizing: border-box;
-  gap: var(--gap-96xl);
   max-width: 100%;
 }
 .pet-l-s-2 {
   align-self: stretch;
-  height: 766px;
-  overflow-y: auto;
+  height: 100vh;
+  overflow-y: visible;
   flex-shrink: 0;
   display: flex;
   flex-direction: row;

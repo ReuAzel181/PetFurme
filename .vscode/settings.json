@@ -1,0 +1,14 @@
+{
+  "locofyConfig": {
+    "project": "PetFurMeTest2",
+    "id": "66adc73c617e4f227cb0e88f",
+    "framework": "vue",
+    "typescript": false,
+    "styling": "CSS",
+    "unit": "px",
+    "naming": "Pascal Case",
+    "path": "public/",
+    "componentsPath": "e:\\PetFurMeTest\\src\\components",
+    "screensPath": "e:\\PetFurMeTest\\src\\pages"
+  }
+}
