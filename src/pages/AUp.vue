@@ -517,7 +517,7 @@ export default defineComponent({
   position: absolute;
   top: 0px;
   left: 327px;
-  width: 1593px;
+  width: 100vh;
   height: 1080px;
   display: flex;
   flex-direction: column;

@@ -265,6 +265,7 @@ export default defineComponent({
   z-index: 2;
 }
 .rectangle-parent {
+  height: 100vh;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -296,7 +297,7 @@ export default defineComponent({
   position: absolute;
   top: 0px;
   left: 327px;
-  width: 1593px;
+  max-width: calc(100% - 327px);
   height: 1080px;
   display: flex;
   flex-direction: column;
@@ -305,11 +306,11 @@ export default defineComponent({
   padding: 0px 0px 617px;
   box-sizing: border-box;
   gap: var(--gap-12xs);
-  max-width: 100%;
+
 }
 .prod {
   width: 100%;
-  height: 1080px;
+  height: 100vh;
   position: relative;
   background-color: var(--color-whitesmoke-100);
   overflow: hidden;

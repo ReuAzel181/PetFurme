@@ -431,6 +431,7 @@ export default defineComponent({
     var(--padding-26xl);
   box-sizing: border-box;
   flex-shrink: 0;
+  width: calc(100% - 327px);
   max-width: 100%;
   gap: var(--gap-xl);
   text-align: left;
@@ -1112,7 +1113,7 @@ export default defineComponent({
   margin-top: -723px;
 }
 .today-notifications {
-  height: 671px;
+  height: 100vh;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -1181,7 +1182,8 @@ export default defineComponent({
   justify-content: flex-end;
   padding: 0px var(--padding-24xl);
   box-sizing: border-box;
-  max-width: calc(100% - 327px);
+  max-width: 100%;
+  width: calc(100% - 327px);
   flex-shrink: 0;
   text-align: left;
   font-size: var(--font-size-11xl);
@@ -1191,7 +1193,7 @@ export default defineComponent({
 .header-group {
   position: relative;
   left: 327px;
-  height: 1080px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

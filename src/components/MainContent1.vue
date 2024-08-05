@@ -295,6 +295,7 @@ export default defineComponent({
   align-items: flex-start;
   justify-content: flex-start;
   max-width: 100%;
+  width: calc(100% - 328);
 }
 .main-content1 {
   width: 1571px;

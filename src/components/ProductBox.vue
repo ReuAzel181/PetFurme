@@ -1633,7 +1633,7 @@ export default defineComponent({
   box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.1);
   border-radius: 0px 0px var(--br-xl) var(--br-xl);
   background-color: var(--theme-white-default);
-  overflow-y: auto;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

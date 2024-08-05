@@ -1105,7 +1105,7 @@ export default defineComponent({
   align-items: flex-start;
   justify-content: flex-start;
   gap: 46.8px;
-  max-width: calc(100% - 327px);
+  width: calc(100% - 327px);
   flex-shrink: 0;
   text-align: center;
   font-size: var(--font-size-xl);

@@ -219,6 +219,7 @@ export default defineComponent({
   left: 0px;
   background-color: var(--color-darkslategray);
   width: 327px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
