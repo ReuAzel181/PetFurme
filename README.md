@@ -29,6 +29,10 @@ Made with Laravel 10, Codeigniter and MySql.
   - Admin and sub-admin roles
   - Manage user access and permissions
 
+## Environemt & Dependencies
+  - Composer
+  - Node.js
+
 ## List of Installed Packages
     - @tabler/core@1.0.0-beta20
     - autoprefixer@10.4.16
