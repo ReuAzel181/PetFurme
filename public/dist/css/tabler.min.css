@@ -27953,7 +27953,18 @@ img {
     --bs-bg-opacity: 1;
     background-color: rgba(187, 88, 205, var(--bs-bg-opacity)) !important;
   }
-  
+
+.bg-lemon {
+    --bs-bg-opacity: 1;
+    background-color: rgba(236, 228, 34, var(--bs-bg-opacity)) !important;
+}
+
+
+.bg-crimson {
+    --bs-bg-opacity: 1;
+    background-color: rgba(238, 83, 79, var(--bs-bg-opacity)) !important;
+}
+
 
 .bg-facebook {
     --tblr-bg-opacity: 1;

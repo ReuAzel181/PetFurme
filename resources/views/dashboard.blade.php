@@ -242,7 +242,7 @@
                                     <div class="row align-items-center">
                                         <div class="col-auto">
                                             <span
-                                                class="bg-orchid text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                                class="bg-crimson text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
                                                 <img src="assets/img2/apmt_icon.png" alt="Appointment Icon"
                                                     class="icon icon-tabler icon-tabler-files" width="24" height="24"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
@@ -277,7 +277,7 @@
                                     <div class="row align-items-center">
                                         <div class="col-auto">
                                             <span
-                                                class="bg-orchid text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                                class="bg-lemon text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
                                                 <img src="assets/img2/aprvl_icon.png" alt="Approval Icon"
                                                     class="icon icon-tabler icon-tabler-files" width="24" height="24"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
@@ -456,8 +456,26 @@
 
                     </div>
                 </div>
+                <div class="col-13">
+                    <div class="row row-cards">
+                        <div class="col-sm-6 col-lg-3">
+                        </div>
+                    </div>
+                </div>
 
                 
+            </div>
+        </div>
+
+        <div class="container-xl">
+            <div class="row row-deck row-cards">
+                <div class="card">
+                    <div class="card-body" style="height: 300px;">
+                        <div class="card" style="width: 30%;">
+                            <a href="#">Appoinments</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

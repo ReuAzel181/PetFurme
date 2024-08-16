@@ -239,459 +239,465 @@
             </div>
         </header>
 
-        <header class="navbar-expand-md">
-            <div class="collapse navbar-collapse" id="navbar-menu">
-                <div class="navbar" style="padding-bottom: 0px; padding-top: 0px; height: calc(100vh - 3.5rem);">
-                    <div class="container-xl" style="background-color: #3A4652; padding: 0px;">
-                        <ul class="navbar-nav" style="margin: 0; position: relative; left: 70px;">
+        <div class="content-sd">
 
-                            <li class="nav-header">MAIN</li>
+            <header class="navbar-expand-md">
+                <div class="collapse navbar-collapse" id="navbar-menu">
+                    <div class="navbar" style="padding-bottom: 0px; padding-top: 0px; height: calc(100vh - 3.5rem);">
+                        <div class="container-xl" style="background-color: #3A4652; padding: 0px;">
+                            <ul class="navbar-nav" style="margin: 0; position: relative; left: 70px; padding-top: 50px">
 
-                            <li class="nav-item {{ request()->is('dashboard*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('dashboard') }}">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
-                                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-                                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Dashboard') }}
-                                    </span>
-                                </a>
-                            </li>
+                                <li class="nav-header">MAIN</li>
 
-                            {{-- 
-                            PAG MAY LAMAN NA YUNG NOTIF!!!
-
-                            <li class="nav-item {{ request()->is('notification*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('notification') }}">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
-                                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-                                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        {{ __('Notification') }}
-                                    </span>
-                                </a>
-                            </li>
-                            --}}
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="return false;">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Bell Icon SVG -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Notifications') }}
-                                    </span>
-                                </a>
-                            </li>
-
-
-                            {{--   MESSAGES & APPOINTMENTS NO routes/web.php && Http/Controllers  --}}
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="return false;">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Bell Icon SVG -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        {{ __('Messages') }}
-                                    </span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="return false;">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Bell Icon SVG -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Appointmens') }}
-                                    </span>
-                                </a>
-                            </li>
-
-                            <li class="nav-header">ADMINISTRATION</li>
-
-
-
-                            {{--   USER MANAGEMENT & PETS NO routes/web.php && Http/Controllers  --}}
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">   
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Bell Icon SVG -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('User Management') }}
-                                    </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <div class="dropdown-menu-columns">
-                                        <div class="dropdown-menu-column">
-                                            <a class="dropdown-item" href="{{ route('orders.index') }}">
-                                                {{ __('Pet Owner') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('orders.complete') }}">
-                                                {{ __('Sub Admin') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="return false;">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Bell Icon SVG -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Pets') }}
-                                    </span>
-                                </a>
-                            </li>
-
-                            {{-- ETO MERON! --}}
-
-                            <li class="nav-item {{ request()->is('products*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('products.index') }}">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-packages" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M7 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
-                                            <path d="M2 13.5v5.5l5 3" />
-                                            <path d="M7 16.545l5 -3.03" />
-                                            <path d="M17 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
-                                            <path d="M12 19l5 3" />
-                                            <path d="M17 16.5l5 -3" />
-                                            <path d="M12 13.5v-5.5l-5 -3l5 -3l5 3v5.5" />
-                                            <path d="M7 5.03v5.455" />
-                                            <path d="M12 8l5 -3" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Products') }}
-                                    </span>
-                                </a>
-                            </li>
-
-
-                            <li class="nav-item dropdown {{ request()->is('orders*') ? 'active' : null }}">
-                                <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-package-export" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5" />
-                                            <path d="M12 12l8 -4.5" />
-                                            <path d="M12 12v9" />
-                                            <path d="M12 12l-8 -4.5" />
-                                            <path d="M15 18h7" />
-                                            <path d="M19 15l3 3l-3 3" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Orders') }}
-                                    </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <div class="dropdown-menu-columns">
-                                        <div class="dropdown-menu-column">
-                                            <a class="dropdown-item" href="{{ route('orders.index') }}">
-                                                {{ __('All') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('orders.complete') }}">
-                                                {{ __('Completed') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('orders.pending') }}">
-                                                {{ __('Pending') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('due.index') }}">
-                                                {{ __('Due') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-
-
-                            <li class="nav-item dropdown {{ request()->is('purchases*') ? 'active' : null }}">
-                                <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-package-import" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5" />
-                                            <path d="M12 12l8 -4.5" />
-                                            <path d="M12 12v9" />
-                                            <path d="M12 12l-8 -4.5" />
-                                            <path d="M22 18h-7" />
-                                            <path d="M18 15l-3 3l3 3" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Purchases') }}
-                                    </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <div class="dropdown-menu-columns">
-                                        <div class="dropdown-menu-column">
-                                            <a class="dropdown-item" href="{{ route('purchases.index') }}">
-                                                {{ __('All') }}
-                                            </a>
-                                            <a class="dropdown-item"
-                                                href="{{ route('purchases.approvedPurchases') }}">
-                                                {{ __('Approval') }}
-                                            </a>
-                                            <a class="dropdown-item"
-                                                href="{{ route('purchases.purchaseReport') }}">
-                                                {{ __('Daily Purchase Report') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-
-
-
-                            <li class="nav-item {{ request()->is('quotations*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('quotations.index') }}">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-file" width="24" height="24"
-                                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                            fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                            <path
-                                                d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Quotations') }}
-                                    </span>
-                                </a>
-                            </li>
-
-                            <li class="nav-header">REPORTS</li>
-
-
-                            {{--   SALES & APPOINTMENTS NO routes/web.php && Http/Controllers  --}}
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="return false;">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Bell Icon SVG -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        {{ __('Sales') }}
-                                    </span>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="return false;">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Bell Icon SVG -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        {{ __('Appointments') }}
-                                    </span>
-                                </a>
-                            </li>
-
-                            <li
-                                class="nav-item dropdown {{ request()->is('suppliers*', 'customers*') ? 'active' : null }}">
-                                <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-layers-subtract" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path
-                                                d="M8 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
-                                            <path d="M16 16v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-8a2 2 0 0 1 2 -2h2" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Pages') }}
-                                    </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <div class="dropdown-menu-columns">
-                                        <div class="dropdown-menu-column">
-                                            <a class="dropdown-item" href="{{ route('suppliers.index') }}">
-                                                {{ __('Suppliers') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('customers.index') }}">
-                                                {{ __('Customers') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-
-
-                            <li
-                                class="nav-item dropdown {{ request()->is('users*', 'categories*', 'units*') ? 'active' : null }}">
-                                <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-settings" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path
-                                                d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
-                                            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Settings') }}
-                                    </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    <div class="dropdown-menu-columns">
-                                        <div class="dropdown-menu-column">
-                                            {{-- <a class="dropdown-item" href="{{ route('users.index') }}">
-                                                    {{ __('Users') }}
-                                                </a> --}}
-                                            <a class="dropdown-item" href="{{ route('categories.index') }}">
-                                                {{ __('Categories') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('units.index') }}">
-                                                {{ __('Units') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-
-
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <div class="page-wrapper" style="position: relative; left: 400px; padding: 0 50px;">
-            <div style=" position:absolute; width: calc(100vw - 400px); padding: 0 50px; left: 0px;">
-                @yield('content')
-            </div>
-            <div style="position:absolute; background-color: #3A4652; top:30px">
-
-            </div>
-
-            {{-- <footer class="footer footer-transparent d-print-none">
-                <div class="container-xl">
-                    <div class="row text-center align-items-center flex-row-reverse">
-                        <div class="col-lg-auto ms-lg-auto">
-                            <ul class="list-inline list-inline-dots mb-0">
-                                <li class="list-inline-item"><a href="https://tabler.io/docs" target="_blank"
-                                        class="link-secondary" rel="noopener">Documentation</a></li>
-                                <li class="list-inline-item"><a href="" class="link-secondary">License</a>
-                                </li>
-                                <li class="list-inline-item"><a href="https://github.com/tabler/tabler"
-                                        target="_blank" class="link-secondary" rel="noopener">Source code</a></li>
-                                <li class="list-inline-item">
-                                    <a href="https://github.com/sponsors/codecalm" target="_blank"
-                                        class="link-secondary" rel="noopener">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/heart -->
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon text-pink icon-filled icon-inline" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path
-                                                d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-                                        </svg>
-                                        Sponsor
+                                <li class="nav-item {{ request()->is('dashboard*') ? 'active' : null }}">
+                                    <a class="nav-link" href="{{ route('dashboard') }}">
+                                        <span
+                                            class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                stroke="currentColor" fill="none" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                                                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                                                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Dashboard') }}
+                                        </span>
                                     </a>
                                 </li>
-                            </ul>
-                        </div>
-                        <div class="col-12 col-lg-auto mt-3 mt-lg-0">
-                            <ul class="list-inline list-inline-dots mb-0">
-                                <li class="list-inline-item">
-                                    Copyright &copy; {{ now()->year }}
-                                    <a href="." class="link-secondary">Tabler</a>.
-                                    All rights reserved.
-                                </li>
-                                <li class="list-inline-item">
-                                    <a href="./changelog.html" class="link-secondary" rel="noopener">
-                                        v1.0.0-beta19
+
+                                {{-- 
+                                PAG MAY LAMAN NA YUNG NOTIF!!!
+
+                                <li class="nav-item {{ request()->is('notification*') ? 'active' : null }}">
+                                    <a class="nav-link" href="{{ route('notification') }}">
+                                        <span
+                                            class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                stroke="currentColor" fill="none" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                                                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                                                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title">
+                                            {{ __('Notification') }}
+                                        </span>
                                     </a>
                                 </li>
+                                --}}
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="return false;">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <!-- Bell Icon SVG -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Notifications') }}
+                                        </span>
+                                    </a>
+                                </li>
+
+
+                                {{--   MESSAGES & APPOINTMENTS NO routes/web.php && Http/Controllers  --}}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="return false;">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <!-- Bell Icon SVG -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title">
+                                            {{ __('Messages') }}
+                                        </span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="return false;">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <!-- Bell Icon SVG -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Appointmens') }}
+                                        </span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-header">ADMINISTRATION</li>
+
+
+
+                                {{--   USER MANAGEMENT & PETS NO routes/web.php && Http/Controllers  --}}
+
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside" role="button" aria-expanded="false">   
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <!-- Bell Icon SVG -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('User Management') }}
+                                        </span>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-menu-columns">
+                                            <div class="dropdown-menu-column">
+                                                <a class="dropdown-item" href="{{ route('orders.index') }}">
+                                                    {{ __('Pet Owner') }}
+                                                </a>
+                                                <a class="dropdown-item" href="{{ route('orders.complete') }}">
+                                                    {{ __('Sub Admin') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="return false;">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <!-- Bell Icon SVG -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Pets') }}
+                                        </span>
+                                    </a>
+                                </li>
+
+                                {{-- ETO MERON! --}}
+
+                                <li class="nav-item {{ request()->is('products*') ? 'active' : null }}">
+                                    <a class="nav-link" href="{{ route('products.index') }}">
+                                        <span
+                                            class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="icon icon-tabler icon-tabler-packages" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                stroke="currentColor" fill="none" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M7 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
+                                                <path d="M2 13.5v5.5l5 3" />
+                                                <path d="M7 16.545l5 -3.03" />
+                                                <path d="M17 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
+                                                <path d="M12 19l5 3" />
+                                                <path d="M17 16.5l5 -3" />
+                                                <path d="M12 13.5v-5.5l-5 -3l5 -3l5 3v5.5" />
+                                                <path d="M7 5.03v5.455" />
+                                                <path d="M12 8l5 -3" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Products') }}
+                                        </span>
+                                    </a>
+                                </li>
+
+
+                                <li class="nav-item dropdown {{ request()->is('orders*') ? 'active' : null }}">
+                                    <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="icon icon-tabler icon-tabler-package-export" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                stroke="currentColor" fill="none" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5" />
+                                                <path d="M12 12l8 -4.5" />
+                                                <path d="M12 12v9" />
+                                                <path d="M12 12l-8 -4.5" />
+                                                <path d="M15 18h7" />
+                                                <path d="M19 15l3 3l-3 3" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Orders') }}
+                                        </span>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-menu-columns">
+                                            <div class="dropdown-menu-column">
+                                                <a class="dropdown-item" href="{{ route('orders.index') }}">
+                                                    {{ __('All') }}
+                                                </a>
+                                                <a class="dropdown-item" href="{{ route('orders.complete') }}">
+                                                    {{ __('Completed') }}
+                                                </a>
+                                                <a class="dropdown-item" href="{{ route('orders.pending') }}">
+                                                    {{ __('Pending') }}
+                                                </a>
+                                                <a class="dropdown-item" href="{{ route('due.index') }}">
+                                                    {{ __('Due') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+
+                                <li class="nav-item dropdown {{ request()->is('purchases*') ? 'active' : null }}">
+                                    <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="icon icon-tabler icon-tabler-package-import" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                stroke="currentColor" fill="none" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5" />
+                                                <path d="M12 12l8 -4.5" />
+                                                <path d="M12 12v9" />
+                                                <path d="M12 12l-8 -4.5" />
+                                                <path d="M22 18h-7" />
+                                                <path d="M18 15l-3 3l3 3" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Purchases') }}
+                                        </span>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-menu-columns">
+                                            <div class="dropdown-menu-column">
+                                                <a class="dropdown-item" href="{{ route('purchases.index') }}">
+                                                    {{ __('All') }}
+                                                </a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('purchases.approvedPurchases') }}">
+                                                    {{ __('Approval') }}
+                                                </a>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('purchases.purchaseReport') }}">
+                                                    {{ __('Daily Purchase Report') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+
+
+                                <li class="nav-item {{ request()->is('quotations*') ? 'active' : null }}">
+                                    <a class="nav-link" href="{{ route('quotations.index') }}">
+                                        <span
+                                            class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="icon icon-tabler icon-tabler-file" width="24" height="24"
+                                                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                <path
+                                                    d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Quotations') }}
+                                        </span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-header">REPORTS</li>
+
+
+                                {{--   SALES & APPOINTMENTS NO routes/web.php && Http/Controllers  --}}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="return false;">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <!-- Bell Icon SVG -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title">
+                                            {{ __('Sales') }}
+                                        </span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" onclick="return false;">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <!-- Bell Icon SVG -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title">
+                                            {{ __('Appointments') }}
+                                        </span>
+                                    </a>
+                                </li>
+
+                                <li
+                                    class="nav-item dropdown {{ request()->is('suppliers*', 'customers*') ? 'active' : null }}">
+                                    <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="icon icon-tabler icon-tabler-layers-subtract" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                stroke="currentColor" fill="none" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path
+                                                    d="M8 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
+                                                <path d="M16 16v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-8a2 2 0 0 1 2 -2h2" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Pages') }}
+                                        </span>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-menu-columns">
+                                            <div class="dropdown-menu-column">
+                                                <a class="dropdown-item" href="{{ route('suppliers.index') }}">
+                                                    {{ __('Suppliers') }}
+                                                </a>
+                                                <a class="dropdown-item" href="{{ route('customers.index') }}">
+                                                    {{ __('Customers') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+
+                                <li
+                                    class="nav-item dropdown {{ request()->is('users*', 'categories*', 'units*') ? 'active' : null }}">
+                                    <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="icon icon-tabler icon-tabler-settings" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                stroke="currentColor" fill="none" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path
+                                                    d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
+                                                <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title" style="z-index: 1;">
+                                            {{ __('Settings') }}
+                                        </span>
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-menu-columns">
+                                            <div class="dropdown-menu-column">
+                                                {{-- <a class="dropdown-item" href="{{ route('users.index') }}">
+                                                        {{ __('Users') }}
+                                                    </a> --}}
+                                                <a class="dropdown-item" href="{{ route('categories.index') }}">
+                                                    {{ __('Categories') }}
+                                                </a>
+                                                <a class="dropdown-item" href="{{ route('units.index') }}">
+                                                    {{ __('Units') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
                             </ul>
+
+
                         </div>
                     </div>
                 </div>
-            </footer> --}}
-        </div>
+            </header>
+
+            <div class="page-wrapper" style="position: relative; left: 400px; padding: 0 50px;">
+                <div style=" position:absolute; width: calc(100vw - 400px); padding: 0 50px; left: 0px;">
+                    @yield('content')
+                </div>
+                <div style="position:absolute; background-color: #3A4652; top:30px">
+
+                </div>
+
+                {{-- <footer class="footer footer-transparent d-print-none">
+                    <div class="container-xl">
+                        <div class="row text-center align-items-center flex-row-reverse">
+                            <div class="col-lg-auto ms-lg-auto">
+                                <ul class="list-inline list-inline-dots mb-0">
+                                    <li class="list-inline-item"><a href="https://tabler.io/docs" target="_blank"
+                                            class="link-secondary" rel="noopener">Documentation</a></li>
+                                    <li class="list-inline-item"><a href="" class="link-secondary">License</a>
+                                    </li>
+                                    <li class="list-inline-item"><a href="https://github.com/tabler/tabler"
+                                            target="_blank" class="link-secondary" rel="noopener">Source code</a></li>
+                                    <li class="list-inline-item">
+                                        <a href="https://github.com/sponsors/codecalm" target="_blank"
+                                            class="link-secondary" rel="noopener">
+                                            <!-- Download SVG icon from http://tabler-icons.io/i/heart -->
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="icon text-pink icon-filled icon-inline" width="24"
+                                                height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                stroke="currentColor" fill="none" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path
+                                                    d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+                                            </svg>
+                                            Sponsor
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+                                <ul class="list-inline list-inline-dots mb-0">
+                                    <li class="list-inline-item">
+                                        Copyright &copy; {{ now()->year }}
+                                        <a href="." class="link-secondary">Tabler</a>.
+                                        All rights reserved.
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <a href="./changelog.html" class="link-secondary" rel="noopener">
+                                            v1.0.0-beta19
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-xl">
+
+                    </div>
+                </footer> --}}
+            </div>
+        </div> {{-- contentsd --}}
     </div>
 
     <!-- Libs JS -->
