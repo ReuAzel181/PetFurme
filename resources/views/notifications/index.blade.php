@@ -1,8 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.tabler')
 
 @section('content')
-    <div class="container">
-        <h1>Notifications</h1>
-        <p>No notifications to display yet.</p>
+    <div class="page">
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="card">
+                </div>
+            </div>
+        </div>
     </div>
 @endsection

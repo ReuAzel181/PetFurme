@@ -33,6 +33,12 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+
+    // Route Notification <------
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
+});
+
 Route::get('php/', function () {
     return phpinfo();
 });
@@ -87,13 +93,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('products/export/', [ProductExportController::class, 'create'])->name('products.export.store');
     Route::resource('/products', ProductController::class);
 
-    // Route Notification <------
-    Route::get('/notification', function () {
-        return ''; // Empty response
-    })->name('notification');
-    
-    
-    //Route::get('/notification', [NotificationController::class, 'index'])->name('notification');
 
 
     // Route POS
