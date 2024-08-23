@@ -30,16 +30,16 @@ Made with Laravel 10, Codeigniter and MySql.
   - Manage user access and permissions
 
 ## List of Installed Packages
-├── @tabler/core@1.0.0-beta20
-├── autoprefixer@10.4.16
-├── axios@1.6.2
-├── js-beautify@1.15.1
-├── laravel-datatables-vite@0.5.2
-├── laravel-vite-plugin@0.7.8
-├── postcss@8.4.31
-├── tailwindcss@3.3.5
-├── vite-plugin-static-copy@0.17.1
-└── vite@4.5.3
+    - @tabler/core@1.0.0-beta20
+    - autoprefixer@10.4.16
+    - axios@1.6.2
+    - js-beautify@1.15.1
+    - laravel-datatables-vite@0.5.2
+    - laravel-vite-plugin@0.7.8
+    - postcss@8.4.31
+    - tailwindcss@3.3.5
+    - vite-plugin-static-copy@0.17.1
+    - vite@4.5.3
 
 ## 🚀 How to Use
 
