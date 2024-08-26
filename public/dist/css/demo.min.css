@@ -14,5 +14,6 @@
     position:relative; 
     font-weight: bold; 
     color: white; 
-    padding: 0 110px 10px 110px;
+    padding: 10px 110px 10px 110px;
+    margin-bottom: 0px;
 }
