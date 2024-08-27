@@ -265,6 +265,10 @@ body {
     -webkit-tap-highlight-color: transparent
 }
 
+.nav-link-title{
+    z-index: 1;
+}
+
 .hr,
 hr {
     margin: 2rem 0;

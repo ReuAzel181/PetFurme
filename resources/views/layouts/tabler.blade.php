@@ -237,7 +237,7 @@
                                                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
                                             </svg>
                                         </span>
-                                        <span class="nav-link-title" style="z-index: 1;">
+                                        <span class="nav-link-title">
                                             {{ __('Dashboard') }}
                                         </span>
                                     </a>
@@ -260,7 +260,7 @@
                                                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
                                             </svg>
                                         </span>
-                                        <span class="nav-link-title">
+                                        <span class="nav-link-title" style="z-index: 1">
                                             {{ __('Notification') }}
                                         </span>
                                     </a>
