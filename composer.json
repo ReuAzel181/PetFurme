@@ -16,7 +16,7 @@
         "laravolt/avatar": "^5.0",
         "livewire/livewire": "^3.1",
         "mimisk13/laravel-tabler": "^0.0.5",
-        "phpoffice/phpspreadsheet": "^1.28",
+        "phpoffice/phpspreadsheet": "^2.2",
         "picqer/php-barcode-generator": "^2.2",
         "power-components/livewire-powergrid": "^5.1",
         "rappasoft/laravel-livewire-tables": "^3.1",
