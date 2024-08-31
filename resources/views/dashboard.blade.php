@@ -351,13 +351,16 @@
                                 <div class="col">
                                     <a href="#">Appointments</a>
                                 </div>
-                                <div class="col">
+                                <div class="col" style="display: flex;">
                                     <p>From</p>
-                                    <input type="date" name="from_date" style="width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                                    <div class="input-group">
+                                        <input type="date" name="from_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
+                                    </div>
+                                    
                                 </div>
                                 <div class="col">
                                     <p>To</p>
-                                    <input type="date" name="to_date" style="width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                                    <input type="date" name="to_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
                                 </div>
                             </div>
                             </div>

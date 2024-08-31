@@ -332,6 +332,25 @@ p {
     margin-bottom: 1rem
 }
 
+.date-control {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.input-group {
+    padding: 10px;
+}
+
+/* Minimal Style */
+.date-control {
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+}
+
 abbr[title] {
     -webkit-text-decoration: underline dotted;
     text-decoration: underline dotted;
