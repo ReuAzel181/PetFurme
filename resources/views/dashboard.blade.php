@@ -349,7 +349,10 @@
                         <div class="card" style="width: 100%;">
                             <div class="row">
                                 <div class="col">
-                                    <a href="#">Appointments</a>
+                                    <div>
+                                        <a href="#">Appointments</a>
+                                    </div>    
+                               
                                 </div>
                                 <div class="col" style="display: flex;">
                                     <p>From</p>
