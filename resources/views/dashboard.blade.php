@@ -346,9 +346,24 @@
             <div class="row row-deck row-cards">
                 <div class="card">
                     <div class="card-body" style="height: 300px;">
-                        <div class="card" style="width: 30%;">
-                            <a href="#">Appoinments</a>
+                        <div class="card" style="width: 100%;">
+                            <div class="row">
+                                <div class="col">
+                                    <a href="#">Appointments</a>
+                                </div>
+                                <div class="col">
+                                    <p>From</p>
+                                    <input type="date" name="from_date" style="width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                                </div>
+                                <div class="col">
+                                    <p>To</p>
+                                    <input type="date" name="to_date" style="width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: 0.25rem;">
+                                </div>
+                            </div>
+                            </div>
+                            </div>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
