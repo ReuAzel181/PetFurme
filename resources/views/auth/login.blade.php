@@ -47,21 +47,21 @@
                         Password
                     </label>
 
-                    <div class="input-group input-group-flat">
-                        <input type="password"
-                            name="password"
-                            id="password"
-                            class="form-control @error('password') is-invalid @enderror"
-                            placeholder="Your password"
-                            autocomplete="off"
-                        >
+                    <!-- <div class="input-group input-group-flat"> -->
+                    <input type="password"
+                        name="password"
+                        id="password"
+                        class="form-control @error('password') is-invalid @enderror"
+                        placeholder="Your password"
+                        autocomplete="off"
+                    >
 
-                        @error('password')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
+                    @error('password')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                    <!-- </div> -->
                 </div>
 
                 <div class="mb-2">

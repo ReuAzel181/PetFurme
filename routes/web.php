@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MesController;
+use APP\Http\Controllers\PetController;
 
 use App\Http\Controllers\Dashboards\DashboardController;
 use App\Http\Controllers\InvoiceController;
@@ -42,10 +43,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
 });
 
-
  // Route Messages <------
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mes', [MesController::class, 'index'])->name('mes.index');
+});
+
+ // Route Pet <------
+ Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/pet', [MesController::class, 'index'])->name('pet.index');
 });
 
 Route::get('php/', function () {
