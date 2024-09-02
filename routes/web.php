@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MesController;
+use App\Http\Controllers\AppointController;
 use APP\Http\Controllers\PetController;
 
 use App\Http\Controllers\Dashboards\DashboardController;
@@ -47,6 +48,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mes', [MesController::class, 'index'])->name('mes.index');
 });
+
+ // Route Appointment <------
+ Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/appoint', [MesController::class, 'index'])->name('appoint.index');
+});
+
 
  // Route Pet <------
  Route::middleware(['auth', 'verified'])->group(function () {
