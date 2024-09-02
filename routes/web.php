@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MesController;
+
 use App\Http\Controllers\Dashboards\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Order\DueOrderController;
@@ -37,6 +40,12 @@ use Illuminate\Support\Facades\Auth;
     // Route Notification <------
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
+});
+
+
+ // Route Messages <------
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/mes', [MesController::class, 'index'])->name('mes.index');
 });
 
 Route::get('php/', function () {
