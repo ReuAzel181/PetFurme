@@ -10,5 +10,6 @@
     "path": "public/",
     "componentsPath": "e:\\PetFurMeTest\\src\\components",
     "screensPath": "e:\\PetFurMeTest\\src\\pages"
-  }
+  },
+  "git.ignoreLimitWarning": true
 }

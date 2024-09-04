@@ -1,0 +1,134 @@
+[2024-08-26 21:08:21] local.INFO: Detected N+1 Query  
+[2024-08-26 21:08:21] local.INFO: Model: App\Models\Product
+Relation: App\Models\Category
+Num-Called: 9
+Call-Stack:
+#19 \app\Livewire\Tables\ProductTable.php:41
+#20 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+#21 \vendor\laravel\framework\src\Illuminate\Container\Util.php:41
+#22 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:93
+#23 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+#24 \vendor\livewire\livewire\src\Wrapped.php:23
+#25 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:271
+#26 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:231
+#27 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:54
+#28 \vendor\livewire\livewire\src\LivewireManager.php:73
+#29 \storage\framework\views\d77e14ea48c6b1aa1a1a13d7880c53cb.php:61
+#31 \vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php:124
+#32 \vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php:58
+#33 \vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:22
+#34 \vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php:72
+#35 \vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:10
+#36 \vendor\laravel\framework\src\Illuminate\View\View.php:207
+#37 \vendor\laravel\framework\src\Illuminate\View\View.php:190
+#38 \vendor\laravel\framework\src\Illuminate\View\View.php:159
+#39 \vendor\laravel\framework\src\Illuminate\View\View.php:504
+#40 \vendor\spatie\backtrace\src\Arguments\Reducers\StringableArgumentReducer.php:19
+#41 \vendor\spatie\backtrace\src\Arguments\ReduceArgumentPayloadAction.php:21
+#42 \vendor\spatie\backtrace\src\Arguments\ReduceArgumentsAction.php:53
+#45 \vendor\spatie\backtrace\src\Backtrace.php:203
+#46 \vendor\spatie\backtrace\src\Backtrace.php:122
+#47 \vendor\spatie\flare-client-php\src\Report.php:330
+#48 \vendor\spatie\flare-client-php\src\Report.php:382
+#49 \vendor\spatie\ignition\src\ErrorPage\ErrorPageViewModel.php:90
+  
+[2024-08-26 21:08:21] local.INFO: Model: App\Models\Product
+Relation: App\Models\Unit
+Num-Called: 9
+Call-Stack:
+#19 \app\Livewire\Tables\ProductTable.php:41
+#20 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+#21 \vendor\laravel\framework\src\Illuminate\Container\Util.php:41
+#22 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:93
+#23 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+#24 \vendor\livewire\livewire\src\Wrapped.php:23
+#25 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:271
+#26 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:231
+#27 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:54
+#28 \vendor\livewire\livewire\src\LivewireManager.php:73
+#29 \storage\framework\views\d77e14ea48c6b1aa1a1a13d7880c53cb.php:61
+#31 \vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php:124
+#32 \vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php:58
+#33 \vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:22
+#34 \vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php:72
+#35 \vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:10
+#36 \vendor\laravel\framework\src\Illuminate\View\View.php:207
+#37 \vendor\laravel\framework\src\Illuminate\View\View.php:190
+#38 \vendor\laravel\framework\src\Illuminate\View\View.php:159
+#39 \vendor\laravel\framework\src\Illuminate\View\View.php:504
+#40 \vendor\spatie\backtrace\src\Arguments\Reducers\StringableArgumentReducer.php:19
+#41 \vendor\spatie\backtrace\src\Arguments\ReduceArgumentPayloadAction.php:21
+#42 \vendor\spatie\backtrace\src\Arguments\ReduceArgumentsAction.php:53
+#45 \vendor\spatie\backtrace\src\Backtrace.php:203
+#46 \vendor\spatie\backtrace\src\Backtrace.php:122
+#47 \vendor\spatie\flare-client-php\src\Report.php:330
+#48 \vendor\spatie\flare-client-php\src\Report.php:382
+#49 \vendor\spatie\ignition\src\ErrorPage\ErrorPageViewModel.php:90
+  
+[2024-08-26 21:09:01] local.INFO: Detected N+1 Query  
+[2024-08-26 21:09:01] local.INFO: Model: App\Models\Product
+Relation: App\Models\Category
+Num-Called: 9
+Call-Stack:
+#19 \app\Livewire\Tables\ProductTable.php:41
+#20 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+#21 \vendor\laravel\framework\src\Illuminate\Container\Util.php:41
+#22 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:93
+#23 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+#24 \vendor\livewire\livewire\src\Wrapped.php:23
+#25 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:271
+#26 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:231
+#27 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:54
+#28 \vendor\livewire\livewire\src\LivewireManager.php:73
+#29 \storage\framework\views\d77e14ea48c6b1aa1a1a13d7880c53cb.php:61
+#31 \vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php:124
+#32 \vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php:58
+#33 \vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:22
+#34 \vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php:72
+#35 \vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:10
+#36 \vendor\laravel\framework\src\Illuminate\View\View.php:207
+#37 \vendor\laravel\framework\src\Illuminate\View\View.php:190
+#38 \vendor\laravel\framework\src\Illuminate\View\View.php:159
+#39 \vendor\laravel\framework\src\Illuminate\View\View.php:504
+#40 \vendor\spatie\backtrace\src\Arguments\Reducers\StringableArgumentReducer.php:19
+#41 \vendor\spatie\backtrace\src\Arguments\ReduceArgumentPayloadAction.php:21
+#42 \vendor\spatie\backtrace\src\Arguments\ReduceArgumentsAction.php:53
+#45 \vendor\spatie\backtrace\src\Backtrace.php:203
+#46 \vendor\spatie\backtrace\src\Backtrace.php:122
+#47 \vendor\spatie\flare-client-php\src\Report.php:330
+#48 \vendor\spatie\flare-client-php\src\Report.php:382
+#49 \vendor\spatie\ignition\src\ErrorPage\ErrorPageViewModel.php:90
+  
+[2024-08-26 21:09:01] local.INFO: Model: App\Models\Product
+Relation: App\Models\Unit
+Num-Called: 9
+Call-Stack:
+#19 \app\Livewire\Tables\ProductTable.php:41
+#20 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:36
+#21 \vendor\laravel\framework\src\Illuminate\Container\Util.php:41
+#22 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:93
+#23 \vendor\laravel\framework\src\Illuminate\Container\BoundMethod.php:35
+#24 \vendor\livewire\livewire\src\Wrapped.php:23
+#25 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:271
+#26 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:231
+#27 \vendor\livewire\livewire\src\Mechanisms\HandleComponents\HandleComponents.php:54
+#28 \vendor\livewire\livewire\src\LivewireManager.php:73
+#29 \storage\framework\views\d77e14ea48c6b1aa1a1a13d7880c53cb.php:61
+#31 \vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php:124
+#32 \vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php:58
+#33 \vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:22
+#34 \vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php:72
+#35 \vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php:10
+#36 \vendor\laravel\framework\src\Illuminate\View\View.php:207
+#37 \vendor\laravel\framework\src\Illuminate\View\View.php:190
+#38 \vendor\laravel\framework\src\Illuminate\View\View.php:159
+#39 \vendor\laravel\framework\src\Illuminate\View\View.php:504
+#40 \vendor\spatie\backtrace\src\Arguments\Reducers\StringableArgumentReducer.php:19
+#41 \vendor\spatie\backtrace\src\Arguments\ReduceArgumentPayloadAction.php:21
+#42 \vendor\spatie\backtrace\src\Arguments\ReduceArgumentsAction.php:53
+#45 \vendor\spatie\backtrace\src\Backtrace.php:203
+#46 \vendor\spatie\backtrace\src\Backtrace.php:122
+#47 \vendor\spatie\flare-client-php\src\Report.php:330
+#48 \vendor\spatie\flare-client-php\src\Report.php:382
+#49 \vendor\spatie\ignition\src\ErrorPage\ErrorPageViewModel.php:90
+  
