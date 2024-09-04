@@ -7,7 +7,7 @@
 
 <div class="side-bar"> 
     <div class="main-title">
-        <h1 class="main-title text"> Customize your pet based on your preferences
+        <h1 class="main-title text"> Customize your pet base on your preferences
         </h1>
     </div>
     <div><img src="assets/img2/login_icon.png" alt="Login Icon" style="width: 300px;"></div>
