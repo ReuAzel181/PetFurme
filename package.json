@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "petfurmetest2",
   "version": "0.1.0",
   "private": true,
@@ -20,4 +21,26 @@
   "main": "index.js",
   "author": "",
   "license": "ISC"
+=======
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "start": "vite preview"
+    },
+    "devDependencies": {
+        "@tabler/core": "^1.0.0-beta20",
+        "autoprefixer": "^10.4.2",
+        "axios": "^1.1.2",
+        "js-beautify": "^1.15.1",
+        "laravel-vite-plugin": "^0.7.2",
+        "postcss": "^8.4.6",
+        "tailwindcss": "^3.1.0",
+        "vite": "^4.0.0",
+        "vite-plugin-static-copy": "^0.17.0"
+    },
+    "dependencies": {
+        "laravel-datatables-vite": "^0.5.2"
+    }
+>>>>>>> main
 }

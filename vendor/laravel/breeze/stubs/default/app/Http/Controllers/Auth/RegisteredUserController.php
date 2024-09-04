@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+<<<<<<< HEAD:vendor/laravel/breeze/stubs/default/app/Http/Controllers/Auth/RegisteredUserController.php
+=======
+use Illuminate\Support\Str;
+
+>>>>>>> main:app/Http/Controllers/Auth/RegisteredUserController.php
 
 class RegisteredUserController extends Controller
 {

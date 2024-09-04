@@ -42,6 +42,7 @@
     <div class="page-body">
         <div class="container-xl">
             <div class="row row-deck row-cards">
+<<<<<<< HEAD:vendor/mimisk13/laravel-tabler/stubs/default/resources/views/dashboard.blade.php
                 <div class="col-sm-6 col-lg-3">
                     <div class="card">
                         <div class="card-body">
@@ -163,18 +164,190 @@
                         </div>
                     </div>
                 </div>
+=======
+
+                <!-- COMMENT MULA DITO -->
+                <!-- DELETED COMMENT #1 -->
+                <!-- COMMENT HANGGANG DITO -->
+
+                <!-- PETS -->
+>>>>>>> main:resources/views/dashboard.blade.php
 
                 {{---
                 <div class="col-12">
                     <div class="row row-cards">
+
                         <div class="col-sm-6 col-lg-3">
                             <div class="card card-sm">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
+                                            <span
+                                                class="bg-violet text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                                <img src="assets/img2/pet_icon.png" alt="Pet Icon"
+                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
+                                                    <path
+                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
+                                                    <path
+                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="font-weight-medium">
+                                                {{ $quotations }} Pets
+                                            </div>
+                                            <div class="text-muted">
+                                                {{ $todayQuotations }} today
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PET OWNERS -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span
+                                                class="bg-orchid text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                                <img src="assets/img2/user_icon.png" alt="Pet Owner Icon"
+                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
+                                                    <path
+                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
+                                                    <path
+                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="font-weight-medium">
+                                                {{ $quotations }} Pet Owners
+                                            </div>
+                                            <div class="text-muted">
+                                                {{ $todayQuotations }} today
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- APPOINTMENTS -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span
+                                                class="bg-crimson text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                                <img src="assets/img2/apmt_icon.png" alt="Appointment Icon"
+                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
+                                                    <path
+                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
+                                                    <path
+                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="font-weight-medium">
+                                                {{ $quotations }} Appointments
+                                            </div>
+                                            <div class="text-muted">
+                                                {{ $todayQuotations }} today
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- APPROVALS -->
+
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <span
+                                                class="bg-lemon text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                                <img src="assets/img2/aprvl_icon.png" alt="Approval Icon"
+                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
+                                                    <path
+                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
+                                                    <path
+                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <div class="col">
+                                            <div class="font-weight-medium">
+                                                {{ $quotations }} Approvals
+                                            </div>
+                                            <div class="text-muted">
+                                                {{ $todayQuotations }} today
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- PRODUCTS -->
+                    
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="card card-sm">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+<<<<<<< HEAD:vendor/mimisk13/laravel-tabler/stubs/default/resources/views/dashboard.blade.php
                                     <span class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16.7 8a3 3 0 0 0 -2.7 -2h-4a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-4a3 3 0 0 1 -2.7 -2" /><path d="M12 3v3m0 12v3" /></svg>
                                     </span>
+=======
+                                            <span
+                                                class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
+                                                <img src="assets/img2/shop_icon.png" alt="Products Icon"
+                                                    class="icon icon-tabler icon-tabler-packages" width="24"
+                                                    height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                    stroke="currentColor" fill="none" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M7 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
+                                                    <path d="M2 13.5v5.5l5 3" />
+                                                    <path d="M7 16.545l5 -3.03" />
+                                                    <path d="M17 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
+                                                    <path d="M12 19l5 3" />
+                                                    <path d="M17 16.5l5 -3" />
+                                                    <path d="M12 13.5v-5.5l-5 -3l5 -3l5 3v5.5" />
+                                                    <path d="M7 5.03v5.455" />
+                                                    <path d="M12 8l5 -3" />
+                                                </svg>
+                                            </span>
+>>>>>>> main:resources/views/dashboard.blade.php
                                         </div>
                                         <div class="col">
                                             <div class="font-weight-medium">
@@ -188,6 +361,11 @@
                                 </div>
                             </div>
                         </div>
+
+                        
+
+                        <!-- ORDERS -->
+
                         <div class="col-sm-6 col-lg-3">
                             <div class="card card-sm">
                                 <div class="card-body">
@@ -209,6 +387,9 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- PURCHASES -->
+
                         <div class="col-sm-6 col-lg-3">
                             <div class="card card-sm">
                                 <div class="card-body">
@@ -230,6 +411,9 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- QUOTATIONS -->
+
                         <div class="col-sm-6 col-lg-3">
                             <div class="card card-sm">
                                 <div class="card-body">
@@ -251,10 +435,21 @@
                                 </div>
                             </div>
                         </div>
+
+                        
+
+
+                    </div>
+                </div>
+                <div class="col-13">
+                    <div class="row row-cards">
+                        <div class="col-sm-6 col-lg-3">
+                        </div>
                     </div>
                 </div>
                 ---}}
 
+<<<<<<< HEAD:vendor/mimisk13/laravel-tabler/stubs/default/resources/views/dashboard.blade.php
                 {{---
                 <div class="col-lg-6">
                     <div class="card">
@@ -271,303 +466,47 @@
                             <div class="ratio ratio-21x9">
                                 <div>
                                     <div id="map-world" class="w-100 h-100"></div>
+=======
+                
+            </div>
+        </div>
+
+        <div class="container-xl">
+            <div class="row row-deck row-cards">
+                <div class="card">
+                    <div class="card-body" style="height: 300px;">
+                        <div class="card" style="width: 100%;">
+                            <div class="row">
+                                
+                                <div class="col" id="date">
+                                    <div class="col" id="date">
+                                        <a href="#">Appointments</a>
+                                    </div>    
+>>>>>>> main:resources/views/dashboard.blade.php
                                 </div>
+
+                                <div class="col" id="date">
+                                    <p class="fromTo">From</p>
+                                    <div class="input-group">
+                                        <input type="date" name="from_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
+                                    </div>
+                                </div>
+
+                                <div class="col" id="date">
+                                    <p class="fromTo">To</p>
+                                    <div class="input-group">
+                                        <input type="date" name="to_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
+                                    </div>
+                                </div>
+
+                            </div>
+                            </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="row row-cards">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <p class="mb-3">Using Storage <strong>6854.45 MB </strong>of 8 GB</p>
-                                    <div class="progress progress-separated mb-3">
-                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 44%" aria-label="Regular"></div>
-                                        <div class="progress-bar bg-info" role="progressbar" style="width: 19%" aria-label="System"></div>
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 9%" aria-label="Shared"></div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-auto d-flex align-items-center pe-2">
-                                            <span class="legend me-2 bg-primary"></span>
-                                            <span>Regular</span>
-                                            <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">915MB</span>
-                                        </div>
-                                        <div class="col-auto d-flex align-items-center px-2">
-                                            <span class="legend me-2 bg-info"></span>
-                                            <span>System</span>
-                                            <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">415MB</span>
-                                        </div>
-                                        <div class="col-auto d-flex align-items-center px-2">
-                                            <span class="legend me-2 bg-success"></span>
-                                            <span>Shared</span>
-                                            <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">201MB</span>
-                                        </div>
-                                        <div class="col-auto d-flex align-items-center ps-2">
-                                            <span class="legend me-2"></span>
-                                            <span>Free</span>
-                                            <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">612MB</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="card" style="height: 28rem">
-                                <div class="card-body card-body-scrollable card-body-scrollable-shadow">
-                                    <div class="divide-y">
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar">JL</span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Jeffie Lewzey</strong> commented on your <strong>"I'm not a witch."</strong> post.
-                                                    </div>
-                                                    <div class="text-muted">yesterday</div>
-                                                </div>
-                                                <div class="col-auto align-self-center">
-                                                    <div class="badge bg-primary"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url({{ asset('static/avatars/002m.jpg') }})"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        It's <strong>Mallory Hulme</strong>'s birthday. Wish him well!
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                                <div class="col-auto align-self-center">
-                                                    <div class="badge bg-primary"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/003m.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Dunn Slane</strong> posted <strong>"Well, what do you want?"</strong>.
-                                                    </div>
-                                                    <div class="text-muted">today</div>
-                                                </div>
-                                                <div class="col-auto align-self-center">
-                                                    <div class="badge bg-primary"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/000f.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Emmy Levet</strong> created a new project <strong>Morning alarm clock</strong>.
-                                                    </div>
-                                                    <div class="text-muted">4 days ago</div>
-                                                </div>
-                                                <div class="col-auto align-self-center">
-                                                    <div class="badge bg-primary"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/001f.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Maryjo Lebarree</strong> liked your photo.
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar">EP</span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Egan Poetz</strong> registered new client as <strong>Trilia</strong>.
-                                                    </div>
-                                                    <div class="text-muted">yesterday</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/002f.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Kellie Skingley</strong> closed a new deal on project <strong>Pen Pineapple Apple Pen</strong>.
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/003f.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Christabel Charlwood</strong> created a new project for <strong>Wikibox</strong>.
-                                                    </div>
-                                                    <div class="text-muted">4 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar">HS</span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Haskel Shelper</strong> change status of <strong>Tabler Icons</strong> from <strong>open</strong> to <strong>closed</strong>.
-                                                    </div>
-                                                    <div class="text-muted">today</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/006m.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Lorry Mion</strong> liked <strong>Tabler UI Kit</strong>.
-                                                    </div>
-                                                    <div class="text-muted">yesterday</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/004f.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Leesa Beaty</strong> posted new video.
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/007m.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Perren Keemar</strong> and 3 others followed you.
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar">SA</span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Sunny Airey</strong> upload 3 new photos to category <strong>Inspirations</strong>.
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/009m.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Geoffry Flaunders</strong> made a <strong>$10</strong> donation.
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/010m.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Thatcher Keel</strong> created a profile.
-                                                    </div>
-                                                    <div class="text-muted">3 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/005f.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Dyann Escala</strong> hosted the event <strong>Tabler UI Birthday</strong>.
-                                                    </div>
-                                                    <div class="text-muted">4 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar" style="background-image: url(./static/avatars/006f.jpg)"></span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Avivah Mugleston</strong> mentioned you on <strong>Best of 2020</strong>.
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-auto">
-                                                    <span class="avatar">AA</span>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="text-truncate">
-                                                        <strong>Arlie Armstead</strong> sent a Review Request to <strong>Amanda Blake</strong>.
-                                                    </div>
-                                                    <div class="text-muted">2 days ago</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
+<<<<<<< HEAD:vendor/mimisk13/laravel-tabler/stubs/default/resources/views/dashboard.blade.php
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-header border-0">
@@ -763,6 +702,8 @@
                         Create new report
                     </a>
                 </div>
+=======
+>>>>>>> main:resources/views/dashboard.blade.php
             </div>
         </div>
     </div>
