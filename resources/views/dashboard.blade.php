@@ -264,7 +264,7 @@
                                     <div class="row align-items-center">
                                         <div class="col-auto">
                                             <span
-                                                class="bg-twitter text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
+                                                class="bg-twitter text-white avatar">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                     class="icon icon-tabler icon-tabler-truck-delivery" width="24"
                                                     height="24" viewBox="0 0 24 24" stroke-width="2"
@@ -299,7 +299,7 @@
                                     <div class="row align-items-center">
                                         <div class="col-auto">
                                             <span
-                                                class="bg-facebook text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                                class="bg-facebook text-white avatar"><
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                     class="icon icon-tabler icon-tabler-files" width="24" height="24"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
@@ -350,9 +350,33 @@
                             <div class="row">
                                 
                                 <div class="col" id="date">
-                                    <div class="col" id="date">
+                                    <div class="col" id="date" style="justify-content: center;">
                                         <a href="#">Appointments</a>
-                                    </div>    
+                                        <li class="nav-item dropdown">
+
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" 
+                                            height="24" viewBox="0 0 24 24" fill="none" 
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-arrows-sort">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M3 9l4 -4l4 4m-4 -4v14" />
+                                                <path d="M21 15l-4 4l-4 -4m4 4v-14" />
+                                            </svg>
+                                            <div class="dropdown-menu">
+                                            <div class="dropdown-menu-columns">
+                                                <div class="dropdown-menu-column">
+                                                    <a class="dropdown-item" href="{{ route('orders.index') }}">
+                                                        {{ __('Pet Owner') }}
+                                                    </a>
+                                                    <a class="dropdown-item" href="{{ route('orders.complete') }}">
+                                                        {{ __('Sub Admin') }}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                        </li>
+                                    </div>
+                                    
                                 </div>
 
                                 <div class="col" id="date">
