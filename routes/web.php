@@ -7,6 +7,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MesController;
 use App\Http\Controllers\AppointController;
 use App\Http\Controllers\PetController;
+use App\Http\Controllers\SalesController;
 
 use App\Http\Controllers\Dashboards\DashboardController;
 use App\Http\Controllers\InvoiceController;
@@ -57,6 +58,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
  // Route Pet <------
  Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/pet', [PetController::class, 'index'])->name('pet.index');
+});
+
+ // Route Pet <------
+ Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/sales', [PetController::class, 'index'])->name('sales.index');
 });
 
 Route::get('php/', function () {

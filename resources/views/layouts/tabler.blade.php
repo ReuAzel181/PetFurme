@@ -50,10 +50,7 @@
                 </button>
                 <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
                     <H style="margin: 0 50px 0 50px;">USER</H1>
-                    <!-- <a href="{{ url('/') }}">
-                        <img src="{{ asset('static/logo.svg') }}" width="110" height="32" alt="Hello"
-                            class="navbar-brand-image">
-                    </a> -->
+
                 </h1>
                 <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
                     <form action="./" method="get" autocomplete="off" novalidate>
@@ -251,7 +248,9 @@
                                 <li class="nav-item {{ request()->is('notification*') ? 'active' : null }}">
                                     <a class="nav-link" href="{{ route('notification') }}">
                                         <span
-                                            class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                                            class="nav-link-icon d-md-none d-lg-inline-block">
+                                            <!-- <img src="{{ asset('assets/img2/bell.png') }}" alt="Bell"> -->
+
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
                                                 height="24" viewBox="0 0 24 24" stroke-width="2"
                                                 stroke="currentColor" fill="none" stroke-linecap="round"
@@ -347,7 +346,7 @@
                                 </li>
 
                                 <!-- PETS -->
-                                 
+
                                 <li class="nav-item {{ request()->is('pet*') ? 'active' : null }}">
                                     <a class="nav-link" href="{{ route('pet.index') }}">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -366,7 +365,7 @@
                                     </a>
                                 </li>
 
-                                {{-- ETO MERON! --}}
+                                <!-- PRODUCT -->
 
                                 <li class="nav-item {{ request()->is('products*') ? 'active' : null }}">
                                     <a class="nav-link" href="{{ route('products.index') }}">
@@ -395,7 +394,7 @@
                                     </a>
                                 </li>
 
-
+                                <!-- ORDERS -->
                                 <li class="nav-item dropdown {{ request()->is('orders*') ? 'active' : null }}">
                                     <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
                                         data-bs-auto-close="outside" role="button" aria-expanded="false">
@@ -438,7 +437,7 @@
                                     </div>
                                 </li>
 
-
+                                <!-- PURCHASES -->
                                 <li class="nav-item dropdown {{ request()->is('purchases*') ? 'active' : null }}">
                                     <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
                                         data-bs-auto-close="outside" role="button" aria-expanded="false">
@@ -481,7 +480,7 @@
                                 </li>
 
 
-
+                                <!-- QUOTATIONS -->
                                 <li class="nav-item {{ request()->is('quotations*') ? 'active' : null }}">
                                     <a class="nav-link" href="{{ route('quotations.index') }}">
                                         <span
@@ -504,13 +503,16 @@
 
                                 <li class="nav-header">REPORTS</li>
 
-
-                                {{--   SALES & APPOINTMENTS NO routes/web.php && Http/Controllers  --}}
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#" onclick="return false;">
+                                <!-- SALES -->
+                               
+                                <li class="nav-item {{ request()->is('sales*') ? 'active' : null }}">
+                                    <a class="nav-link" href="{{ route('sales.index') }}">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                                             <!-- Bell Icon SVG -->
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" 
+                                            height="24" viewBox="0 0 24 24" stroke-width="2" 
+                                            stroke="currentColor" fill="none" stroke-linecap="round" 
+                                            stroke-linejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                 <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
                                             </svg>
@@ -520,24 +522,11 @@
                                         </span>
                                     </a>
                                 </li>
+                                
 
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#" onclick="return false;">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                            <!-- Bell Icon SVG -->
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M5 17h14m-7 -2v2m-3 -2a3 3 0 0 1 6 0a2 2 0 0 1 -2 2a2 2 0 0 1 -2 -2m-1 2a1 1 0 0 1 -2 0m-1 -3a3 3 0 0 0 6 0a2 2 0 0 0 -2 -2h-2a2 2 0 0 0 -2 2z"/>
-                                            </svg>
-                                        </span>
-                                        <span class="nav-link-title">
-                                            {{ __('Appointments') }}
-                                        </span>
-                                    </a>
-                                </li>
-
-                                <li
-                                    class="nav-item dropdown {{ request()->is('suppliers*', 'customers*') ? 'active' : null }}">
+                                <!-- PAGES -->
+                                 
+                                <li class="nav-item dropdown {{ request()->is('suppliers*', 'customers*') ? 'active' : null }}">
                                     <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
                                         data-bs-auto-close="outside" role="button" aria-expanded="false">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -570,9 +559,8 @@
                                     </div>
                                 </li>
 
-
-                                <li
-                                    class="nav-item dropdown {{ request()->is('users*', 'categories*', 'units*') ? 'active' : null }}">
+                                <!-- SETTINGS -->
+                                <li class="nav-item dropdown {{ request()->is('users*', 'categories*', 'units*') ? 'active' : null }}">
                                     <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
                                         data-bs-auto-close="outside" role="button" aria-expanded="false">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
