@@ -116,9 +116,8 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
-                                            <span
-                                                class="bg-crimson text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
-                                                <img src="assets/img2/apmt_icon.png" alt="Appointment Icon"
+                                            <span class="bg-crimson text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                                            <img src="assets/img2/apmt_icon.png" alt="Appointment Icon"
                                                     class="icon icon-tabler icon-tabler-files" width="24" height="24"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                                                     fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -128,7 +127,7 @@
                                                         d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
                                                     <path
                                                         d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
-                                                </svg>
+                                            </svg>
                                             </span>
                                         </div>
                                         <div class="col">
@@ -348,37 +347,33 @@
                     <div class="card-body" style="height: 300px;">
                         <div class="card" style="width: 100%;">
                             <div class="row">
-                                
-                                <div class="col" id="date">
-                                    <div class="col" id="date" style="justify-content: center;">
-                                        <a href="#">Appointments</a>
-                                        <li class="nav-item dropdown">
+                        
+                            <div class="col" id="date">
+                                <div class="col" id="date" style="justify-content: center;">
+                                    <a href="#">Appointments</a>
 
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" 
+                                    <li class="nav-item dropdown" style="list-style: none;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" 
                                             height="24" viewBox="0 0 24 24" fill="none" 
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-arrows-sort">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M3 9l4 -4l4 4m-4 -4v14" />
-                                                <path d="M21 15l-4 4l-4 -4m4 4v-14" />
-                                            </svg>
-                                            <div class="dropdown-menu">
-                                            <div class="dropdown-menu-columns">
-                                                <div class="dropdown-menu-column">
-                                                    <a class="dropdown-item" href="{{ route('orders.index') }}">
-                                                        {{ __('Pet Owner') }}
-                                                    </a>
-                                                    <a class="dropdown-item" href="{{ route('orders.complete') }}">
-                                                        {{ __('Sub Admin') }}
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>    
-                                        </li>
-                                    </div>
-                                    
-                                </div>
+                                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-arrows-sort nav-link"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M3 9l4 -4l4 4m-4 -4v14" />
+                                            <path d="M21 15l-4 4l-4 -4m4 4v-14" />
+                                        </svg>
+                                        
+                                        <!-- Dropdown menu -->
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{{ route('orders.index') }}">Pet Owner</a></li>
+                                            <li><a class="dropdown-item" href="{{ route('orders.complete') }}">Sub Admin</a></li>
+                                        </ul>
+                                    </li>
 
+                                </div>
+                            </div>
+
+                                
                                 <div class="col" id="date">
                                     <p class="fromTo">From</p>
                                     <div class="input-group">
