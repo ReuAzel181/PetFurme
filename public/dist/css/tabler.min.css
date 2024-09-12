@@ -351,6 +351,16 @@ p {
     color: #333;
 }
 
+#date {
+    display: flex;
+    align-items: center;
+}
+
+.fromTo {
+    margin-bottom: 0px;
+}
+
+
 abbr[title] {
     -webkit-text-decoration: underline dotted;
     text-decoration: underline dotted;
