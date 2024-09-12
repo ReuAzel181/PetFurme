@@ -48,6 +48,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
  // Route Messages <------
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mes', [MesController::class, 'index'])->name('mes.index');
+    
+    // Route to show messages in a conversation
+    Route::get('/mes/{conversation}', [MesController::class, 'show'])->name('messages.show');
+    
+    // Route to send a message
+    Route::post('/mes/{conversation}/send', [MesController::class, 'sendMessage'])->name('messages.send');
 });
 
  // Route Appointment <------
