@@ -45,16 +45,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
 });
 
- // Route Messages <------
+// Route Messages <------
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Route to list all conversations
     Route::get('/mes', [MesController::class, 'index'])->name('mes.index');
     
-    // Route to show messages in a conversation
-    Route::get('/mes/{conversation}', [MesController::class, 'show'])->name('messages.show');
-    
-    // Route to send a message
-    Route::post('/mes/{conversation}/send', [MesController::class, 'sendMessage'])->name('messages.send');
+    // Middleware to check if the user has access to the conversation
+    Route::middleware('checkConversationAccess')->group(function () {
+        // Route to show messages in a conversation
+        Route::get('/mes/{conversation}', [MesController::class, 'show'])->name('messages.show');
+        
+        // Route to send a message
+        Route::post('/mes/{conversation}/send', [MesController::class, 'sendMessage'])->name('messages.send');
+    });
 });
+
 
  // Route Appointment <------
  Route::middleware(['auth', 'verified'])->group(function () {

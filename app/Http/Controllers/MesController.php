@@ -23,25 +23,33 @@ class MesController extends Controller
     // Display messages in a specific conversation
     public function show($conversationId)
     {
-        $conversation = Conversation::findOrFail($conversationId);
+        $conversation = Conversation::where('id', $conversationId)
+                                    ->whereHas('participants', function ($query) {
+                                        $query->where('user_id', Auth::id());
+                                    })
+                                    ->firstOrFail();
+    
         $messages = $conversation->messages()->with('user')->get();
-
+    
         return view('message.show', compact('conversation', 'messages'));
     }
+    
 
     // Send a new message
     public function sendMessage(Request $request, $conversationId)
     {
         $request->validate([
-            'message' => 'required'
+            'message' => 'required|string|max:1000',
         ]);
-
+    
         $message = new Message();
         $message->conversation_id = $conversationId;
         $message->user_id = Auth::id();
         $message->message = $request->message;
         $message->save();
-
-        return redirect()->route('messages.show', $conversationId);
+    
+        return redirect()->route('messages.show', $conversationId)
+                         ->with('success', 'Message sent successfully!');
     }
+    
 }

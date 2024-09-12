@@ -22,6 +22,13 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
+    
+    /*For Message*/
+    protected $routeMiddleware = [
+        // Other middleware
+        'checkConversationAccess' => \App\Http\Middleware\CheckConversationAccess::class,
+    ];
+    
 
     /**
      * The application's route middleware groups.
