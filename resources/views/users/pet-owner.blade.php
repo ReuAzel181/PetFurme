@@ -1,0 +1,53 @@
+@extends('layouts.tabler')
+
+@section('title', 'Pet Owners')
+
+@section('content')
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center mb-3">
+                <div class="col">
+                    <h1 class="page-title">
+                        Pet Owners
+                    </h1>
+                </div>
+                <div class="col-auto ms-auto d-print-none">
+                    <a href="{{ route('users.create') }}" class="btn btn-primary">
+                        {{ __('Create Pet Owner') }}
+                    </a>
+                </div>
+            </div>
+
+            @include('partials._breadcrumbs')
+        </div>
+    </div>
+
+    <div class="page-body">
+        <div class="container-xl">
+            @if($users->isEmpty())
+                <p>No pet owners found.</p>
+            @else
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <!-- Add other columns as needed -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($users as $user)
+                            <tr>
+                                <td>{{ $user->id }}</td>
+                                <td>{{ $user->name }}</td>
+                                <td>{{ $user->email }}</td>
+                                <!-- Add other columns as needed -->
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    </div>
+@endsection

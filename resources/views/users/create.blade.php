@@ -67,6 +67,24 @@
                                 <div class="row row-cards">
                                     <div class="col-md-12">
                                         <div class="mb-3">
+                                            <label for="type" class="form-label">
+                                                {{ __('User Type') }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select id="type" name="type" class="form-control @error('type') is-invalid @enderror" required>
+                                                <option value="" disabled selected>Select User Type</option>
+                                                <option value="pet_owner" {{ old('type') == 'pet_owner' ? 'selected' : '' }}>Pet Owner</option>
+                                                <option value="sub_admin" {{ old('type') == 'sub_admin' ? 'selected' : '' }}>Sub Admin</option>
+                                            </select>
+
+                                            @error('type')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-3">
                                             <label for="name" class="form-label">
                                                 {{ __('Name') }}
                                                 <span class="text-danger">*</span>
@@ -85,7 +103,6 @@
                                             </div>
                                             @enderror
                                         </div>
-
 
                                         <div class="mb-3">
                                             <label for="email" class="form-label">
@@ -107,67 +124,87 @@
                                             @enderror
                                         </div>
 
-                                        {{---
                                         <div class="mb-3">
-                                            <label for="username" class="form-label">
-                                                {{ __('Username') }}
+                                            <label for="password" class="form-label">
+                                                {{ __('Password') }}
                                                 <span class="text-danger">*</span>
                                             </label>
 
-                                            <input type="text"
-                                                   id="username"
-                                                   name="username"
-                                                   class="form-control @error('username') is-invalid @enderror"
-                                                   value="{{ old('username') }}"
+                                            <input type="password"
+                                                   id="password"
+                                                   name="password"
+                                                   class="form-control @error('password') is-invalid @enderror"
                                             >
 
-                                            @error('username')
+                                            @error('password')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
                                             @enderror
                                         </div>
-                                        ---}}
+
+                                        <div class="mb-3">
+                                            <label for="password_confirmation" class="form-label">
+                                                {{ __('Password confirmation') }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+
+                                            <input type="password"
+                                                   id="password_confirmation"
+                                                   name="password_confirmation"
+                                                   class="form-control @error('password_confirmation') is-invalid @enderror"
+                                            >
+
+                                            @error('password_confirmation')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                            @enderror
+                                        </div>
                                     </div>
 
+                                    <!-- Conditional Fields -->
+                                    <div id="pet-owner-fields" style="display: none;">
+                                        <div class="col-md-6">
+                                            <label for="number_of_pets" class="form-label">
+                                                {{ __('Number of Pets') }}
+                                            </label>
 
-                                    <div class="col-sm-6 col-md-6">
-                                        <label for="password" class="form-label">
-                                            {{ __('Password') }}
-                                            <span class="text-danger">*</span>
-                                        </label>
+                                            <input type="number"
+                                                   id="number_of_pets"
+                                                   name="number_of_pets"
+                                                   class="form-control @error('number_of_pets') is-invalid @enderror"
+                                                   value="{{ old('number_of_pets') }}"
+                                            >
 
-                                        <input type="password"
-                                               id="password"
-                                               name="password"
-                                               class="form-control @error('password') is-invalid @enderror"
-                                        >
-
-                                        @error('password')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
+                                            @error('number_of_pets')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                            @enderror
                                         </div>
-                                        @enderror
+
+                                        <div class="col-md-12">
+                                            <label for="address" class="form-label">
+                                                {{ __('Address') }}
+                                            </label>
+
+                                            <textarea id="address"
+                                                      name="address"
+                                                      class="form-control @error('address') is-invalid @enderror"
+                                            >{{ old('address') }}</textarea>
+
+                                            @error('address')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                            @enderror
+                                        </div>
                                     </div>
 
-
-                                    <div class="col-sm-6 col-md-6">
-                                        <label for="password_confirmation" class="form-label">
-                                            {{ __('Password confirmation') }}
-                                            <span class="text-danger">*</span>
-                                        </label>
-
-                                        <input type="password"
-                                               id="password_confirmation"
-                                               name="password_confirmation"
-                                               class="form-control @error('password_confirmation') is-invalid @enderror"
-                                        >
-
-                                        @error('password_confirmation')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                        @enderror
+                                    <!-- Conditional Fields for Sub Admin (if needed) -->
+                                    <div id="sub-admin-fields" style="display: none;">
+                                        <!-- Add fields specific to Sub Admin here if needed -->
                                     </div>
                                 </div>
                             </div>
@@ -188,8 +225,28 @@
         </div>
     </div>
 </div>
+
 @endsection
 
 @pushonce('page-scripts')
 <script src="{{ asset('assets/js/img-preview.js') }}"></script>
+<script>
+    // Show/Hide fields based on user type
+    document.getElementById('type').addEventListener('change', function() {
+        var type = this.value;
+        var petOwnerFields = document.getElementById('pet-owner-fields');
+        var subAdminFields = document.getElementById('sub-admin-fields');
+        
+        if (type === 'pet_owner') {
+            petOwnerFields.style.display = 'block';
+            subAdminFields.style.display = 'none';
+        } else if (type === 'sub_admin') {
+            petOwnerFields.style.display = 'none';
+            subAdminFields.style.display = 'block';
+        } else {
+            petOwnerFields.style.display = 'none';
+            subAdminFields.style.display = 'none';
+        }
+    });
+</script>
 @endpushonce

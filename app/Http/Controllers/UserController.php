@@ -20,32 +20,63 @@ class UserController extends Controller
         ]);
     }
 
+    public function petOwner()
+    {
+        // Fetch users with the "Pet Owner" role
+        $users = User::where('role', 'pet_owner')->get();
+
+        return view('users.pet-owner', ['users' => $users]);
+    }
+
+    public function subAdmin()
+    {
+        // Fetch users with the "Sub Admin" role
+        $users = User::where('role', 'sub_admin')->get();
+
+        return view('users.sub-admin', ['users' => $users]);
+    }
+
     public function create()
     {
         return view('users.create');
     }
-
-    public function store(StoreUserRequest $request)
+    public function userManagementOverview()
     {
-        $user = User::create($request->all());
+        // You can return a view or redirect to a default page
+        return view('users.user-management-overview');
+    }
 
-        /**
-         * Handle upload an image
-         */
-        if($request->hasFile('photo')){
+
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'type' => 'required|in:pet_owner,sub_admin',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'number_of_pets' => 'nullable|required_if:type,pet_owner|integer',
+            'address' => 'nullable|required_if:type,pet_owner|string',
+        ]);
+
+        $validatedData['password'] = Hash::make($validatedData['password']);
+        
+        // Create user
+        $user = User::create($validatedData);
+
+        // Handle file upload
+        if ($request->hasFile('photo')) {
             $file = $request->file('photo');
             $filename = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
-
             $file->storeAs('profile/', $filename, 'public');
-            $user->update([
-                'photo' => $filename
-            ]);
+            $user->update(['photo' => $filename]);
         }
 
         return redirect()
             ->route('users.index')
             ->with('success', 'New User has been created!');
     }
+
 
     public function show(User $user)
     {

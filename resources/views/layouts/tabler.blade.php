@@ -343,16 +343,17 @@
                                     <div class="dropdown-menu">
                                         <div class="dropdown-menu-columns">
                                             <div class="dropdown-menu-column">
-                                                <a class="dropdown-item" href="{{ route('orders.index') }}">
+                                                <a class="dropdown-item" href="{{ route('user-management.pet-owner') }}">
                                                     {{ __('Pet Owner') }}
                                                 </a>
-                                                <a class="dropdown-item" href="{{ route('orders.complete') }}">
+                                                <a class="dropdown-item" href="{{ route('user-management.sub-admin') }}">
                                                     {{ __('Sub Admin') }}
                                                 </a>
                                             </div>
                                         </div>
                                     </div>
                                 </li>
+
 
                                 <!-- PETS -->
 

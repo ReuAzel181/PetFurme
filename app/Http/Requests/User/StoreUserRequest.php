@@ -11,7 +11,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return true; // Adjust based on your authorization logic
     }
 
     /**
@@ -22,12 +22,11 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'photo' => 'image|file|max:1024',
-            'name' => 'required|max:50',
-            'email' => 'required|email|max:50|unique:users,email',
-            //'username' => 'required|min:4|max:25|alpha_dash:ascii|unique:users,username',
-            'password' => 'required_with:password_confirmation|min:6',
-            'password_confirmation' => 'same:password|min:6',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024', // Adjusted to allow specific image types
+            'name' => 'required|string|max:255', // Extended the max length to 255
+            'email' => 'required|email|max:255|unique:users,email', // Extended the max length to 255
+            'password' => 'required|string|min:6|confirmed', // Added 'confirmed' rule
+            'password_confirmation' => 'required_with:password|string|min:6', // Ensured it's required if password is present
         ];
     }
 }
