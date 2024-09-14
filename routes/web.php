@@ -9,8 +9,6 @@ use App\Http\Controllers\AppointController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\SalesController;
 
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Dashboards\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Order\DueOrderController;
@@ -27,6 +25,8 @@ use App\Http\Controllers\Quotation\QuotationController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
 
+use App\Http\Controllers\UserController; // <------ Include the UserController
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -39,7 +39,6 @@ use Illuminate\Support\Facades\Auth;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
 
 
     // Route Notification <------
@@ -197,7 +196,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 // Include the user management routes
-require __DIR__.'/user-management.php';
+require base_path('routes/user-management.php');
+
 
 require __DIR__.'/auth.php';
 

@@ -19,7 +19,7 @@
     <div class="container-xl">
         <div class="row row-cards">
 
-            <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('user-management.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-lg-4">
@@ -104,6 +104,41 @@
                                             @enderror
                                         </div>
 
+                                        <div class="col-md-12">
+                                            <label for="phone" class="form-label">
+                                                {{ __('Phone Number') }}
+                                            </label>
+                                            <input type="text"
+                                                id="phone"
+                                                name="phone"
+                                                class="form-control @error('phone') is-invalid @enderror"
+                                                value="{{ old('phone') }}"
+                                            >
+                                            @error('phone')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                            @enderror
+                                        </div>
+
+
+                                        <div class="col-md-12">
+                                            <label for="address" class="form-label">
+                                                {{ __('Address') }}
+                                            </label>
+
+                                            <textarea id="address"
+                                                      name="address"
+                                                      class="form-control @error('address') is-invalid @enderror"
+                                            >{{ old('address') }}</textarea>
+
+                                            @error('address')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                            @enderror
+                                        </div>
+
                                         <div class="mb-3">
                                             <label for="email" class="form-label">
                                                 {{ __('Email address') }}
@@ -161,10 +196,16 @@
                                             </div>
                                             @enderror
                                         </div>
+                                        
                                     </div>
+
+                                        
 
                                     <!-- Conditional Fields -->
                                     <div id="pet-owner-fields" style="display: none;">
+
+                                        
+
                                         <div class="col-md-6">
                                             <label for="number_of_pets" class="form-label">
                                                 {{ __('Number of Pets') }}
@@ -185,26 +226,47 @@
                                         </div>
 
                                         <div class="col-md-12">
-                                            <label for="address" class="form-label">
-                                                {{ __('Address') }}
+                                            <label for="pet_type" class="form-label">
+                                                {{ __('Pet Type') }}
                                             </label>
-
-                                            <textarea id="address"
-                                                      name="address"
-                                                      class="form-control @error('address') is-invalid @enderror"
-                                            >{{ old('address') }}</textarea>
-
-                                            @error('address')
+                                            <input type="text"
+                                                id="pet_type"
+                                                name="pet_type"
+                                                class="form-control @error('pet_type') is-invalid @enderror"
+                                                value="{{ old('pet_type') }}"
+                                            >
+                                            @error('pet_type')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
                                             @enderror
                                         </div>
+                                        
+                                        <div class="col-md-12">
+                                            <label for="pet_name" class="form-label">
+                                                {{ __('Pet Name') }}
+                                            </label>
+                                            <input type="text"
+                                                id="pet_name"
+                                                name="pet_name"
+                                                class="form-control @error('pet_name') is-invalid @enderror"
+                                                value="{{ old('pet_name') }}"
+                                            >
+                                            @error('pet_name')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                            @enderror
+                                        </div>
+
+                                        
+
+                                        
                                     </div>
 
                                     <!-- Conditional Fields for Sub Admin (if needed) -->
                                     <div id="sub-admin-fields" style="display: none;">
-                                        <!-- Add fields specific to Sub Admin here if needed -->
+
                                     </div>
                                 </div>
                             </div>

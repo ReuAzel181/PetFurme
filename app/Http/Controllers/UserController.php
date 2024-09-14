@@ -56,10 +56,22 @@ class UserController extends Controller
             'password' => 'required|string|min:6|confirmed',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'number_of_pets' => 'nullable|required_if:type,pet_owner|integer',
-            'address' => 'nullable|required_if:type,pet_owner|string',
+            'phone' => 'nullable|required_if:type,pet_owner|string',
+            'pet_name' => 'nullable|required_if:type,pet_owner|string|max:100',
+            'pet_type' => 'nullable|required_if:type,pet_owner|string|max:100',
+            'address' => 'nullable|required_if:type,pet_owner|string|max:255',
         ]);
 
+
+        $validatedData['role'] = $validatedData['type']; // Ensure role is set
+
         $validatedData['password'] = Hash::make($validatedData['password']);
+
+
+
+        // Debug output
+        \Log::info('Validated Data:', $validatedData);
+
         
         // Create user
         $user = User::create($validatedData);
@@ -72,9 +84,13 @@ class UserController extends Controller
             $user->update(['photo' => $filename]);
         }
 
+        // Redirect based on role
+        $redirectRoute = $user->role === 'sub_admin' ? 'user-management.sub-admin' : 'user-management.pet-owner';
+        \Log::info('Redirecting to:', ['route' => $redirectRoute]);
+
         return redirect()
-            ->route('users.index')
-            ->with('success', 'New User has been created!');
+        ->route($redirectRoute)
+        ->with('success', 'New ' . ucfirst($user->role) . ' has been created!');
     }
 
 
@@ -95,15 +111,10 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
 
-//        if ($validatedData['email'] != $user->email) {
-//            $validatedData['email_verified_at'] = null;
-//        }
-
         $user->update($request->except('photo'));
 
-        /**
-         * Handle upload image with Storage.
-         */
+        // Handle upload image with Storage.
+
         if($request->hasFile('photo')){
 
             // Delete Old Photo
@@ -149,9 +160,8 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        /**
-         * Delete photo if exists.
-         */
+        //  Delete photo if exists.
+         
         if($user->photo){
             unlink(public_path('storage/profile/') . $user->photo);
         }

@@ -15,7 +15,7 @@ class AddRoleToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->nullable(); // Add 'role' column
+            $table->string('role')->default('pet_owner')->change(); // Set default value and make it NOT NULL
         });
     }
 
@@ -27,7 +27,7 @@ class AddRoleToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role'); // Remove 'role' column
+            $table->string('role')->nullable()->change(); // Revert to nullable if needed
         });
     }
 }

@@ -12,7 +12,7 @@
                     </h1>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
-                    <a href="{{ route('users.create') }}" class="btn btn-primary">
+                    <a href="{{ route('user-management.create') }}" class="btn btn-primary">
                         {{ __('Create Pet Owner') }}
                     </a>
                 </div>
@@ -31,8 +31,13 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Photo</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Phone</th>
+                            <th>Pet Name</th>
+                            <th>Pet Type</th>
+                            <th>Address</th>
                             <!-- Add other columns as needed -->
                         </tr>
                     </thead>
@@ -40,8 +45,13 @@
                         @foreach($users as $user)
                             <tr>
                                 <td>{{ $user->id }}</td>
+                                <td>{{ $user->photo }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
+                                <td>{{ $user->phone ?? 'N/A' }}</td>
+                                <td>{{ $user->pet_name ?? 'N/A' }}</td>
+                                <td>{{ $user->pet_type ?? 'N/A' }}</td>
+                                <td>{{ $user->address ?? 'N/A' }}</td>
                                 <!-- Add other columns as needed -->
                             </tr>
                         @endforeach
