@@ -204,60 +204,61 @@
                                     <!-- Conditional Fields -->
                                     <div id="pet-owner-fields" style="display: none;">
 
-                                        
+                                            <div class="col-md-6">
+                                                <label for="number_of_pets" class="form-label">
+                                                    {{ __('Number of Pets') }}
+                                                </label>
 
-                                        <div class="col-md-6">
-                                            <label for="number_of_pets" class="form-label">
-                                                {{ __('Number of Pets') }}
-                                            </label>
+                                                <input type="number"
+                                                    id="number_of_pets"
+                                                    name="number_of_pets"
+                                                    class="form-control @error('number_of_pets') is-invalid @enderror"
+                                                    value="{{ old('number_of_pets') }}"
+                                                     min="0"
+                                                >
 
-                                            <input type="number"
-                                                   id="number_of_pets"
-                                                   name="number_of_pets"
-                                                   class="form-control @error('number_of_pets') is-invalid @enderror"
-                                                   value="{{ old('number_of_pets') }}"
-                                            >
-
-                                            @error('number_of_pets')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
+                                                @error('number_of_pets')
+                                                <div class="invalid-feedback">
+                                                    {{ $message }}
+                                                </div>
+                                                @enderror
                                             </div>
-                                            @enderror
-                                        </div>
 
-                                        <div class="col-md-12">
-                                            <label for="pet_type" class="form-label">
-                                                {{ __('Pet Type') }}
-                                            </label>
-                                            <input type="text"
-                                                id="pet_type"
-                                                name="pet_type"
-                                                class="form-control @error('pet_type') is-invalid @enderror"
-                                                value="{{ old('pet_type') }}"
-                                            >
-                                            @error('pet_type')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
+                                            <div id="pets-container"></div>
+
+                                            <div class="col-md-12">
+                                                <label for="pet_type" class="form-label">
+                                                    {{ __('Pet Type') }}
+                                                </label>
+                                                <input type="text"
+                                                    id="pet_type"
+                                                    name="pet_type"
+                                                    class="form-control @error('pet_type') is-invalid @enderror"
+                                                    value="{{ old('pet_type') }}"
+                                                >
+                                                @error('pet_type')
+                                                <div class="invalid-feedback">
+                                                    {{ $message }}
+                                                </div>
+                                                @enderror
                                             </div>
-                                            @enderror
-                                        </div>
-                                        
-                                        <div class="col-md-12">
-                                            <label for="pet_name" class="form-label">
-                                                {{ __('Pet Name') }}
-                                            </label>
-                                            <input type="text"
-                                                id="pet_name"
-                                                name="pet_name"
-                                                class="form-control @error('pet_name') is-invalid @enderror"
-                                                value="{{ old('pet_name') }}"
-                                            >
-                                            @error('pet_name')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
+                                            
+                                            <div class="col-md-12">
+                                                <label for="pet_name" class="form-label">
+                                                    {{ __('Pet Name') }}
+                                                </label>
+                                                <input type="text"
+                                                    id="pet_name"
+                                                    name="pet_name"
+                                                    class="form-control @error('pet_name') is-invalid @enderror"
+                                                    value="{{ old('pet_name') }}"
+                                                >
+                                                @error('pet_name')
+                                                <div class="invalid-feedback">
+                                                    {{ $message }}
+                                                </div>
+                                                @enderror
                                             </div>
-                                            @enderror
-                                        </div>
 
                                         
 
@@ -310,5 +311,29 @@
             subAdminFields.style.display = 'none';
         }
     });
+        // Handle dynamic fields for pets
+        document.getElementById('number_of_pets').addEventListener('input', function() {
+        var numberOfPets = parseInt(this.value);
+        var petsContainer = document.getElementById('pets-container');
+
+        // Clear the container
+        petsContainer.innerHTML = '';
+
+        // Add fields dynamically based on the number of pets
+        for (var i = 0; i < numberOfPets; i++) {
+            var petFields = `
+                <div class="col-md-6">
+                    <label for="pet_type_${i}" class="form-label">Pet ${i + 1} Type</label>
+                    <input type="text" id="pet_type_${i}" name="pet_types[]" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label for="pet_name_${i}" class="form-label">Pet ${i + 1} Name</label>
+                    <input type="text" id="pet_name_${i}" name="pet_names[]" class="form-control">
+                </div>
+            `;
+            petsContainer.insertAdjacentHTML('beforeend', petFields);
+        }
+    });
+    
 </script>
 @endpushonce
