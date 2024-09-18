@@ -30,6 +30,7 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Type</th>
+                            <th>Phone</th>
                             <th>Number of Pets</th>
                             <th>Address</th>
                             <th>Actions</th>
@@ -41,6 +42,7 @@
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
+                                <td>{{ $user->phone ?? 'N/A' }}</td>
                                 <td>{{ ucfirst($user->type) }}</td>
                                 <td>{{ $user->number_of_pets ?? 'N/A' }}</td>
                                 <td>{{ $user->address ?? 'N/A' }}</td>

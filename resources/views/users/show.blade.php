@@ -52,7 +52,7 @@
                                         </tr>
                                         <tr>
                                             <td>Email address</td>
-                                            <td>{{ $user->email }}</td>
+                                            <td>{{ $user->store_email }}</td>
                                         </tr>
                                         <tr>
                                             <td>Email verification</td>

@@ -51,7 +51,7 @@
                                 <td>{{ $user->phone ?? 'N/A' }}</td>
                                 <td>{{ $user->pet_name ?? 'N/A' }}</td>
                                 <td>{{ $user->pet_type ?? 'N/A' }}</td>
-                                <td>{{ $user->address ?? 'N/A' }}</td>
+                                <td>{{ $user->store_address ?? 'N/A' }}</td>
                                 <!-- Add other columns as needed -->
                             </tr>
                         @endforeach
