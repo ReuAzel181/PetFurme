@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * The User model represents application users and handles authentication.
+ * 
+ * - Implements MustVerifyEmail for email verification.
+ * - Uses $fillable for mass-assignable attributes like name, email, and phone.
+ * - Hides sensitive data (password, remember_token) via $hidden.
+ * - Casts date fields like email_verified_at and timestamps using $casts.
+ * - Includes a search scope for querying by name or email.
+ * - Uses 'name' for route model binding.
+ */
+
 namespace App\Models;
 
 use Laravel\Sanctum\HasApiTokens;
@@ -22,9 +33,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'username',
         'email',
         'password',
+        'phone',
         "store_name",
         "store_address",
-        "store_phone",
         "store_email",
     ];
 

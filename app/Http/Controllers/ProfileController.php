@@ -77,14 +77,14 @@ class ProfileController extends Controller
         $request->validate([
             'store_name' => 'required|max:50',
             'store_address' => 'required|max:50',
-            "store_phone" => 'required|min:10',
+            "phone" => 'required|min:10',
             'store_email' => 'required|email|max:50|unique:users,store_email,' . auth()->id(),
         ]);
 
         User::find(auth()->id())->update([
             "store_name" => $request->store_name,
             "store_address" => $request->store_address,
-            "store_phone" => $request->store_phone,
+            "phone" => $request->phone,
             "store_email" => $request->store_email,
         ]);
 

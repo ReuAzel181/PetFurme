@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string("store_name")->nullable();
             $table->string("store_address")->nullable();
             
-            $table->string("store_phone")->nullable();
+            // $table->string("store_phone")->nullable();
             $table->string("store_email")->nullable();
             $table->rememberToken();
             $table->timestamps();

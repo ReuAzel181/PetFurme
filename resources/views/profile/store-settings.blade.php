@@ -35,7 +35,7 @@
                         <div class="card-body">
                             <x-input type="text" name="store_name" label="Store Name" value="{{ $user->store_name }}"
                                 required />
-                            <x-input type="tel" name="store_phone" label="Store Phone" value="{{ $user->store_phone }}"
+                            <x-input type="tel" name="phone" label="Store Phone" value="{{ $user->phone }}"
                                 required />
                             <x-input type="email" name="store_email" label="Store Eamil" value="{{ $user->store_email }}"
                                 required />
