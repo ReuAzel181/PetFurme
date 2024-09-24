@@ -13,36 +13,38 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
-     */
-    public function create(): View
-    {
-        return view('auth.login');
-    }
-
-    /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(Request $request)
     {
-        $request->authenticate();
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        $request->session()->regenerate();
+        // Attempt to authenticate the user
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            // Generate a token using Sanctum
+            $token = $user->createToken('YourAppName')->plainTextToken;
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+            return response()->json(['token' => $token], 200);
+        }
+
+        // Return unauthorized response if authentication fails
+        return response()->json(['message' => 'Unauthorized'], 401);
     }
 
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return response()->json(['message' => 'Successfully logged out.']);
     }
 }

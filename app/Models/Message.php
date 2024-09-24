@@ -9,6 +9,8 @@ class Message extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['content', 'user_id', 'conversation_id']; // Add fields as needed
+
     // Define the relationship with the user
     public function user()
     {
