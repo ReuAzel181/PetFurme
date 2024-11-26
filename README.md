@@ -6,28 +6,28 @@
 ![Diagram Class](https://github.com/fajarghifar/inventory-management-system/assets/71541409/0c7d4163-96f5-4724-8741-4615e52ecf98)
 
 ## 😎 Features
-    - **Pet Management:** Add, update, delete pet profiles; view details and history
+- Pet Management:** Add, update, delete pet profiles; view details and history
 
-    - **Pet Owners:** Manage owner profiles; link pets to owners
+- **Pet Owners:** Manage owner profiles; link pets to owners
 
-    - **Appointments:** Schedule/manage appointments; view history
+- **Appointments:** Schedule/manage appointments; view history
 
-    - **Products:** Manage products; view details and stock
+- **Products:** Manage products; view details and stock
 
-    - **Orders:** Create/manage orders; track status/history
+- **Orders:** Create/manage orders; track status/history
 
-    - **Reports:** Generate reports on pets, orders, and products
+- **Reports:** Generate reports on pets, orders, and products
 
-    - **User Management:** Admin/sub-admin roles; manage user access/permissions
+- **User Management:** Admin/sub-admin roles; manage user access/permissions
 
 ## Installed Packages  & Dependencies:
-**UI & Styling:** @tabler/core (UI kit), tailwindcss (Utility CSS).
+- **UI & Styling:** @tabler/core (UI kit), tailwindcss (Utility CSS).
 
-**CSS Processing:** autoprefixer, postcss.
+- **CSS Processing:** autoprefixer, postcss.
 
-**HTTP & Data:** axios (HTTP client), laravel-datatables-vite (DataTables with Laravel & Vite), laravel-vite-plugin (Laravel-Vite plugin).
+- **HTTP & Data:** axios (HTTP client), laravel-datatables-vite (DataTables with Laravel & Vite), laravel-vite-plugin (Laravel-Vite plugin).
 
-**Others:** js-beautify (Code beautifier), vite (Build tool), Composer & Node.js.
+- **Others:** js-beautify (Code beautifier), vite (Build tool), Composer & Node.js.
 
 ## 🚀 How to Use
 
