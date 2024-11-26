@@ -9,22 +9,27 @@ Made with Laravel 10, Codeigniter, and MySql.
 
 ## 😎 Features
 **Pet Management:** Add, update, delete pet profiles; view details and history
+
 **Pet Owners:** Manage owner profiles; link pets to owners
+
 **Appointments:** Schedule/manage appointments; view history
+
 **Products:** Manage products; view details and stock
+
 **Orders:** Create/manage orders; track status/history
+
 **Reports:** Generate reports on pets, orders, and products
+
 **User Management:** Admin/sub-admin roles; manage user access/permissions
 
-## Environemt & Dependencies
-  - Composer
-  - Node.js
-
-## Installed Packages:
+## Installed Packages  & Dependencies:
 **UI & Styling:** @tabler/core (UI kit), tailwindcss (Utility CSS).
+
 **CSS Processing:** autoprefixer, postcss.
+
 **HTTP & Data:** axios (HTTP client), laravel-datatables-vite (DataTables with Laravel & Vite), laravel-vite-plugin (Laravel-Vite plugin).
-**Others:** js-beautify (Code beautifier), vite (Build tool).
+
+**Others:** js-beautify (Code beautifier), vite (Build tool), Composer & Node.js.
 
 ## 🚀 How to Use
 
