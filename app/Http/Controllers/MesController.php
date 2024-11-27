@@ -49,7 +49,7 @@ class MesController extends Controller
         $message->save();
     
         return redirect()->route('messages.show', $conversationId)
-                         ->with('success', 'Message sent successfully!');
+                        ->with('success', 'Message sent successfully!');
     }
     
 }

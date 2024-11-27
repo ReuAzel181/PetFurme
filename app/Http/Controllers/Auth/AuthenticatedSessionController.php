@@ -12,11 +12,17 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    public function create(): View
+    {
+        return view('auth.login');
+    }
     /**
      * Handle an incoming authentication request.
      */
     public function store(Request $request)
     {
+
+
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',

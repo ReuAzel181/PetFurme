@@ -29,6 +29,7 @@ use App\Http\Controllers\UserController; // <------ Include the UserController
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -40,19 +41,23 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-
-    // Route Notification <------
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
+// Route Notification <------
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
 });
+
+// Route Notification
+// Route::middleware(['auth', 'verified'])->group(function () {
+//     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+// });
 
 // Route Messages <------
 Route::middleware(['auth', 'verified'])->group(function () {
     // Route to list all conversations
     Route::get('/mes', [MesController::class, 'index'])->name('mes.index');
     
-    // Middleware to check if the user has access to the conversation
-    Route::middleware('checkConversationAccess')->group(function () {
+// Middleware to check if the user has access to the conversation
+Route::middleware('checkConversationAccess')->group(function () {
         // Route to show messages in a conversation
         Route::get('/mes/{conversation}', [MesController::class, 'show'])->name('messages.show');
         
@@ -63,17 +68,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
  // Route Appointment <------
- Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/appoint', [AppointController::class, 'index'])->name('appoint.index');
 });
 
  // Route Pet <------
- Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/pet', [PetController::class, 'index'])->name('pet.index');
 });
 
  // Route Pet <------
- Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sales', [PetController::class, 'index'])->name('sales.index');
 });
 

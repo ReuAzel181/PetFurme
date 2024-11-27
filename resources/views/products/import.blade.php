@@ -19,10 +19,10 @@
 
                 <x-slot:content>
                     <input type="file"
-                           id="file"
-                           name="file"
-                           class="form-control @error('file') is-invalid @enderror"
-                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                        id="file"
+                        name="file"
+                        class="form-control @error('file') is-invalid @enderror"
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     >
 
                     @error('file')

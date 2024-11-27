@@ -6,6 +6,10 @@ use App\Http\Controllers\API\V1\ProductController;
 use App\Http\Controllers\ApiMessageController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
+// For the login and logout routes
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('api.login');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('api.logout');
+
 // Public routes
 Route::post('login', [AuthenticatedSessionController::class, 'store']);
 

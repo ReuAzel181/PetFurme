@@ -25,45 +25,19 @@
                                 <h3 class="card-title">
                                     {{ __('Product Image') }}
                                 </h3>
-
+<!-- 
                                 <img style="width: 90px;" id="image-preview"
                                     src="{{ $product->product_image ? asset('storage/' . $product->product_image) : asset('assets/img/products/default.webp') }}"
+                                    alt="" class="img-account-profile mb-2"> -->
+
+                                <img style="width: 90px;" id="image-preview"
+                                    src="{{ $product->product_image ? asset('assets/img/products/' . $product->product_image) : asset('assets/img/products/default.webp') }}"
                                     alt="" class="img-account-profile mb-2">
+
                             </div>
+                            
                         </div>
                     </div>
-                    <!---
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="card-title">
-                                    Product Code
-                                </div>
-                                <div class="row row-cards">
-                                    <div class="col-md-6">
-                                        <label class="small mb-1">
-                                            Product code
-                                        </label>
-
-                                        <div class="form-control">
-                                            {{ $product->code }}
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6 align-middle">
-                                        <label class="small mb-1">
-                                            Barcode
-                                        </label>
-
-                                        <div class="mt-1">
-                                            {!! $barcode !!}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    --->
 
                     <div class="col-lg-8">
                         <div class="card">

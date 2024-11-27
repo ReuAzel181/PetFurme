@@ -2,6 +2,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+
+    @stack('styles')
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
@@ -243,7 +245,7 @@
                                 </li>
 
 
-                               <!-- NOTIFICATION -->
+                                <!-- NOTIFICATION -->
 
                                 <li class="nav-item {{ request()->is('notification*') ? 'active' : null }}">
                                     <a class="nav-link" href="{{ route('notification') }}">

@@ -266,6 +266,7 @@ body {
 }
 
 .nav-link-title{
+    font-size: 1.3rem;
     z-index: 1;
 }
 
@@ -858,7 +859,10 @@ progress {
     .container-sm,
     .container-xl,
     .container-xxl {
-        max-width: 1320px
+        max-width: 1320px;
+        margin-left: 0px;
+        margin-right: 0px;
+        display: contents;
     }
 }
 
@@ -3164,6 +3168,10 @@ progress {
     margin-bottom: .5rem;
     font-size: .875rem;
     font-weight: var(--tblr-font-weight-medium)
+}
+.font-weight-medium {
+    font-size: large;
+    font-weight: bold;
 }
 
 .col-form-label {
@@ -20167,7 +20175,7 @@ body {
 
 .page-title {
     margin: 0;
-    font-size: var(--tblr-font-size-h2);
+    font-size: var(--tblr-font-size-h1);
     line-height: var(--tblr-line-height-h4);
     font-weight: var(--tblr-font-weight-headings);
     color: inherit;
@@ -20573,7 +20581,7 @@ body[data-bs-theme=dark] [data-bs-theme=light] {
 }
 
 .avatar {
-    --tblr-avatar-size: 2.5rem;
+    --tblr-avatar-size: 4rem;
     --tblr-avatar-status-size: 0.75rem;
     --tblr-avatar-bg: var(--tblr-bg-surface-secondary);
     --tblr-avatar-box-shadow: var(--tblr-box-shadow-border);
@@ -23253,7 +23261,7 @@ a.card-title:hover {
 }
 
 .card-sm>.card-body {
-    padding: 1rem;
+    padding: 2rem;
     display: flex;
     overflow: hidden;
 }

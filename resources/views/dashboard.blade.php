@@ -42,7 +42,7 @@
                     <div class="row row-cards">
 
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm" style="background-color: rgba(93, 74, 199, 0.40) !important;">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -77,7 +77,7 @@
                         <!-- PET OWNERS -->
 
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm" style="background-color: rgba(187, 88, 205, 0.40) !important;">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -112,7 +112,7 @@
                         <!-- APPOINTMENTS -->
 
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm" style="background-color: rgba(238, 83, 79, 0.40) !important;">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -146,7 +146,7 @@
                         <!-- APPROVALS -->
 
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm" style="background-color: rgba(236, 228, 34, 0.40) !important;">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -182,7 +182,7 @@
                         <!-- PRODUCTS -->
                     
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm" style="background-color: rgba(2, 84, 155, 0.40) !important;">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -224,7 +224,7 @@
                         <!-- ORDERS -->
 
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm" style="background-color: rgb(44, 182, 67, 0.40) !important;">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -258,7 +258,7 @@
                         <!-- PURCHASES -->
 
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm" style="background-color: rgb(31, 161, 239, 0.40) !important;">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -293,12 +293,12 @@
                         <!-- QUOTATIONS -->
 
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm">
+                            <div class="card card-sm" style="background-color: rgb(24, 119, 240, 0.40) !important;">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-auto">
                                             <span
-                                                class="bg-facebook text-white avatar"><
+                                                class="bg-facebook text-white avatar">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                     class="icon icon-tabler icon-tabler-files" width="24" height="24"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
