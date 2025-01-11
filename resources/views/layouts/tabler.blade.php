@@ -43,7 +43,7 @@
     <script src="{{ asset('dist/js/demo-theme.min.js') }}"></script>
 
     <div class="page" style="overflow: hidden;">
-        <header class="navbar navbar-expand-md d-print-none" style="height: 70px">
+        <header class="navbar navbar-expand-md d-print-none" style="height: 70px; justify-content: center;">
        
             <div class="container-xl">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu"
@@ -73,7 +73,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="navbar-nav flex-row order-md-last">
+                <div class="navbar-nav flex-row order-md-last" style="margin-right: 0px; margin-left: 0px;">
                     <div class="d-none d-md-flex">
 
                         {{-- -
@@ -137,27 +137,25 @@
                     </div>
 
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
-                            aria-label="Open user menu">
+                        <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+                            <!-- User Avatar -->
                             <span class="avatar avatar-sm shadow-none"
-                                style="background-image: url('https://example.com/path/to/static/image.jpg');">
+                                style="background-image: url('{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('default-avatar.png') }}');">
                             </span>
 
+                            <!-- User Info -->
                             <div class="d-none d-xl-block ps-2">
                                 <div>{{ Auth::user()->name }}</div>
-                                {{--                                    <div class="mt-1 small text-muted">UI Designer</div> --}}
+                                {{-- <div class="mt-1 small text-muted">UI Designer</div> --}}
                             </div>
                         </a>
+
+                        <!-- Dropdown Menu -->
                         <div class="dropdown-menu">
                             <a href="{{ route('profile.edit') }}" class="dropdown-item">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="icon dropdown-item-icon icon-tabler icon-tabler-settings" width="24"
-                                    height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon icon-tabler icon-tabler-settings" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <path
-                                        d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z">
-                                    </path>
+                                    <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"></path>
                                     <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
                                 </svg>
                                 Account
@@ -165,21 +163,18 @@
                             <form action="{{ route('logout') }}" method="post">
                                 @csrf
                                 <button type="submit" class="dropdown-item">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="icon dropdown-item-icon icon-tabler icon-tabler-logout" width="24"
-                                        height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                        fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path
-                                            d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
-                                        <path d="M9 12h12l-3 -3" />
-                                        <path d="M18 15l3 -3" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon icon-tabler icon-tabler-logout" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24V24H0z" fill="none"></path>
+                                        <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"></path>
+                                        <path d="M9 12h12l-3 -3"></path>
+                                        <path d="M18 15l3 -3"></path>
                                     </svg>
                                     Logout
                                 </button>
                             </form>
                         </div>
                     </div>
+
 
                     {{-- -
                         <div class="dropdown">
@@ -320,41 +315,25 @@
 
                                 <li class="nav-header">ADMINISTRATION</li>
 
-
-
-                                {{--   USER MANAGEMENT & PETS NO routes/web.php && Http/Controllers  --}}
-
-                                <li class="nav-item dropdown {{ request()->is('user-management*') ? 'active' : null }}">
-                                    <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
-                                        data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                <li class="nav-item {{ request()->is('user-management-index') ? 'active' : null }}">
+                                    <a class="nav-link" href="{{ route('user-management.index') }}">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-user-edit">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                            <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
-                                            <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
-                                        </svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-user-edit">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                                                <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
+                                                <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
+                                            </svg>
                                         </span>
-                                        <span class="nav-link-title" style="z-index: 1;">
+                                        <span class="nav-link-title">
                                             {{ __('User Management') }}
                                         </span>
                                     </a>
-                                    <div class="dropdown-menu">
-                                        <div class="dropdown-menu-columns">
-                                            <div class="dropdown-menu-column">
-                                                <a class="dropdown-item" href="{{ route('user-management.pet-owner') }}">
-                                                    {{ __('Pet Owner') }}
-                                                </a>
-                                                <a class="dropdown-item" href="{{ route('user-management.sub-admin') }}">
-                                                    {{ __('Sub Admin') }}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </li>
+
 
 
                                 <!-- PETS -->

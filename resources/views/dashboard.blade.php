@@ -63,16 +63,17 @@
                                         </div>
                                         <div class="col">
                                             <div class="font-weight-medium">
-                                                {{ $quotations }} Pets
+                                                {{ $pets }} Pets
                                             </div>
                                             <div class="text-muted">
-                                                {{ $todayQuotations }} today
+                                                {{ $todayPets }} today
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- PET OWNERS -->
 

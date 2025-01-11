@@ -10,6 +10,7 @@ use App\Models\Purchase;
 use App\Models\Quotation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\Pet; 
 
 class DashboardController extends Controller
 {
@@ -27,7 +28,12 @@ class DashboardController extends Controller
         $categories = Category::where("user_id", auth()->id())->count();
         $quotations = Quotation::where("user_id", auth()->id())->count();
 
+        $pets = Pet::where("user_id", auth()->id())->count();
+        $todayPets = Pet::where("user_id", auth()->id())->whereDate('created_at', today()->format('Y-m-d'))->count();
+
         return view('dashboard', [
+            'pets' => $pets,
+            'todayPets' => $todayPets,
             'products' => $products,
             'orders' => $orders,
             'purchases' => $purchases,

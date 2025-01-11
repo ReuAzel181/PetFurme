@@ -5,171 +5,150 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\User\StoreUserRequest;
-use App\Http\Requests\User\UpdateUserRequest;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function index()
+    // Display all users or filter by role
+    public function index(Request $request)
     {
-        // TODO: Select columns
-        $users = User::all();
-
-        return view('users.index', [
-            'users' => $users
-        ]);
+        // Get the role from the query parameter or default to 'all'
+        $role = $request->query('role', 'all');
+    
+        // Fetch users based on the role
+        $users = $role === 'all' 
+            ? User::all() 
+            : User::where('role', $role)->get();
+    
+        // Pass roles for filtering buttons
+        $roles = [
+            'all' => 'All',
+            'pet_owner' => 'Pet Owners',
+            'sub_admin' => 'Sub Admins',
+            'admin' => 'Admins',
+        ];
+    
+        return view('users.index', compact('users', 'roles', 'role'));
     }
 
+    // Display pet owners
     public function petOwner()
     {
-        // Fetch users with the "Pet Owner" role
         $users = User::where('role', 'pet_owner')->get();
-
-        return view('users.pet-owner', ['users' => $users]);
+        return view('users.pet-owner', compact('users'));
     }
 
+    // Display sub admins
     public function subAdmin()
     {
-        // Fetch users with the "Sub Admin" role
         $users = User::where('role', 'sub_admin')->get();
-
-        return view('users.sub-admin', ['users' => $users]);
+        return view('users.sub-admin', compact('users'));
     }
 
+    public function admin()
+    {
+        $users = User::where('role', 'admin')->get(); // Fetch admin users
+        return view('users.admin', compact('users'));
+    }
+
+    // Show create user form
     public function create()
     {
         return view('users.create');
     }
-    public function userManagementOverview()
-    {
-        // You can return a view or redirect to a default page
-        return view('users.user-management-overview');
-    }
 
-
+    // Store a new user
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'type' => 'required|in:pet_owner,sub_admin',
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string|max:255',
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'number_of_pets' => 'nullable|required_if:type,pet_owner|integer',
-            'phone' => 'nullable|required_if:type,pet_owner|string',
-            'pet_name' => 'nullable|required_if:type,pet_owner|string|max:100',
-            'pet_type' => 'nullable|required_if:type,pet_owner|string|max:100',
-            'address' => 'nullable|required_if:type,pet_owner|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20',
+            'pet_name' => 'nullable|string|max:255',
+            'pet_type' => 'nullable|string|max:255',
+            'store_name' => 'nullable|string|max:255',
+            'store_address' => 'nullable|string|max:255',
+            'store_email' => 'nullable|string|email|max:255',
+            'password' => 'required|string|min:8',
+            'role' => 'required|string|in:admin,sub_admin,pet_owner',
+            'photo' => 'nullable|image|max:2048', // Max size: 2MB
         ]);
-
-
-        $validatedData['role'] = $validatedData['type']; // Ensure role is set
-
-        $validatedData['password'] = Hash::make($validatedData['password']);
-
-
-
-        // Debug output
-        \Log::info('Validated Data:', $validatedData);
-
-        
-        // Create user
-        $user = User::create($validatedData);
-
+    
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+    
         // Handle file upload
+        $photoPath = null;
         if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $filename = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
-            $file->storeAs('profile/', $filename, 'public');
-            $user->update(['photo' => $filename]);
+            $photoPath = $request->file('photo')->store('user_photos', 'public');
+        }
+    
+        // Create the user
+        User::create([
+            'username' => $request->username,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone ?? 'N/A',
+            'pet_name' => $request->pet_name ?? 'N/A',
+            'pet_type' => $request->pet_type ?? 'N/A',
+            'store_name' => $request->store_name ?? 'N/A',
+            'store_address' => $request->store_address ?? 'N/A',
+            'store_email' => $request->store_email ?? 'N/A',
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'photo' => $photoPath,
+        ]);
+    
+        return redirect()->route('user-management.index')->with('success', 'User created successfully.');
+    }
+    
+
+
+    // Show edit user form
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+        return view('users.edit', compact('user'));
+    }
+
+    // Update user details
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'phone' => 'nullable|string|max:20',
+            'photo' => 'nullable|image|max:2048',
+            // Add other validation rules as needed
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Redirect based on role
-        $redirectRoute = $user->role === 'sub_admin' ? 'user-management.sub-admin' : 'user-management.pet-owner';
-        \Log::info('Redirecting to:', ['route' => $redirectRoute]);
-
-        return redirect()
-        ->route($redirectRoute)
-        ->with('success', 'New ' . ucfirst($user->role) . ' has been created!');
-    }
-
-
-    public function show(User $user)
-    {
-        return view('users.show', [
-           'user' => $user
-        ]);
-    }
-
-    public function edit(User $user)
-    {
-        return view('users.edit', [
-            'user' => $user
-        ]);
-    }
-
-    public function update(UpdateUserRequest $request, User $user)
-    {
-
-        $user->update($request->except('photo'));
-
-        // Handle upload image with Storage.
-
-        if($request->hasFile('photo')){
-
-            // Delete Old Photo
-            if($user->photo){
-                unlink(public_path('storage/profile/') . $user->photo);
-            }
-
-            // Prepare New Photo
-            $file = $request->file('photo');
-            $fileName = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
-
-            // Store an image to Storage
-            $file->storeAs('profile/', $fileName, 'public');
-
-            // Save DB
-            $user->update([
-                'photo' => $fileName
-            ]);
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('user_photos', 'public');
+            $user->photo = $photoPath;
         }
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'User has been updated!');
+        // Update other fields
+        $user->update($request->except(['photo', '_token', '_method']));
+
+        return redirect()->route('user-management.index')->with('success', 'User updated successfully.');
     }
 
-    public function updatePassword(Request $request, String $username)
+    // Delete a user
+    public function destroy($id)
     {
-        # Validation
-        $validated = $request->validate([
-            'password' => 'required_with:password_confirmation|min:6',
-            'password_confirmation' => 'same:password|min:6',
-        ]);
-
-        # Update the new Password
-        User::where('username', $username)->update([
-            'password' => Hash::make($validated['password'])
-        ]);
-
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'User has been updated!');
-    }
-
-    public function destroy(User $user)
-    {
-        //  Delete photo if exists.
-         
-        if($user->photo){
-            unlink(public_path('storage/profile/') . $user->photo);
-        }
-
+        $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'User has been deleted!');
+        return redirect()->route('user-management.index')->with('success', 'User deleted successfully.');
     }
 }

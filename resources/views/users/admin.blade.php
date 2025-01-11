@@ -3,7 +3,7 @@
 @section('list-content')
 <div>
     @if($users->isEmpty())
-        <p>No pet owners found.</p>
+        <p>No admins found.</p>
     @else
         <table class="table">
             <thead>

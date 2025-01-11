@@ -50,6 +50,8 @@ use Illuminate\Support\Facades\Auth;
 // Route::middleware(['auth', 'verified'])->group(function () {
 //     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 // });
+Route::resource('pets', PetController::class);
+
 
 // Route Messages <------
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -109,16 +111,35 @@ Route::middleware('cache.response')->group(function () {
     })->name('image.file');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('users', UserController::class);
+// Existing User Management Routes
+Route::prefix('user-management')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('user-management.index'); // All users
+    Route::get('/create', [UserController::class, 'create'])->name('user-management.create'); // Add User
+    Route::get('/{id}/edit', [UserController::class, 'edit'])->name('user-management.edit'); // Edit User
+    Route::delete('/{id}', [UserController::class, 'destroy'])->name('user-management.destroy'); // Delete User
+    Route::put('/{id}', [UserController::class, 'update'])->name('users.update'); // Update User
+    Route::post('/', [UserController::class, 'store'])->name('users.store'); // Store User
+    Route::get('/pet-owner', [UserController::class, 'petOwner'])->name('user-management.pet-owner'); // Pet Owners
+    Route::get('/sub-admin', [UserController::class, 'subAdmin'])->name('user-management.sub-admin'); // Sub Admins
+    Route::get('/admin', [UserController::class, 'admin'])->name('user-management.admin'); // Admins
 });
 
+
+// New Dynamic Role View Route
+Route::get('user-management/{role}', function ($role) {
+    $allowedRoles = ['pet_owner', 'sub_admin', 'admin'];
+    if (!in_array($role, $allowedRoles)) {
+        abort(404); // Abort if role is invalid
+    }
+
+    $users = \App\Models\User::where('role', $role)->get(); // Fetch users by role
+    return view("users.$role", compact('users')); // Return the correct view
+})->name('user-management.role');
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('dashboard/', [DashboardController::class, 'index'])->name('dashboard');
 
-    // User Management
     // Route::resource('/users', UserController::class); //->except(['show']);
     Route::put('/user/change-password/{username}', [UserController::class, 'updatePassword'])->name('users.updatePassword');
 
@@ -198,11 +219,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/quotations/complete/{quotation}', [QuotationController::class, 'update'])->name('quotations.update');
     Route::delete('/quotations/delete/{quotation}', [QuotationController::class, 'destroy'])->name('quotations.delete');
 });
-
-
-// Include the user management routes
-require base_path('routes/user-management.php');
-
 
 require __DIR__.'/auth.php';
 
