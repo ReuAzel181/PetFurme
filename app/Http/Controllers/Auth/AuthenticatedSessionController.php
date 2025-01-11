@@ -3,9 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -16,13 +13,12 @@ class AuthenticatedSessionController extends Controller
     {
         return view('auth.login');
     }
+
     /**
      * Handle an incoming authentication request.
      */
     public function store(Request $request)
     {
-
-
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -30,15 +26,16 @@ class AuthenticatedSessionController extends Controller
 
         // Attempt to authenticate the user
         if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            // Generate a token using Sanctum
-            $token = $user->createToken('YourAppName')->plainTextToken;
+            $request->session()->regenerate();
 
-            return response()->json(['token' => $token], 200);
+            // Redirect the user to the intended page (or dashboard)
+            return redirect()->intended('/dashboard');
         }
 
         // Return unauthorized response if authentication fails
-        return response()->json(['message' => 'Unauthorized'], 401);
+        return redirect()->back()
+            ->withErrors(['email' => 'The provided credentials are incorrect.'])
+            ->withInput();
     }
 
     /**
@@ -51,6 +48,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Successfully logged out.']);
+        return redirect('/login');
     }
 }

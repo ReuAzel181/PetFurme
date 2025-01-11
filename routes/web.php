@@ -5,7 +5,7 @@ use App\Http\Controllers\CustomerController;
 
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MesController;
-use App\Http\Controllers\AppointController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\SalesController;
 
@@ -46,11 +46,11 @@ use Illuminate\Support\Facades\Auth;
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
 });
 
-// Route Notification
-// Route::middleware(['auth', 'verified'])->group(function () {
-//     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-// });
-Route::resource('pets', PetController::class);
+Route::get('/api/users/{id}/pets', function ($id) {
+    $pets = App\Models\Pet::where('user_id', $id)->get();
+    return response()->json($pets);
+});
+
 
 
 // Route Messages <------
@@ -70,9 +70,12 @@ Route::middleware('checkConversationAccess')->group(function () {
 
 
  // Route Appointment <------
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/appoint', [AppointController::class, 'index'])->name('appoint.index');
-});
+ Route::get('/appointment', [AppointmentController::class, 'index'])->name('appointment.index');
+ Route::get('/appointment/create', [AppointmentController::class, 'create'])->name('appointment.create');
+ Route::post('/appointment', [AppointmentController::class, 'store'])->name('appointment.store');
+ Route::get('/appointment/{id}/edit', [AppointmentController::class, 'edit'])->name('appointment.edit');
+ Route::put('/appointment/{id}', [AppointmentController::class, 'update'])->name('appointment.update');
+ Route::delete('/appointment/{id}', [AppointmentController::class, 'destroy'])->name('appointment.destroy');
 
  // Route Pet <------
 Route::middleware(['auth', 'verified'])->group(function () {

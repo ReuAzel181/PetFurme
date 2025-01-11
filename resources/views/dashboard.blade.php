@@ -98,12 +98,13 @@
                                             </span>
                                         </div>
                                         <div class="col">
-                                            <div class="font-weight-medium">
-                                                {{ $quotations }} Pet Owners
+                                        <div class="font-weight-medium">
+                                                {{ $totalPetOwners }} Pet Owners
                                             </div>
                                             <div class="text-muted">
-                                                {{ $todayQuotations }} today
+                                                {{ $todayPetOwners }} today
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>

@@ -99,9 +99,10 @@
                                     <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
                                 </svg>
 
-                                @if (auth()->user()->unreadNotifications->count() !== 0)
+                                @if (auth()->check() && optional(auth()->user()->unreadNotifications)->count() !== 0)
                                     <span class="badge bg-red"></span>
                                 @endif
+
                             </a>
                             <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
 
@@ -291,8 +292,8 @@
                                 
                                 <!-- APPOINTMENTS -->
                 
-                                <li class="nav-item {{ request()->is('appoint*') ? 'active' : null }}">
-                                    <a class="nav-link" href="{{ route('appoint.index') }}">
+                                <li class="nav-item {{ request()->is('appointment*') ? 'active' : null }}">
+                                    <a class="nav-link" href="{{ route('appointment.index') }}">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" 
@@ -308,7 +309,7 @@
                                         </svg>
                                         </span>
                                         <span class="nav-link-title" style="z-index: 1;">
-                                            {{ __('Appointments') }}
+                                            {{ __('Appointment') }}
                                         </span>
                                     </a>
                                 </li>

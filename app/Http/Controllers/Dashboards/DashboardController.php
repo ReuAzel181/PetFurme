@@ -11,6 +11,8 @@ use App\Models\Quotation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Pet; 
+use App\Models\User;
+
 
 class DashboardController extends Controller
 {
@@ -31,18 +33,25 @@ class DashboardController extends Controller
         $pets = Pet::where("user_id", auth()->id())->count();
         $todayPets = Pet::where("user_id", auth()->id())->whereDate('created_at', today()->format('Y-m-d'))->count();
 
-        return view('dashboard', [
-            'pets' => $pets,
-            'todayPets' => $todayPets,
-            'products' => $products,
-            'orders' => $orders,
-            'purchases' => $purchases,
-            'todayPurchases' => $todayPurchases,
-            'todayProducts' => $todayProducts,
-            'todayQuotations' => $todayQuotations,
-            'todayOrders' => $todayOrders,
-            'categories' => $categories,
-            'quotations' => $quotations
-        ]);
+        $totalPetOwners = User::where('role', 'pet_owner')->count(); 
+        $todayPetOwners = User::where('role', 'pet_owner')->whereDate('created_at', today())->count(); 
+
+        return view('dashboard', compact(
+            'pets', 
+            'totalPetOwners', 
+            'todayPetOwners',
+            'todayPets', 
+            'products', 
+            'orders', 
+            'purchases', 
+            'todayPurchases', 
+            'todayProducts', 
+            'todayQuotations', 
+            'todayOrders', 
+            'categories', 
+            'quotations'
+        ));
     }
+
+    
 }
