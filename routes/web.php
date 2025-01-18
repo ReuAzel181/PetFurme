@@ -77,7 +77,9 @@ Route::get('/test-supabase', function (MessageService $messageService) {
 
 // Route Notification <------
     Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])
+            ->name('notifications.markAllRead');
 });
 
 
@@ -207,7 +209,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('products/import/', [ProductImportController::class, 'create'])->name('products.import.view');
     Route::post('products/import/', [ProductImportController::class, 'store'])->name('products.import.store');
     Route::get('products/export/', [ProductExportController::class, 'create'])->name('products.export.store');
-    Route::resource('/products', ProductController::class);
+    Route::resource('/products', \App\Http\Controllers\Product\ProductController::class);
 
 
 
@@ -274,4 +276,16 @@ require __DIR__.'/auth.php';
 
 Route::get('test/', function (){
     return view('test');
+});
+
+Route::resource('users', UserController::class);
+
+// Or if you prefer to define them individually:
+Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
+    Route::get('/', [UserController::class, 'index'])->name('index');
+    Route::get('/create', [UserController::class, 'create'])->name('create');
+    Route::post('/', [UserController::class, 'store'])->name('store');
+    Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+    Route::put('/{user}', [UserController::class, 'update'])->name('update');
+    Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
 });

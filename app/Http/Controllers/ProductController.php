@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
@@ -53,16 +54,16 @@ class ProductController extends Controller
     // Update the product
     public function update(Request $request, Product $product)
     {
-        // Validate and update the product
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255',
-            // other validation rules
+            'quantity' => 'required|numeric|min:0',
+            'quantity_alert' => 'required|numeric|min:0',
         ]);
 
-        $product->update($request->all());
+        $product->update($validated);
 
-        return redirect()->route('products.index')->with('success', 'Product updated successfully!');
+        return redirect()->route('products.index')
+            ->with('success', 'Product updated successfully!');
     }
 
     // Delete a product

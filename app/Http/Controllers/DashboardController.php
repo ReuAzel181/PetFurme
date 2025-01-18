@@ -11,24 +11,35 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Get total pets count
-        $totalPets = Pet::count();
+        // Initialize error variable
+        $error = null;
         
-        // Get today's pets (using today's date)
-        $todayPets = Pet::whereDate('created_at', Carbon::now()->toDateString())->count();
+        try {
+            // Get total pets count
+            $totalPets = Pet::count();
+            
+            // Get today's pets (using today's date)
+            $todayPets = Pet::whereDate('created_at', Carbon::now()->toDateString())->count();
 
-        // For debugging - let's log the counts and dates
-        \Log::info('Pet Counts:', [
-            'total' => $totalPets,
-            'today' => $todayPets,
-            'today_date' => Carbon::now()->toDateString(),
-            'sample_pet_dates' => Pet::pluck('created_at')->toArray()
-        ]);
+            // For debugging - let's log the counts and dates
+            \Log::info('Pet Counts:', [
+                'total' => $totalPets,
+                'today' => $todayPets,
+                'today_date' => Carbon::now()->toDateString(),
+                'sample_pet_dates' => Pet::pluck('created_at')->toArray()
+            ]);
 
-        return view('dashboard', [
-            'totalPets' => $totalPets,
-            'todayPets' => $todayPets,
+        } catch (\Exception $e) {
+            $error = "An error occurred while loading the dashboard data.";
+            // You might want to log the actual error here
+            \Log::error($e->getMessage());
+        }
+
+        return view('dashboard', compact(
+            'totalPets',
+            'todayPets',
+            'error',
             // Add other variables as needed
-        ]);
+        ));
     }
 } 

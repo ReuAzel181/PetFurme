@@ -27786,7 +27786,8 @@ img {
 .bg-muted-lt {
     --tblr-bg-opacity: 1;
     --tblr-text-opacity: 1;
-    color: rgba(var(--tblr-muted-rgb), var(--tblr-text-opacity)) !important;
+    color: rgb(193 193 193) !important;
+    font-size: small;
     background-color: rgba(var(--tblr-muted-lt-rgb), var(--tblr-bg-opacity)) !important
 }
 
@@ -28337,7 +28338,8 @@ img {
 
 .text-muted {
     --tblr-text-opacity: 1;
-    color: rgba(var(--tblr-muted-rgb), var(--tblr-text-opacity)) !important
+    color: rgb(197 197 197) !important;
+    font-size: x-small;
 }
 
 .text-muted-fg {

@@ -7,6 +7,12 @@
                 button_label="{{ __('Add your first Order') }}" button_route="{{ route('orders.create') }}" />
         @else
             <div class="container-xl">
+                <div class="col">
+                    @include('partials._page_header', [
+                        'title' => __('Orders'),
+                        'section' => 'OVERVIEW'
+                    ])
+                </div>
                 {{--        <x-card> --}}
                 {{--            <x-slot:header> --}}
                 {{--                <x-slot:title> --}}

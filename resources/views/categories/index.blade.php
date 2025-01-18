@@ -17,6 +17,12 @@
                         <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
                     </div>
                 @endif
+                <div class="col">
+                    @include('partials._page_header', [
+                        'title' => __('Categories'),
+                        'section' => 'OVERVIEW'
+                    ])
+                </div>
                 @livewire('tables.category-table')
             </div>
         @endif

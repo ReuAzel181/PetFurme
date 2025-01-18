@@ -17,12 +17,18 @@ class ProductController extends Controller
 {
     public function index()
     {
-        // Retrieve the count of products for the authenticated user
-        $products = Product::where("user_id", auth()->id())->count();
+        // Retrieve all products for the authenticated user
+        $products = Product::where("user_id", auth()->id())
+            ->with(['category', 'unit']) // Eager load relationships
+            ->latest()  // Order by latest first
+            ->get();
 
-        return view('products.index', [
-            'products' => $products,
+        \Log::info('Fetched products:', [
+            'count' => $products->count(),
+            'user_id' => auth()->id()
         ]);
+
+        return view('products.index', compact('products'));
     }
 
     public function create(Request $request)
@@ -100,13 +106,19 @@ class ProductController extends Controller
 
     public function edit($uuid)
     {
-        // Retrieve product by UUID and categories/units for the authenticated user
-        $product = Product::where("uuid", $uuid)->firstOrFail();
-        return view('products.edit', [
-            'categories' => Category::where("user_id", auth()->id())->get(),
-            'units' => Unit::where("user_id", auth()->id())->get(),
-            'product' => $product
-        ]);
+        // Debug logging
+        \Log::info('Attempting to edit product', ['uuid' => $uuid]);
+
+        $product = Product::where('uuid', $uuid)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        \Log::info('Found product', ['product' => $product->toArray()]);
+
+        $categories = Category::where("user_id", auth()->id())->get(['id', 'name']);
+        $units = Unit::where("user_id", auth()->id())->get(['id', 'name']);
+
+        return view('products.edit', compact('product', 'categories', 'units'));
     }
 
     public function update(UpdateProductRequest $request, $uuid)

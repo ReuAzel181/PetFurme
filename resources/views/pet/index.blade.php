@@ -2,8 +2,14 @@
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="text-center my-4">Pets Management</h1>
-
+    <div class="col">
+        <div class="page-pretitle text-muted 					text-uppercase">
+            overview
+        </div>
+        <h2 class="page-title">
+            Clinic Inventory
+        </h2>
+    </div>
     <!-- Success Message -->
     @if(session('success'))
         <div class="alert alert-success">

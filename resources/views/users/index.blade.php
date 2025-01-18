@@ -2,7 +2,12 @@
 
 @section('content')
 <div class="container">
-    <h1>User Management</h1>
+    <div class="col">
+        @include('partials._page_header', [
+            'title' => __('User Management'),
+            'section' => 'OVERVIEW'
+        ])
+    </div>
     <p>Manage users by category or view all users.</p>
 
     <!-- Filter Buttons -->
