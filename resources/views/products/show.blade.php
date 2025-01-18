@@ -25,20 +25,16 @@
                                 <h3 class="card-title">
                                     {{ __('Product Image') }}
                                 </h3>
-<!-- 
-                                <img style="width: 90px;" id="image-preview"
-                                    src="{{ $product->product_image ? asset('storage/' . $product->product_image) : asset('assets/img/products/default.webp') }}"
-                                    alt="" class="img-account-profile mb-2"> -->
 
-                                <img style="width: 90px;" id="image-preview"
-                                    src="{{ $product->product_image ? asset('assets/img/products/' . $product->product_image) : asset('assets/img/products/default.webp') }}"
-                                    alt="" class="img-account-profile mb-2">
+                                
+                                <img src="{{ $product->product_image ? asset('storage/' . $product->product_image) : asset('assets/img/products/default.webp') }}" 
+                                alt="{{ $product->name }}" 
+                                style="width: 90px !important; height: 90px !important; object-fit: cover !important;">
+
 
                             </div>
-                            
                         </div>
                     </div>
-
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-header">

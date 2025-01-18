@@ -63,12 +63,13 @@
                                         </div>
                                         <div class="col">
                                             <div class="font-weight-medium">
-                                                {{ $pets }} Pets
+                                                {{ $totalPets ?? 0 }} Pets <!-- Use $totalPets for total count -->
                                             </div>
                                             <div class="text-muted">
-                                                {{ $todayPets }} today
+                                                {{ $todayPets ?? 0 }} today <!-- Use $todayPets for today's count -->
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -134,52 +135,16 @@
                                         </div>
                                         <div class="col">
                                             <div class="font-weight-medium">
-                                                {{ $quotations }} Appointments
+                                                {{ $appointments ?? 'No Appointments' }} Appointments
                                             </div>
                                             <div class="text-muted">
-                                                {{ $todayQuotations }} today
+                                                {{ $todayAppointments ?? 'No Appointments Today' }} today
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- APPROVALS -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm" style="background-color: rgba(236, 228, 34, 0.40) !important;">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span
-                                                class="bg-lemon text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
-                                                <img src="assets/img2/aprvl_icon.png" alt="Approval Icon"
-                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
-                                                    <path
-                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
-                                                    <path
-                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <div class="col">
-                                            <div class="font-weight-medium">
-                                                {{ $quotations }} Approvals
-                                            </div>
-                                            <div class="text-muted">
-                                                {{ $todayQuotations }} today
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
 
                         <!-- PRODUCTS -->
                     
@@ -220,115 +185,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        
-
-                        <!-- ORDERS -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm" style="background-color: rgb(44, 182, 67, 0.40) !important;">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span
-                                                class="bg-green text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/shopping-cart -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                                    height="24" viewBox="0 0 24 24" stroke-width="2"
-                                                    stroke="currentColor" fill="none" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                                    <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                                    <path d="M17 17h-11v-14h-2" />
-                                                    <path d="M6 5l14 1l-1 7h-13" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <div class="col">
-                                            <div class="font-weight-medium">
-                                                {{ $orders }} Orders
-                                            </div>
-                                            <div class="text-muted">
-                                                {{ $todayOrders }} shipped
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PURCHASES -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm" style="background-color: rgb(31, 161, 239, 0.40) !important;">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span
-                                                class="bg-twitter text-white avatar">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                    class="icon icon-tabler icon-tabler-truck-delivery" width="24"
-                                                    height="24" viewBox="0 0 24 24" stroke-width="2"
-                                                    stroke="currentColor" fill="none" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                                    <path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                                    <path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" />
-                                                    <path d="M3 9l4 0" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <div class="col">
-                                            <div class="font-weight-medium">
-                                                {{ $purchases }} Purchases
-                                            </div>
-                                            <div class="text-muted">
-                                                {{ $todayPurchases }} today
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- QUOTATIONS -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm" style="background-color: rgb(24, 119, 240, 0.40) !important;">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span
-                                                class="bg-facebook text-white avatar">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
-                                                    <path
-                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
-                                                    <path
-                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <div class="col">
-                                            <div class="font-weight-medium">
-                                                {{ $quotations }} Quotations
-                                            </div>
-                                            <div class="text-muted">
-                                                {{ $todayQuotations }} today
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        
-
 
                     </div>
                 </div>

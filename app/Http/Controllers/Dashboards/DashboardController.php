@@ -20,19 +20,11 @@ class DashboardController extends Controller
     {
         $orders = Order::where("user_id", auth()->id())->count();
         $products = Product::where("user_id", auth()->id())->count();
-
-        $purchases = Purchase::where("user_id", auth()->id())->count();
-        $todayPurchases = Purchase::whereDate('date', today()->format('Y-m-d'))->count();
         $todayProducts = Product::whereDate('created_at', today()->format('Y-m-d'))->count();
-        $todayQuotations = Quotation::whereDate('created_at', today()->format('Y-m-d'))->count();
         $todayOrders = Order::whereDate('created_at', today()->format('Y-m-d'))->count();
-
         $categories = Category::where("user_id", auth()->id())->count();
-        $quotations = Quotation::where("user_id", auth()->id())->count();
-
         $pets = Pet::where("user_id", auth()->id())->count();
         $todayPets = Pet::where("user_id", auth()->id())->whereDate('created_at', today()->format('Y-m-d'))->count();
-
         $totalPetOwners = User::where('role', 'pet_owner')->count(); 
         $todayPetOwners = User::where('role', 'pet_owner')->whereDate('created_at', today())->count(); 
 
@@ -43,13 +35,9 @@ class DashboardController extends Controller
             'todayPets', 
             'products', 
             'orders', 
-            'purchases', 
-            'todayPurchases', 
-            'todayProducts', 
-            'todayQuotations', 
+            'todayProducts',  
             'todayOrders', 
             'categories', 
-            'quotations'
         ));
     }
 

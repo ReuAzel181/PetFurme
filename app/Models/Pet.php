@@ -9,9 +9,11 @@ class Pet extends Model
 {
     use HasFactory;
 
+    protected $table = 'pets';
+    
     protected $fillable = [
-        'name',
         'user_id',
+        'name',
         'type',
         'breed',
         'age',
@@ -19,5 +21,31 @@ class Pet extends Model
         'allergies',
         'notes',
         'category',
+        'gender',
+        'weight',
+        'photo',
     ];
+
+    public static function getTotalCount()
+    {
+        return self::count();
+    }
+
+    public static function getTodayCount()
+    {
+        return self::whereDate('created_at', now()->toDateString())->count();
+    }
+
+
+    // Relationship with User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Relationship with Appointment
+    public function appointment()
+    {
+        return $this->hasMany(Appointment::class);
+    }
 }

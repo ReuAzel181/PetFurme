@@ -4,7 +4,6 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\MesController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\SalesController;
@@ -29,6 +28,41 @@ use App\Http\Controllers\UserController; // <------ Include the UserController
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
+use App\Http\Controllers\MessageController;
+use App\Services\MessageService;
+
+use Supabase\CreateClient;
+
+Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
+Route::get('/messages/users', [MessageController::class, 'showUsers'])->name('messages.users');
+Route::post('/messages/send/{id}', [MessageController::class, 'sendMessage'])->name('messages.send');
+
+Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+Route::resource('messages', MessageController::class);
+
+
+
+Route::get('/test-supabase', function () {
+    $supabase = new \Supabase\CreateClient(
+        config('supabase.url'),
+        config('supabase.key')
+    );
+
+    $response = $supabase->from('messages')->select('*')->execute();
+
+    if (isset($response->error)) {
+        return response()->json(['error' => $response->error], 500);
+    }
+
+    return response()->json(['data' => $response->data], 200);
+});
+
+
+Route::get('/test-supabase', function (MessageService $messageService) {
+    $conversations = $messageService->getConversations();
+    return response()->json($conversations);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -46,26 +80,16 @@ use Illuminate\Support\Facades\Auth;
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notification');
 });
 
-Route::get('/api/users/{id}/pets', function ($id) {
-    $pets = App\Models\Pet::where('user_id', $id)->get();
-    return response()->json($pets);
-});
+
+// Fetch Pet
+// Route::get('/api/users/{id}/pets', function ($id) {
+//     $pets = App\Models\Pet::where('user_id', $id)->get();
+//     return response()->json($pets);
+// });
 
 
-
-// Route Messages <------
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Route to list all conversations
-    Route::get('/mes', [MesController::class, 'index'])->name('mes.index');
-    
-// Middleware to check if the user has access to the conversation
-Route::middleware('checkConversationAccess')->group(function () {
-        // Route to show messages in a conversation
-        Route::get('/mes/{conversation}', [MesController::class, 'show'])->name('messages.show');
-        
-        // Route to send a message
-        Route::post('/mes/{conversation}/send', [MesController::class, 'sendMessage'])->name('messages.send');
-    });
+Route::get('/api/users/{user}/pets', function ($userId) {
+    return Pet::where('user_id', $userId)->get();
 });
 
 
@@ -77,15 +101,13 @@ Route::middleware('checkConversationAccess')->group(function () {
  Route::put('/appointment/{id}', [AppointmentController::class, 'update'])->name('appointment.update');
  Route::delete('/appointment/{id}', [AppointmentController::class, 'destroy'])->name('appointment.destroy');
 
- // Route Pet <------
+// Route Pet and Sales
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('pets', PetController::class);
     Route::get('/pet', [PetController::class, 'index'])->name('pet.index');
-});
-
- // Route Pet <------
-Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sales', [PetController::class, 'index'])->name('sales.index');
 });
+
 
 Route::get('php/', function () {
     return phpinfo();
@@ -153,7 +175,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('/quotations', QuotationController::class);
     Route::resource('/customers', CustomerController::class);
     Route::resource('/suppliers', SupplierController::class);
     Route::resource('/categories', CategoryController::class);
@@ -199,28 +220,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orders/details/{order_id}/download', [OrderController::class, 'downloadInvoice'])->name('order.downloadInvoice');
 
 
-    // Route Purchases
-    Route::get('/purchases/approved', [PurchaseController::class, 'approvedPurchases'])->name('purchases.approvedPurchases');
-    Route::get('/purchases/report', [PurchaseController::class, 'purchaseReport'])->name('purchases.purchaseReport');
-    Route::get('/purchases/report/export', [PurchaseController::class, 'getPurchaseReport'])->name('purchases.getPurchaseReport');
-    Route::post('/purchases/report/export', [PurchaseController::class, 'exportPurchaseReport'])->name('purchases.exportPurchaseReport');
-
-    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
-    Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
-    Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
-
-    //Route::get('/purchases/show/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
-    Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
-
-    //Route::get('/purchases/edit/{purchase}', [PurchaseController::class, 'edit'])->name('purchases.edit');
-    Route::get('/purchases/{purchase}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
-    Route::post('/purchases/update/{purchase}', [PurchaseController::class, 'update'])->name('purchases.update');
-    Route::delete('/purchases/delete/{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.delete');
-
-    // Route Quotations
-    // Route::get('/quotations/{quotation}/edit', [QuotationController::class, 'edit'])->name('quotations.edit');
-    Route::post('/quotations/complete/{quotation}', [QuotationController::class, 'update'])->name('quotations.update');
-    Route::delete('/quotations/delete/{quotation}', [QuotationController::class, 'destroy'])->name('quotations.delete');
 });
 
 require __DIR__.'/auth.php';

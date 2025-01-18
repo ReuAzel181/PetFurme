@@ -9,24 +9,28 @@ class Appointment extends Model
 {
     use HasFactory;
 
-    // Explicitly define the table name
-    protected $table = 'appointment';
+    protected $table = 'appointment'; // Specify the table name explicitly
 
     protected $fillable = [
         'user_id',
         'pet_id',
-        'reason_for_visit',
+        'owner_name',
+        'pet_name',
         'appointment_date',
         'appointment_time',
+        'reason_for_visit',
     ];
 
-    // An appointment belongs to a user
+    // Automatically cast `reason_for_visit` to array when accessed
+    protected $casts = [
+        'reason_for_visit' => 'array',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // An appointment belongs to a pet
     public function pet()
     {
         return $this->belongsTo(Pet::class);

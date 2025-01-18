@@ -1,29 +1,18 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page">
-        <div class="page-body">
-            <div class="container-xl">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Your Conversations</h3>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            @foreach($conversations as $conversation)
-                                <li class="list-group-item">
-                                    <a href="{{ route('messages.show', $conversation->id) }}">
-                                        Conversation #{{ $conversation->id }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    <div class="card-footer">
-                        <a href="#" class="btn btn-primary">Start New Conversation</a>
-                    </div>
+<div class="container">
+    <h1 class="text-center my-4">Conversations</h1>
+    <ul class="list-group">
+        @foreach ($conversations as $conversation)
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ $conversation->user->name }}</strong>
+                    <br><small>Last Message: {{ $conversation->last_message }}</small>
                 </div>
-            </div>
-        </div>
-    </div>
+                <a href="{{ route('messages.chat', $conversation->user->id) }}" class="btn btn-primary btn-sm">View</a>
+            </li>
+        @endforeach
+    </ul>
+</div>
 @endsection

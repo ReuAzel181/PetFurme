@@ -5,7 +5,7 @@ use Closure;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Conversation;
 
-class CheckConversationAccess
+class CheckConversation
 {
     public function handle($request, Closure $next)
     {
