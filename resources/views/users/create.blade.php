@@ -1,92 +1,154 @@
-@extends('layouts.tabler') <!-- Or your preferred layout -->
+@extends('layouts.tabler')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4">Add User</h1>
-    <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <!-- Personal Information -->
-        <h4 class="mb-3">Personal Information</h4>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="phone">Phone (Optional)</label>
-                <input type="text" class="form-control" id="phone" name="phone">
+<div class="page-wrapper">
+    <div class="container-xl">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col">
+                @include('partials._page_header', [
+                    'title' => __('Add New User'),
+                    'section' => 'USER MANAGEMENT'
+                ])
             </div>
         </div>
 
-        <!-- Pet Information -->
-        <h4 class="mb-3">Pet Information (Optional)</h4>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="pet_name">Pet Name</label>
-                <input type="text" class="form-control" id="pet_name" name="pet_name">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="pet_type">Pet Type</label>
-                <input type="text" class="form-control" id="pet_type" name="pet_type">
-            </div>
-        </div>
+        <!-- Form Card -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Validation Errors -->
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
 
-        <!-- Store Information -->
-        <h4 class="mb-3">Store Information (Optional)</h4>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="store_name">Store Name</label>
-                <input type="text" class="form-control" id="store_name" name="store_name">
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="store_address">Store Address</label>
-                <input type="text" class="form-control" id="store_address" name="store_address">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="store_email">Store Email</label>
-                <input type="email" class="form-control" id="store_email" name="store_email">
-            </div>
-        </div>
+                        <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
 
-        <!-- Account Information -->
-        <h4 class="mb-3">Account Information</h4>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="role">Role</label>
-                <select class="form-control" id="role" name="role" required>
-                    <option value="admin">Admin</option>
-                    <option value="sub_admin">Sub Admin</option>
-                    <option value="pet_owner">Pet Owner</option>
-                </select>
+                            <!-- Role Selection -->
+                            <div class="mb-4">
+                                <label class="form-label required">Role</label>
+                                <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
+                                    <option value="">Select Role</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="sub_admin">Sub Admin</option>
+                                    <option value="pet_owner">Pet Owner</option>
+                                </select>
+                                @error('role')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="row">
+                                <!-- Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Name</label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                           id="name" name="name" value="{{ old('name') }}" required>
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <!-- Username -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Username</label>
+                                    <input type="text" class="form-control @error('username') is-invalid @enderror" 
+                                           id="username" name="username" value="{{ old('username') }}" required>
+                                    @error('username')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Email -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Email</label>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                           id="email" name="email" value="{{ old('email') }}" required>
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Phone</label>
+                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                                           id="phone" name="phone" value="{{ old('phone') }}" required>
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Password -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Password</label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                                           id="password" name="password" required>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Confirm Password</label>
+                                    <input type="password" class="form-control" 
+                                           id="password_confirmation" name="password_confirmation" required>
+                                </div>
+                            </div>
+
+                            <!-- Profile Photo -->
+                            <div class="mb-4">
+                                <label class="form-label required">Profile Photo</label>
+                                <input type="file" class="form-control @error('photo') is-invalid @enderror" 
+                                       id="photo" name="photo" required accept="image/*">
+                                @error('photo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-footer">
+                                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary ms-auto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                    </svg>
+                                    Create User
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- Profile Photo -->
-        <h4 class="mb-3">Profile Photo (Optional)</h4>
-        <div class="mb-3">
-            <label for="photo">Upload Photo</label>
-            <input type="file" class="form-control-file" id="photo" name="photo">
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-primary">Add User</button>
-    </form>
+    </div>
 </div>
+
+<style>
+    .required:after {
+        content: ' *';
+        color: red;
+    }
+    .form-footer {
+        display: flex;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e6e7e9;
+    }
+</style>
 @endsection

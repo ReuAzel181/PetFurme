@@ -1,12 +1,22 @@
 @extends('layouts.tabler')
 
 @section('content')
-<div class="page">
+<div class="page-wrapper">
+    <div class="container-xl">
+        <div class="row">
+            <div class="col">
+                @include('partials._page_header', [
+                    'title' => __('Appointments'),
+                    'section' => 'OVERVIEW'
+                ])
+            </div>
+        </div>
+    </div>
+
     <div class="page-body">
         <div class="container-xl">
             <div class="card">
                 <div class="card-header d-flex align-items-center">
-                    <h3>Appointments</h3>
                     <a href="{{ route('appointment.create') }}" class="btn btn-primary ms-auto">Add Appointment</a>
                 </div>
 

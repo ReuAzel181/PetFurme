@@ -2,8 +2,19 @@
 
 @section('content')
 <div class="container-xl">
-    <h1 class="my-4 text-center">Edit Pet Details</h1>
-
+    <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col">
+                        @include('partials._page_header', [
+                            'title' => __('Edit Pet Details'),
+                            'section' => 'OVERVIEW'
+                        ])
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Success Message -->
     @if(session('success'))
         <div class="alert alert-success">
@@ -24,10 +35,19 @@
                         <input type="text" name="name" value="{{ $pet->name }}" class="form-control" required>
                     </div>
 
-                    <!-- Pet Type -->
+                    <!-- Category -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Type <span class="text-danger">*</span></label>
-                        <input type="text" name="type" value="{{ $pet->type }}" class="form-control" required>
+                        <label class="form-label">Category <span class="text-danger">*</span></label>
+                        <select name="category" class="form-select" required>
+                            <option value="">Select Category</option>
+                            <option value="Dog" {{ $pet->category == 'Dog' ? 'selected' : '' }}>Dog</option>
+                            <option value="Cat" {{ $pet->category == 'Cat' ? 'selected' : '' }}>Cat</option>
+                            <option value="Bird" {{ $pet->category == 'Bird' ? 'selected' : '' }}>Bird</option>
+                            <option value="Fish" {{ $pet->category == 'Fish' ? 'selected' : '' }}>Fish</option>
+                            <option value="Reptile" {{ $pet->category == 'Reptile' ? 'selected' : '' }}>Reptile</option>
+                            <option value="Amphibian" {{ $pet->category == 'Amphibian' ? 'selected' : '' }}>Amphibian</option>
+                            <option value="Other" {{ $pet->category == 'Other' ? 'selected' : '' }}>Other</option>
+                        </select>
                     </div>
                 </div>
 
@@ -61,8 +81,15 @@
 
                     <!-- Age -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Age (Years)</label>
-                        <input type="number" name="age" value="{{ $pet->age }}" class="form-control">
+                        <label class="form-label">Age</label>
+                        <div class="input-group">
+                            <input type="number" name="age" class="form-control" min="0" 
+                                value="{{ $pet->age >= 12 ? floor($pet->age/12) : $pet->age }}" placeholder="Enter age">
+                            <select name="age_unit" class="form-select" style="max-width: 120px;">
+                                <option value="months" {{ $pet->age < 12 ? 'selected' : '' }}>Months</option>
+                                <option value="years" {{ $pet->age >= 12 ? 'selected' : '' }}>Years</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 

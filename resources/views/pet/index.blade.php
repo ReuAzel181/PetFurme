@@ -2,24 +2,33 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="col">
-        <div class="page-pretitle text-muted 					text-uppercase">
-            overview
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col">
+                    @include('partials._page_header', [
+                        'title' => __('Pet List'),
+                        'section' => 'OVERVIEW'
+                    ])
+                </div>
+            </div>
         </div>
-        <h2 class="page-title">
-            Clinic Inventory
-        </h2>
+        <a href="{{ route('pets.create') }}" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M12 5l0 14"></path>
+                <path d="M5 12l14 0"></path>
+            </svg>
+            Add New Pet
+        </a>
     </div>
+
     <!-- Success Message -->
     @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
     @endif
-
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ route('pets.create') }}" class="btn btn-primary btn-lg">Add New Pet</a>
-    </div>
 
     @if($pets->isEmpty())
         <div class="alert alert-info text-center">
@@ -32,7 +41,6 @@
                     <tr>
                         <th>Photo</th>
                         <th>Name</th>
-                        <th>Type</th>
                         <th>Owner</th>
                         <th>Category</th>
                         <th>Gender</th>
@@ -55,15 +63,23 @@
                             @endif
                         </td>
                         <td>{{ $pet->name }}</td>
-                        <td>{{ $pet->type }}</td>
                         <td>{{ $pet->user ? $pet->user->name : 'No registered owner' }}</td>
                         <td>{{ $pet->category }}</td>
                         <td>{{ $pet->gender }}</td>
                         <td>{{ $pet->breed }}</td>
-                        <td>{{ $pet->age }}</td>
+                        <td>
+                            @if($pet->age >= 12)
+                                {{ floor($pet->age/12) }} {{ Str::plural('year', floor($pet->age/12)) }}
+                                @if($pet->age % 12 > 0)
+                                    {{ $pet->age % 12 }} {{ Str::plural('month', $pet->age % 12) }}
+                                @endif
+                            @else
+                                {{ $pet->age }} {{ Str::plural('month', $pet->age) }}
+                            @endif
+                        </td>
                         <td>{{ $pet->weight }}</td>
-                        <td>{{ $pet->allergies ?? 'None' }}</td> <!-- Added proper handling for allergies -->
-                        <td>{{ $pet->notes ?? 'None' }}</td> <!-- Ensures notes are displayed or shows 'None' if null -->
+                        <td>{{ $pet->allergies ?? 'None' }}</td>
+                        <td>{{ $pet->notes ?? 'None' }}</td>
                         <td>
                             <div class="d-flex justify-content-around">
                                 <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-warning btn-sm">Edit</a>

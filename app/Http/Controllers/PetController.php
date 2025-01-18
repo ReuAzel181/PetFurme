@@ -44,56 +44,67 @@ class PetController extends Controller
     // Store a newly created pet in storage
     public function store(Request $request)
     {
+        // First validate the has_account field
         $request->validate([
-            'has_account' => 'required', // Whether the owner has an account
-            'name' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
-            'owner_name' => 'nullable|string|max:255',
-            'category' => 'nullable|string|max:255',
-            'gender' => 'nullable|string',
-            'breed' => 'nullable|string|max:255',
-            'age' => 'nullable|integer',
-            'weight' => 'nullable|numeric',
-            'allergies' => 'nullable|string',
-            'notes' => 'nullable|string',
-            'photo' => 'nullable|image|max:2048',
+            'has_account' => 'required|in:yes,no',
         ]);
-    
-        $user = null;
-        $ownerName = null;
-    
+
+        // Then validate the rest based on has_account value
         if ($request->has_account === 'yes') {
-            // Use an existing user
-            $request->validate(['user_id' => 'required|exists:users,id']);
-            $user = User::findOrFail($request->user_id);
+            $validated = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'name' => 'required|string|max:255',
+                'category' => 'required|string',
+                'breed' => 'nullable|string|max:255',
+                'age' => 'nullable|numeric',
+                'gender' => 'nullable|string|in:Male,Female,Other',
+                'weight' => 'nullable|numeric',
+                'allergies' => 'nullable|string',
+                'notes' => 'nullable|string',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
         } else {
-            // For unregistered owners
-            $request->validate(['owner_name' => 'required|string|max:255']);
-            $ownerName = $request->owner_name;
+            $validated = $request->validate([
+                'owner_name' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+                'category' => 'required|string',
+                'breed' => 'nullable|string|max:255',
+                'age' => 'nullable|numeric',
+                'gender' => 'nullable|string|in:Male,Female,Other',
+                'weight' => 'nullable|numeric',
+                'allergies' => 'nullable|string',
+                'notes' => 'nullable|string',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
         }
-    
+
         // Handle file upload
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('pet_photos', 'public');
         }
-    
+
+        // Convert age to months if years is selected
+        $age = $request->age;
+        if ($request->age_unit === 'years' && $age) {
+            $age = $age * 12; // Convert years to months
+        }
+
         // Create the pet
         Pet::create([
-            'user_id' => $user ? $user->id : null, // Set user_id to null if no user
-            'owner_name' => $ownerName, // Set owner_name for unregistered owners
+            'user_id' => $request->has_account === 'yes' ? $request->user_id : null,
+            'owner_name' => $request->has_account === 'no' ? $request->owner_name : null,
             'name' => $request->name,
-            'type' => $request->type,
             'category' => $request->category,
             'gender' => $request->gender,
             'breed' => $request->breed,
-            'age' => $request->age,
+            'age' => $age,
             'weight' => $request->weight,
             'allergies' => $request->allergies,
             'notes' => $request->notes,
             'photo' => $photoPath,
         ]);
-    
+
         return redirect()->route('pets.index')->with('success', 'Pet added successfully!');
     }
 
@@ -101,11 +112,11 @@ class PetController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
+            'category' => 'required|string',
             'user_id' => 'nullable|exists:users,id',
             'owner_name' => 'nullable|string|max:255',
             'breed' => 'nullable|string|max:255',
-            'age' => 'nullable|integer',
+            'age' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
             'allergies' => 'nullable|string',
             'notes' => 'nullable|string',
@@ -120,14 +131,20 @@ class PetController extends Controller
             $pet->photo = $request->file('photo')->store('pet_photos', 'public');
         }
 
+        // Convert age to months if years is selected
+        $age = $request->age;
+        if ($request->age_unit === 'years' && $age) {
+            $age = $age * 12; // Convert years to months
+        }
+
         // Update the pet
         $pet->update([
             'user_id' => $request->user_id, // Assign user if selected
             'owner_name' => $request->user_id ? null : $request->owner_name, // Clear owner_name if user_id is set
             'name' => $request->name,
-            'type' => $request->type,
+            'category' => $request->category,
             'breed' => $request->breed,
-            'age' => $request->age,
+            'age' => $age,
             'weight' => $request->weight,
             'allergies' => $request->allergies,
             'notes' => $request->notes,
