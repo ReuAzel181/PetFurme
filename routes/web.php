@@ -88,8 +88,31 @@ Route::get('/test-supabase', function (MessageService $messageService) {
 // });
 
 
-Route::get('/api/users/{user}/pets', function ($userId) {
-    return Pet::where('user_id', $userId)->get();
+Route::middleware(['auth', 'verified'])->group(function () {
+    // ... other routes ...
+    
+    // Pets API route
+    Route::get('/api/users/{user}/pets', function($user) {
+        try {
+            \Log::info('Fetching pets for user', ['user_id' => $user]);
+            
+            $pets = \App\Models\Pet::where('user_id', $user)
+                ->select('id', 'name', 'type', 'age')
+                ->get();
+            
+            \Log::info('Found pets', ['count' => $pets->count(), 'pets' => $pets->toArray()]);
+            
+            return response()->json($pets);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching pets', [
+                'user_id' => $user,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    })->name('api.user.pets');
 });
 
 
@@ -163,7 +186,7 @@ Route::get('user-management/{role}', function ($role) {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('dashboard/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Route::resource('/users', UserController::class); //->except(['show']);
     Route::put('/user/change-password/{username}', [UserController::class, 'updatePassword'])->name('users.updatePassword');
@@ -219,6 +242,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // TODO: Remove from OrderController
     Route::get('/orders/details/{order_id}/download', [OrderController::class, 'downloadInvoice'])->name('order.downloadInvoice');
 
+    // Add these routes for appointments
+    Route::resource('appointment', AppointmentController::class);
+    
+    // Single API route for fetching pets
+    Route::get('/api/users/{user}/pets', function($user) {
+        try {
+            \Log::info('Fetching pets for user', ['user_id' => $user]);
+            
+            $pets = \App\Models\Pet::where('user_id', $user)
+                ->select('id', 'name', 'type', 'age')
+                ->get();
+            
+            \Log::info('Found pets', ['count' => $pets->count(), 'pets' => $pets->toArray()]);
+            
+            return response()->json($pets);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching pets', [
+                'user_id' => $user,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    })->name('api.user.pets');
 
 });
 

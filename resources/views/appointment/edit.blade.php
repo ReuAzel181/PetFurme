@@ -5,56 +5,73 @@
     <div class="page-body">
         <div class="container-xl">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex align-items-center">
                     <h3>Edit Appointment</h3>
+                    <a href="{{ route('appointment.index') }}" class="btn btn-secondary ms-auto">Back to List</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('appointment.update', $appointment->id) }}" method="POST">
                         @csrf
                         @method('PUT')
 
-                        <!-- Owner Name -->
-                        <div class="mb-3">
-                            <label for="owner_name" class="form-label">Owner Name</label>
-                            <input type="text" name="owner_name" id="owner_name" class="form-control" value="{{ $appointment->owner_name }}" required>
+                        <div class="row">
+                            <!-- Owner Details -->
+                            <div class="col-md-6 mb-3">
+                                <label for="owner_name" class="form-label">Owner Name</label>
+                                <input type="text" name="owner_name" id="owner_name" class="form-control" value="{{ $appointment->owner_name }}" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="user_account" class="form-label">User Account</label>
+                                <select name="user_id" id="user_account" class="form-select">
+                                    <option value="">User with no account</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}" {{ $appointment->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
-                        <!-- User Account -->
-                        <div class="mb-3">
-                            <label for="user_account" class="form-label">User Account</label>
-                            <select name="user_id" id="user_account" class="form-select">
-                                <option value="">User with no account</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ $appointment->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                                @endforeach
-                            </select>
+                        <div class="row">
+                            <!-- Pet Details -->
+                            <div class="col-md-4 mb-3">
+                                <label for="pet_name" class="form-label">Pet Name</label>
+                                <input type="text" name="pet_name" id="pet_name" class="form-control" value="{{ $appointment->pet_name }}" required>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="pet_type" class="form-label">Pet Type</label>
+                                <input type="text" name="pet_type" id="pet_type" class="form-control" value="{{ $appointment->pet_type }}" required>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="pet_age" class="form-label">Pet Age</label>
+                                <input type="number" name="pet_age" id="pet_age" class="form-control" value="{{ $appointment->pet_age }}" required>
+                            </div>
                         </div>
 
-                        <!-- Pet Details -->
-                        <div class="mb-3">
-                            <label for="pet_name" class="form-label">Pet Name</label>
-                            <input type="text" name="pet_name" id="pet_name" class="form-control" value="{{ $appointment->pet_name }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pet_type" class="form-label">Pet Type</label>
-                            <input type="text" name="pet_type" id="pet_type" class="form-control" value="{{ $appointment->pet_type }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pet_age" class="form-label">Pet Age</label>
-                            <input type="number" name="pet_age" id="pet_age" class="form-control" value="{{ $appointment->pet_age }}" required>
+                        <div class="row">
+                            <!-- Appointment Timing -->
+                            <div class="col-md-6 mb-3">
+                                <label for="appointment_date" class="form-label">Date</label>
+                                <input type="date" name="appointment_date" id="appointment_date" class="form-control" value="{{ $appointment->appointment_date }}" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="appointment_time" class="form-label">Time</label>
+                                <input type="time" name="appointment_time" id="appointment_time" class="form-control" value="{{ $appointment->appointment_time }}" required>
+                            </div>
                         </div>
 
                         <!-- Reasons for Visit -->
                         <div class="mb-3">
                             <label for="reason_for_visit" class="form-label">Reasons for Visit</label>
                             <div id="selected-reasons" class="mb-2">
-                            @if(!empty($appointment->reason_for_visit))
-                                @foreach(json_decode($appointment->reason_for_visit, true) as $reason)
-                                    <span class="badge bg-primary text-white me-2">{{ $reason }}</span>
-                                @endforeach
-                            @else
-                                <span>N/A</span>
-                            @endif
+                                @if(!empty($appointment->reason_for_visit))
+                                    @foreach(json_decode($appointment->reason_for_visit, true) as $reason)
+                                        <span class="badge bg-primary text-white me-2">{{ $reason }}</span>
+                                    @endforeach
+                                @endif
                             </div>
                             <div class="input-group">
                                 <select id="reason-options" class="form-select">
@@ -74,20 +91,10 @@
                             <input type="hidden" name="reason_for_visit" id="reason_for_visit" value="{{ old('reason_for_visit', $appointment->reason_for_visit ?? '[]') }}">
                         </div>
 
-
-                        <!-- Appointment Date -->
-                        <div class="mb-3">
-                            <label for="appointment_date" class="form-label">Date</label>
-                            <input type="date" name="appointment_date" id="appointment_date" class="form-control" value="{{ $appointment->appointment_date }}" required>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('appointment.index') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Appointment</button>
                         </div>
-
-                        <!-- Appointment Time -->
-                        <div class="mb-3">
-                            <label for="appointment_time" class="form-label">Time</label>
-                            <input type="time" name="appointment_time" id="appointment_time" class="form-control" value="{{ $appointment->appointment_time }}" required>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Update Appointment</button>
                     </form>
                 </div>
             </div>
@@ -98,7 +105,7 @@
 
 @section('scripts')
 <script>
-    let selectedReasons = @json($appointment->reasons->pluck('name')->toArray());
+    let selectedReasons = @json($appointment->reasons?->pluck('name')->toArray() ?? []);
 
     function addReason() {
         const reasonOptions = document.getElementById('reason-options');
@@ -109,18 +116,18 @@
         } else if (selectedOption && !selectedReasons.includes(selectedOption)) {
             selectedReasons.push(selectedOption);
             renderReasons();
-            reasonOptions.value = ''; // Reset dropdown
+            reasonOptions.value = '';
         }
     }
 
     function addCustomReason() {
-        const customReasonInput = document.getElementById('custom_reason_for_visit');
+        const customReasonInput = document.getElementById('custom_reason');
         const customReason = customReasonInput.value.trim();
 
         if (customReason && !selectedReasons.includes(customReason)) {
             selectedReasons.push(customReason);
             renderReasons();
-            customReasonInput.value = ''; // Clear input
+            customReasonInput.value = '';
             document.getElementById('custom-reason-group').style.display = 'none';
         }
     }
@@ -144,7 +151,6 @@
             selectedReasonsContainer.appendChild(reasonElement);
         });
 
-        // Update the hidden input with selected reasons
         document.getElementById('reason_for_visit').value = JSON.stringify(selectedReasons);
     }
 

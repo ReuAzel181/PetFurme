@@ -27,3 +27,7 @@
     });
 
     Route::get('products/', [ProductController::class, 'index'])->name('api.product.index');
+
+    Route::get('/users/{user}/pets', function (App\Models\User $user) {
+        return $user->pets;
+    })->name('api.user.pets');

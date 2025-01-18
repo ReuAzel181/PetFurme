@@ -31,12 +31,13 @@ class AppointmentController extends Controller
 
     public function create()
     {
-        $users = User::where('role', 'pet_owner')->get(); // Fetch all users with the 'pet_owner' role
-        $pets = Pet::where('user_id', auth()->id())->get(); // Fetch pets for the logged-in user
-    
-        $reasons = ['Vaccination', 'Grooming', 'Checkup', 'Other']; // Predefined reasons
-    
-        return view('appointment.create', compact('users', 'pets', 'reasons'));
+        $users = User::where('role', 'pet_owner')
+            ->with(['pets' => function($query) {
+                $query->select('id', 'user_id', 'name', 'type', 'age');
+            }])
+            ->get(['id', 'name', 'email']);
+
+        return view('appointment.create', compact('users'));
     }
     
 
@@ -81,30 +82,24 @@ class AppointmentController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $appointment = Appointment::findOrFail($id);
+        
+        $validatedData = $request->validate([
             'user_id' => 'nullable|exists:users,id',
-            'owner_name' => 'required_without:user_id|string|max:255',
             'pet_id' => 'nullable|exists:pets,id',
-            'pet_name' => 'required_without:pet_id|string|max:255',
+            'owner_name' => 'required_without:user_id|nullable|string',
+            'pet_name' => 'required|string',
+            'pet_type' => 'required|string',
+            'pet_age' => 'required|integer',
             'appointment_date' => 'required|date',
             'appointment_time' => 'required',
-            'reason_for_visit' => 'required|string', // JSON-encoded string
+            'reason_for_visit' => 'required'
         ]);
-    
-        $appointment = Appointment::findOrFail($id);
-    
-        // Update the appointment
-        $appointment->update([
-            'user_id' => $request->user_id,
-            'owner_name' => $request->owner_name,
-            'pet_id' => $request->pet_id,
-            'pet_name' => $request->pet_name,
-            'appointment_date' => $request->appointment_date,
-            'appointment_time' => $request->appointment_time,
-            'reason_for_visit' => json_encode($request->reason_for_visit), // Store updated reasons as JSON
-        ]);
-    
-        return redirect()->route('appointment.index')->with('success', 'Appointment updated successfully.');
+
+        $appointment->update($validatedData);
+
+        return redirect()->route('appointment.index')
+            ->with('success', 'Appointment updated successfully');
     }
     
 

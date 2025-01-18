@@ -135,10 +135,10 @@
                                         </div>
                                         <div class="col">
                                             <div class="font-weight-medium">
-                                                {{ $appointments ?? 'No Appointments' }} Appointments
+                                                {{ $appointments }} Appointments
                                             </div>
                                             <div class="text-muted">
-                                                {{ $todayAppointments ?? 'No Appointments Today' }} today
+                                                {{ $todayAppointments }} today
                                             </div>
                                         </div>
                                     </div>
@@ -202,55 +202,198 @@
         <div class="container-xl">
             <div class="row row-deck row-cards">
                 <div class="card">
-                    <div class="card-body" style="height: 300px;">
-                        <div class="card" style="width: 100%;">
-                            <div class="row">
-                        
-                            <div class="col" id="date">
-                                <div class="col" id="date" style="justify-content: center;">
-                                    <a href="#">Appointments</a>
-
-                                    <li class="nav-item dropdown" style="list-style: none;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" 
-                                            height="24" viewBox="0 0 24 24" fill="none" 
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-arrows-sort nav-link"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M3 9l4 -4l4 4m-4 -4v14" />
-                                            <path d="M21 15l-4 4l-4 -4m4 4v-14" />
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="card-title mb-0">Recent Activities</h3>
+                            <small class="text-muted">Track all system activities</small>
+                        </div>
+                        <div class="ms-auto">
+                            <form method="GET" class="d-flex gap-2">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
+                                            <path d="M16 3v4" />
+                                            <path d="M8 3v4" />
+                                            <path d="M4 11h16" />
                                         </svg>
-                                        
-                                        <!-- Dropdown menu -->
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="{{ route('orders.index') }}">Pet Owner</a></li>
-                                            <li><a class="dropdown-item" href="{{ route('orders.complete') }}">Sub Admin</a></li>
-                                        </ul>
-                                    </li>
-
+                                    </span>
+                                    <input type="date" class="form-control" name="from_date" value="{{ $fromDate }}">
                                 </div>
-                            </div>
-
-                                
-                                <div class="col" id="date">
-                                    <p class="fromTo">From</p>
-                                    <div class="input-group">
-                                        <input type="date" name="from_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
-                                    </div>
+                                <div class="input-group">
+                                    <span class="input-group-text">to</span>
+                                    <input type="date" class="form-control" name="to_date" value="{{ $toDate }}">
                                 </div>
-
-                                <div class="col" id="date">
-                                    <p class="fromTo">To</p>
-                                    <div class="input-group">
-                                        <input type="date" name="to_date" class="date-control" value="<?php echo date('Y-m-d'); ?>">
-                                    </div>
-                                </div>
-
-                            </div>
-                            </div>
-                            </div>
+                                <select name="sort_by" class="form-select" style="width: auto;">
+                                    <option value="date" {{ $sortBy === 'date' ? 'selected' : '' }}>Latest First</option>
+                                    <option value="type" {{ $sortBy === 'type' ? 'selected' : '' }}>By Activity Type</option>
+                                    <option value="description" {{ $sortBy === 'description' ? 'selected' : '' }}>By Description</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                        <path d="M21 21l-6 -6" />
+                                    </svg>
+                                    Filter
+                                </button>
+                            </form>
                         </div>
                     </div>
+                    <div class="card-body p-0">
+                        <div class="scrollable-container" style="max-height: 500px; overflow-y: auto;">
+                            <div class="table-responsive">
+                                <table class="table table-vcenter table-hover table-sticky">
+                                    <thead class="sticky-top bg-white">
+                                        <tr>
+                                            <th class="w-1">Time</th>
+                                            <th class="w-1">Type</th>
+                                            <th>Details</th>
+                                            <th class="w-1">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($recentEvents as $event)
+                                            <tr>
+                                                <td class="text-muted">
+                                                    <span data-bs-toggle="tooltip" 
+                                                          title="{{ Carbon\Carbon::parse($event->created_at)->format('M d, Y h:i A') }}">
+                                                        {{ Carbon\Carbon::parse($event->date)->format('M d') }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @php
+                                                        $typeInfo = match($event->type) {
+                                                            'appointment' => [
+                                                                'color' => 'blue',
+                                                                'icon' => 'calendar',
+                                                                'label' => 'Appointment',
+                                                                'status' => 'Upcoming'
+                                                            ],
+                                                            'low_stock' => [
+                                                                'color' => 'yellow',
+                                                                'icon' => 'alert-triangle',
+                                                                'label' => 'Low Stock',
+                                                                'status' => 'Warning'
+                                                            ],
+                                                            'out_of_stock' => [
+                                                                'color' => 'red',
+                                                                'icon' => 'x-circle',
+                                                                'label' => 'Out of Stock',
+                                                                'status' => 'Critical'
+                                                            ],
+                                                            'new_product' => [
+                                                                'color' => 'azure',
+                                                                'icon' => 'package',
+                                                                'label' => 'New Product',
+                                                                'status' => 'Added'
+                                                            ],
+                                                            'new_pet' => [
+                                                                'color' => 'green',
+                                                                'icon' => 'paw',
+                                                                'label' => 'New Pet',
+                                                                'status' => 'Registered'
+                                                            ],
+                                                            'new_pet_owner' => [
+                                                                'color' => 'purple',
+                                                                'icon' => 'user-plus',
+                                                                'label' => 'New Owner',
+                                                                'status' => 'Registered'
+                                                            ],
+                                                            'new_order' => [
+                                                                'color' => 'indigo',
+                                                                'icon' => 'shopping-cart',
+                                                                'label' => 'New Order',
+                                                                'status' => 'Placed'
+                                                            ],
+                                                            default => [
+                                                                'color' => 'gray',
+                                                                'icon' => 'info-circle',
+                                                                'label' => 'Activity',
+                                                                'status' => 'Info'
+                                                            ]
+                                                        };
+                                                    @endphp
+                                                    <span class="badge bg-{{ $typeInfo['color'] }}-lt" 
+                                                          style="font-size: 0.9em; padding: 0.5em 0.8em;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" 
+                                                             class="icon icon-{{ $typeInfo['icon'] }}" 
+                                                             width="24" height="24" viewBox="0 0 24 24" 
+                                                             stroke-width="2" stroke="currentColor" 
+                                                             fill="none" stroke-linecap="round" 
+                                                             stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <!-- Add appropriate icon path here -->
+                                                        </svg>
+                                                        {{ $typeInfo['label'] }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div>
+                                                            <div class="font-weight-medium">{{ $event->description }}</div>
+                                                            <div class="text-muted small">
+                                                                @switch($event->type)
+                                                                    @case('appointment')
+                                                                        Scheduled appointment
+                                                                        @break
+                                                                    @case('new_pet')
+                                                                        New pet registered in the system
+                                                                        @break
+                                                                    @case('new_pet_owner')
+                                                                        New pet owner account created
+                                                                        @break
+                                                                @endswitch
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @switch($event->type)
+                                                        @case('appointment')
+                                                            <span class="status status-blue">
+                                                                Scheduled
+                                                            </span>
+                                                            @break
+                                                        @case('new_pet')
+                                                            <span class="status status-green">
+                                                                Active
+                                                            </span>
+                                                            @break
+                                                        @case('new_pet_owner')
+                                                            <span class="status status-purple">
+                                                                Registered
+                                                            </span>
+                                                            @break
+                                                    @endswitch
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="text-center py-4">
+                                                    <div class="empty">
+                                                        <div class="empty-icon">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                <circle cx="12" cy="12" r="9" />
+                                                                <line x1="9" y1="10" x2="9.01" y2="10" />
+                                                                <line x1="15" y1="10" x2="15.01" y2="10" />
+                                                                <path d="M9.5 15.25a3.5 3.5 0 0 1 5 0" />
+                                                            </svg>
+                                                        </div>
+                                                        <p class="empty-title">No activities found</p>
+                                                        <p class="empty-subtitle text-muted">
+                                                            Try adjusting your search or date range to find what you're looking for.
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -481,3 +624,38 @@
         // @formatter:on
     </script>
 @endpushonce
+
+<style>
+    .scrollable-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .scrollable-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .scrollable-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .scrollable-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .table-sticky thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .scrollable-container {
+        border-top: 1px solid rgba(98, 105, 118, 0.16);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(98, 105, 118, 0.06);
+    }
+</style>
