@@ -16,7 +16,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('pets', function (Blueprint $table) {
-            $table->string('type')->nullable();
+            $table->string('type')->after('owner_name');
         });
     }
 }; 

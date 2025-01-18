@@ -98,13 +98,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         try {
             \Log::info('Fetching pets for user', ['user_id' => $user]);
             
+            // First get the user details
+            $userData = \App\Models\User::find($user);
+            
+            // Then get the pets with category
             $pets = \App\Models\Pet::where('user_id', $user)
-                ->select('id', 'name', 'type', 'age')
+                ->select('id', 'name', 'category', 'age')
                 ->get();
             
             \Log::info('Found pets', ['count' => $pets->count(), 'pets' => $pets->toArray()]);
             
-            return response()->json($pets);
+            return response()->json([
+                'user' => [
+                    'name' => $userData ? $userData->name : 'No Account',
+                    'has_account' => !is_null($userData)
+                ],
+                'pets' => $pets
+            ]);
         } catch (\Exception $e) {
             \Log::error('Error fetching pets', [
                 'user_id' => $user,
@@ -252,13 +262,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         try {
             \Log::info('Fetching pets for user', ['user_id' => $user]);
             
+            // First get the user details
+            $userData = \App\Models\User::find($user);
+            
+            // Then get the pets with category
             $pets = \App\Models\Pet::where('user_id', $user)
-                ->select('id', 'name', 'type', 'age')
+                ->select('id', 'name', 'category', 'age')
                 ->get();
             
             \Log::info('Found pets', ['count' => $pets->count(), 'pets' => $pets->toArray()]);
             
-            return response()->json($pets);
+            return response()->json([
+                'user' => [
+                    'name' => $userData ? $userData->name : 'No Account',
+                    'has_account' => !is_null($userData)
+                ],
+                'pets' => $pets
+            ]);
         } catch (\Exception $e) {
             \Log::error('Error fetching pets', [
                 'user_id' => $user,

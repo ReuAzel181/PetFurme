@@ -2,98 +2,129 @@
 
 @section('content')
 <div class="page">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col">
+                    @include('partials._page_header', [
+                        'title' => __('Edit Appointment'),
+                        'section' => 'APPOINTMENT'
+                    ])
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="page-body">
         <div class="container-xl">
             <div class="card">
-                <div class="card-header d-flex align-items-center">
-                    <h3>Edit Appointment</h3>
-                    <a href="{{ route('appointment.index') }}" class="btn btn-secondary ms-auto">Back to List</a>
-                </div>
                 <div class="card-body">
                     <form action="{{ route('appointment.update', $appointment->id) }}" method="POST">
                         @csrf
                         @method('PUT')
 
-                        <div class="row">
-                            <!-- Owner Details -->
-                            <div class="col-md-6 mb-3">
-                                <label for="owner_name" class="form-label">Owner Name</label>
-                                <input type="text" name="owner_name" id="owner_name" class="form-control" value="{{ $appointment->owner_name }}" required>
-                            </div>
+                        <!-- Pet Owner Selection -->
+                        <div class="mb-3">
+                            <label for="user_id" class="form-label">Pet Owner</label>
+                            <select name="user_id" id="user_id" class="form-select" required>
+                                <option value="">Select Pet Owner</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}" {{ $appointment->user_id == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label for="user_account" class="form-label">User Account</label>
-                                <select name="user_id" id="user_account" class="form-select">
-                                    <option value="">User with no account</option>
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}" {{ $appointment->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                                    @endforeach
-                                </select>
+                        <!-- Pet Selection -->
+                        <div class="mb-3" id="pet_selection_group">
+                            <label for="pet_id" class="form-label">Select Pet</label>
+                            <select name="pet_id" id="pet_id" class="form-select" required>
+                                <option value="">Choose a pet</option>
+                                @if($appointment->pet)
+                                    <option value="{{ $appointment->pet->id }}" selected>
+                                        {{ $appointment->pet->name }}
+                                    </option>
+                                @endif
+                            </select>
+                        </div>
+
+                        <!-- Pet Details -->
+                        <div id="pet_details">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="pet_name" class="form-label">Pet Name</label>
+                                    <input type="text" id="pet_name" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="pet_type" class="form-label">Pet Type</label>
+                                    <input type="text" id="pet_type" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="pet_age" class="form-label">Pet Age</label>
+                                    <input type="text" id="pet_age" class="form-control" readonly>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Appointment Timing -->
                         <div class="row">
-                            <!-- Pet Details -->
-                            <div class="col-md-4 mb-3">
-                                <label for="pet_name" class="form-label">Pet Name</label>
-                                <input type="text" name="pet_name" id="pet_name" class="form-control" value="{{ $appointment->pet_name }}" required>
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label for="pet_type" class="form-label">Pet Type</label>
-                                <input type="text" name="pet_type" id="pet_type" class="form-control" value="{{ $appointment->pet_type }}" required>
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label for="pet_age" class="form-label">Pet Age</label>
-                                <input type="number" name="pet_age" id="pet_age" class="form-control" value="{{ $appointment->pet_age }}" required>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Appointment Timing -->
                             <div class="col-md-6 mb-3">
                                 <label for="appointment_date" class="form-label">Date</label>
-                                <input type="date" name="appointment_date" id="appointment_date" class="form-control" value="{{ $appointment->appointment_date }}" required>
+                                <input type="date" name="appointment_date" id="appointment_date" 
+                                       class="form-control" value="{{ $appointment->appointment_date }}" required>
                             </div>
-
                             <div class="col-md-6 mb-3">
                                 <label for="appointment_time" class="form-label">Time</label>
-                                <input type="time" name="appointment_time" id="appointment_time" class="form-control" value="{{ $appointment->appointment_time }}" required>
+                                <input type="time" name="appointment_time" id="appointment_time" 
+                                       class="form-control" value="{{ $appointment->appointment_time }}" required>
                             </div>
                         </div>
 
                         <!-- Reasons for Visit -->
                         <div class="mb-3">
-                            <label for="reason_for_visit" class="form-label">Reasons for Visit</label>
-                            <div id="selected-reasons" class="mb-2">
-                                @if(!empty($appointment->reason_for_visit))
-                                    @foreach(json_decode($appointment->reason_for_visit, true) as $reason)
-                                        <span class="badge bg-primary text-white me-2">{{ $reason }}</span>
-                                    @endforeach
-                                @endif
+                            <label class="form-label">Reasons for Visit</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="button" class="btn btn-outline-primary reason-btn" data-reason="Routine Check-up">
+                                    Routine Check-up
+                                </button>
+                                <button type="button" class="btn btn-outline-primary reason-btn" data-reason="Vaccination">
+                                    Vaccination
+                                </button>
+                                <button type="button" class="btn btn-outline-primary reason-btn" data-reason="Emergency">
+                                    Emergency
+                                </button>
+                                <button type="button" class="btn btn-outline-primary reason-btn" data-reason="Grooming">
+                                    Grooming
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="other-reason-btn">
+                                    Other
+                                </button>
                             </div>
-                            <div class="input-group">
-                                <select id="reason-options" class="form-select">
-                                    <option value="">Select a reason</option>
-                                    @foreach($reasons as $reason)
-                                        <option value="{{ $reason }}">{{ $reason }}</option>
-                                    @endforeach
-                                    <option value="Other">Other</option>
-                                </select>
-                                <button type="button" class="btn btn-secondary" onclick="addReason()">Add</button>
+
+                            <input type="hidden" name="reason_for_visit" id="reason_for_visit" required>
+
+                            <!-- Selected Reasons Display -->
+                            <div class="mt-3">
+                                <label class="form-label">Selected Reasons:</label>
+                                <div id="selected-reasons" class="d-flex flex-wrap gap-2">
+                                    <!-- Reason badges will be added here -->
+                                </div>
                             </div>
-                            <div id="custom-reason-group" class="mt-2" style="display: none;">
-                                <label for="custom_reason" class="form-label">Specific Reason</label>
-                                <input type="text" id="custom_reason" class="form-control">
-                                <button type="button" class="btn btn-secondary mt-2" onclick="addCustomReason()">Add Specific Reason</button>
+
+                            <!-- Other Reason Input -->
+                            <div class="mb-3" id="other_reason_group" style="display: none;">
+                                <label for="other_reason" class="form-label">Specify Other Reason</label>
+                                <div class="input-group">
+                                    <input type="text" id="other_reason" class="form-control">
+                                    <button type="button" class="btn btn-primary" id="add-other-reason">Add</button>
+                                </div>
                             </div>
-                            <input type="hidden" name="reason_for_visit" id="reason_for_visit" value="{{ old('reason_for_visit', $appointment->reason_for_visit ?? '[]') }}">
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-primary">Save Appointment</button>
                             <a href="{{ route('appointment.index') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Update Appointment</button>
                         </div>
                     </form>
                 </div>
@@ -103,58 +134,204 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('page-scripts')
 <script>
-    let selectedReasons = @json($appointment->reasons?->pluck('name')->toArray() ?? []);
+document.addEventListener('DOMContentLoaded', function() {
+    const userSelect = document.getElementById('user_id');
+    const petSelect = document.getElementById('pet_id');
+    const selectedReasons = new Set();
+    const reasonButtons = document.querySelectorAll('.reason-btn');
+    const otherReasonBtn = document.getElementById('other-reason-btn');
+    const otherReasonGroup = document.getElementById('other_reason_group');
+    const otherReasonInput = document.getElementById('other_reason');
+    const addOtherReasonBtn = document.getElementById('add-other-reason');
+    const selectedReasonsContainer = document.getElementById('selected-reasons');
+    const reasonForVisitInput = document.getElementById('reason_for_visit');
 
-    function addReason() {
-        const reasonOptions = document.getElementById('reason-options');
-        const selectedOption = reasonOptions.value;
+    // Function to clear pet details
+    function clearPetDetails() {
+        document.getElementById('pet_name').value = '';
+        document.getElementById('pet_type').value = '';
+        document.getElementById('pet_age').value = '';
+    }
 
-        if (selectedOption === 'Other') {
-            document.getElementById('custom-reason-group').style.display = 'block';
-        } else if (selectedOption && !selectedReasons.includes(selectedOption)) {
-            selectedReasons.push(selectedOption);
-            renderReasons();
-            reasonOptions.value = '';
+    // Handle Pet Owner Selection
+    userSelect.addEventListener('change', function() {
+        const userId = this.value;
+        petSelect.innerHTML = '<option value="">Loading pets...</option>';
+        clearPetDetails();
+        
+        if (!userId) {
+            petSelect.innerHTML = '<option value="">Choose a pet</option>';
+            return;
         }
-    }
 
-    function addCustomReason() {
-        const customReasonInput = document.getElementById('custom_reason');
-        const customReason = customReasonInput.value.trim();
+        fetch(`/api/users/${userId}/pets`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                petSelect.innerHTML = '<option value="">Choose a pet</option>';
+                
+                if (Array.isArray(data.pets) && data.pets.length > 0) {
+                    data.pets.forEach(pet => {
+                        const option = document.createElement('option');
+                        option.value = pet.id;
+                        option.text = pet.name;
+                        option.dataset.type = pet.category || '';
+                        option.dataset.age = pet.age || '';
+                        // Select the current pet if it matches
+                        if (pet.id == {{ $appointment->pet_id }}) {
+                            option.selected = true;
+                        }
+                        petSelect.appendChild(option);
+                    });
+                    // Trigger change event to update pet details
+                    petSelect.dispatchEvent(new Event('change'));
+                } else {
+                    petSelect.innerHTML = '<option value="">No pets found</option>';
+                    clearPetDetails();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                petSelect.innerHTML = '<option value="">Error loading pets</option>';
+                clearPetDetails();
+            });
+    });
 
-        if (customReason && !selectedReasons.includes(customReason)) {
-            selectedReasons.push(customReason);
-            renderReasons();
-            customReasonInput.value = '';
-            document.getElementById('custom-reason-group').style.display = 'none';
+    // Handle Pet Selection
+    petSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (!this.value) {
+            clearPetDetails();
+            return;
         }
+        
+        document.getElementById('pet_name').value = selectedOption.text || '';
+        document.getElementById('pet_type').value = selectedOption.dataset.type || '';
+        document.getElementById('pet_age').value = selectedOption.dataset.age || '';
+    });
+
+    // Function to update the hidden input with selected reasons
+    function updateReasonInput() {
+        reasonForVisitInput.value = Array.from(selectedReasons).join(',');
     }
 
-    function removeReason(reason) {
-        selectedReasons = selectedReasons.filter(r => r !== reason);
-        renderReasons();
-    }
+    // Function to create a reason badge
+    function createReasonBadge(reason) {
+        const badge = document.createElement('div');
+        badge.className = 'badge bg-primary d-flex align-items-center gap-2 p-2';
+        badge.innerHTML = `
+            ${reason}
+            <button type="button" class="btn-close btn-close-white" aria-label="Remove"></button>
+        `;
 
-    function renderReasons() {
-        const selectedReasonsContainer = document.getElementById('selected-reasons');
-        selectedReasonsContainer.innerHTML = '';
-
-        selectedReasons.forEach(reason => {
-            const reasonElement = document.createElement('span');
-            reasonElement.className = 'badge bg-primary text-white me-2';
-            reasonElement.innerHTML = `
-                ${reason}
-                <span class="ms-2 cursor-pointer" style="cursor:pointer;" onclick="removeReason('${reason}')">&times;</span>
-            `;
-            selectedReasonsContainer.appendChild(reasonElement);
+        badge.querySelector('.btn-close').addEventListener('click', function() {
+            selectedReasons.delete(reason);
+            badge.remove();
+            
+            // Update button state
+            const button = document.querySelector(`.reason-btn[data-reason="${reason}"]`);
+            if (button) {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-outline-primary');
+            }
+            
+            updateReasonInput();
         });
 
-        document.getElementById('reason_for_visit').value = JSON.stringify(selectedReasons);
+        return badge;
     }
 
-    // Initial rendering of reasons
-    renderReasons();
+    // Initialize existing reasons
+    let initialReasons = @json($appointment->reason_for_visit ?? '');
+    if (typeof initialReasons === 'string' && initialReasons) {
+        // Handle comma-separated string
+        initialReasons = initialReasons.split(',');
+    } else if (!Array.isArray(initialReasons)) {
+        initialReasons = [];
+    }
+
+    initialReasons.forEach(reason => {
+        if (reason && reason.trim()) {
+            const trimmedReason = reason.trim();
+            selectedReasons.add(trimmedReason);
+            const badge = createReasonBadge(trimmedReason);
+            badge.dataset.reason = trimmedReason;
+            selectedReasonsContainer.appendChild(badge);
+
+            // Update button state if it's a predefined reason
+            const button = document.querySelector(`.reason-btn[data-reason="${trimmedReason}"]`);
+            if (button) {
+                button.classList.remove('btn-outline-primary');
+                button.classList.add('btn-primary');
+            }
+        }
+    });
+    updateReasonInput();
+
+    // Handle reason button clicks
+    reasonButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const reason = this.dataset.reason;
+            
+            if (selectedReasons.has(reason)) {
+                selectedReasons.delete(reason);
+                this.classList.remove('btn-primary');
+                this.classList.add('btn-outline-primary');
+                
+                const badge = selectedReasonsContainer.querySelector(`[data-reason="${reason}"]`);
+                if (badge) badge.remove();
+            } else {
+                selectedReasons.add(reason);
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-primary');
+                
+                const badge = createReasonBadge(reason);
+                badge.dataset.reason = reason;
+                selectedReasonsContainer.appendChild(badge);
+            }
+            
+            updateReasonInput();
+        });
+    });
+
+    // Handle "Other" reason
+    otherReasonBtn.addEventListener('click', function() {
+        otherReasonGroup.style.display = otherReasonGroup.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Handle adding custom reason
+    addOtherReasonBtn.addEventListener('click', function() {
+        const customReason = otherReasonInput.value.trim();
+        if (customReason) {
+            if (!selectedReasons.has(customReason)) {
+                selectedReasons.add(customReason);
+                const badge = createReasonBadge(customReason);
+                badge.dataset.reason = customReason;
+                selectedReasonsContainer.appendChild(badge);
+                updateReasonInput();
+            }
+            otherReasonInput.value = '';
+            otherReasonGroup.style.display = 'none';
+        }
+    });
+
+    // Allow Enter key to add custom reason
+    otherReasonInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addOtherReasonBtn.click();
+        }
+    });
+
+    // Trigger initial load of pets for the selected user
+    if (userSelect.value) {
+        userSelect.dispatchEvent(new Event('change'));
+    }
+});
 </script>
-@endsection
+@endpush

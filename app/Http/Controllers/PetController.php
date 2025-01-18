@@ -90,7 +90,7 @@ class PetController extends Controller
             $age = $age * 12; // Convert years to months
         }
 
-        // Create the pet
+        // Create the pet with corrected owner_name logic
         Pet::create([
             'user_id' => $request->has_account === 'yes' ? $request->user_id : null,
             'owner_name' => $request->has_account === 'no' ? $request->owner_name : null,
@@ -137,10 +137,8 @@ class PetController extends Controller
             $age = $age * 12; // Convert years to months
         }
 
-        // Update the pet
-        $pet->update([
-            'user_id' => $request->user_id, // Assign user if selected
-            'owner_name' => $request->user_id ? null : $request->owner_name, // Clear owner_name if user_id is set
+        // Update the pet with corrected owner_name logic
+        $updateData = [
             'name' => $request->name,
             'category' => $request->category,
             'breed' => $request->breed,
@@ -148,7 +146,18 @@ class PetController extends Controller
             'weight' => $request->weight,
             'allergies' => $request->allergies,
             'notes' => $request->notes,
-        ]);
+        ];
+
+        // Handle user_id and owner_name separately
+        if ($request->filled('user_id')) {
+            $updateData['user_id'] = $request->user_id;
+            $updateData['owner_name'] = null;  // Clear owner_name when user is selected
+        } else {
+            $updateData['user_id'] = null;
+            $updateData['owner_name'] = $request->owner_name;  // Set owner_name when no user is selected
+        }
+
+        $pet->update($updateData);
 
         return redirect()->route('pets.index')->with('success', 'Pet updated successfully!');
     }

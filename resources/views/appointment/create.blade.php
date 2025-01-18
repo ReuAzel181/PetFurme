@@ -2,12 +2,21 @@
 
 @section('content')
 <div class="page">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col">
+                    @include('partials._page_header', [
+                        'title' => __('Add New Appointment'),
+                        'section' => 'APPOINTMENT'
+                    ])
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="page-body">
         <div class="container-xl">
             <div class="card">
-                <div class="card-header">
-                    <h3>Add Appointment</h3>
-                </div>
                 <div class="card-body">
                     <form action="{{ route('appointment.store') }}" method="POST" id="appointmentForm">
                         @csrf
@@ -23,7 +32,7 @@
                             </select>
                         </div>
 
-                        <!-- Pet Selection - Always visible -->
+                        <!-- Pet Selection -->
                         <div class="mb-3" id="pet_selection_group">
                             <label for="pet_id" class="form-label">Select Pet</label>
                             <select name="pet_id" id="pet_id" class="form-select" required>
@@ -31,7 +40,7 @@
                             </select>
                         </div>
 
-                        <!-- Pet Details - Always visible -->
+                        <!-- Pet Details -->
                         <div id="pet_details">
                             <div class="row">
                                 <div class="col-md-4 mb-3">
@@ -49,7 +58,7 @@
                             </div>
                         </div>
 
-                        <!-- Appointment Details -->
+                        <!-- Appointment Timing -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="appointment_date" class="form-label">Date</label>
@@ -82,7 +91,6 @@
                                 </button>
                             </div>
                             
-                            <!-- Hidden input to store selected reasons -->
                             <input type="hidden" name="reason_for_visit" id="reason_for_visit" required>
                             
                             <!-- Selected Reasons Display -->
@@ -103,7 +111,10 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Save Appointment</button>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('appointment.index') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Appointment</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -117,6 +128,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const userSelect = document.getElementById('user_id');
     const petSelect = document.getElementById('pet_id');
+    const selectedReasons = new Set();
+    const reasonButtons = document.querySelectorAll('.reason-btn');
+    const otherReasonBtn = document.getElementById('other-reason-btn');
+    const otherReasonGroup = document.getElementById('other_reason_group');
+    const otherReasonInput = document.getElementById('other_reason');
+    const addOtherReasonBtn = document.getElementById('add-other-reason');
+    const selectedReasonsContainer = document.getElementById('selected-reasons');
+    const reasonForVisitInput = document.getElementById('reason_for_visit');
 
     // Function to clear pet details
     function clearPetDetails() {
@@ -129,8 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
     userSelect.addEventListener('change', function() {
         const userId = this.value;
         petSelect.innerHTML = '<option value="">Loading pets...</option>';
-        
-        // Clear pet details when user changes
         clearPetDetails();
         
         if (!userId) {
@@ -138,30 +155,32 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Fetch pets for selected user
         fetch(`/api/users/${userId}/pets`)
-            .then(function(response) {
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
             })
-            .then(function(pets) {
+            .then(data => {
                 petSelect.innerHTML = '<option value="">Choose a pet</option>';
                 
-                if (Array.isArray(pets) && pets.length > 0) {
-                    pets.forEach(function(pet) {
-                        const option = new Option(pet.name, pet.id);
-                        option.dataset.type = pet.type || '';
+                if (Array.isArray(data.pets) && data.pets.length > 0) {
+                    data.pets.forEach(pet => {
+                        const option = document.createElement('option');
+                        option.value = pet.id;
+                        option.text = pet.name;
+                        option.dataset.type = pet.category || '';
                         option.dataset.age = pet.age || '';
                         petSelect.appendChild(option);
                     });
                 } else {
                     petSelect.innerHTML = '<option value="">No pets found</option>';
-                    clearPetDetails(); // Clear pet details if no pets found
+                    clearPetDetails();
                 }
             })
-            .catch(function(error) {
+            .catch(error => {
                 console.error('Error:', error);
                 petSelect.innerHTML = '<option value="">Error loading pets</option>';
-                clearPetDetails(); // Clear pet details on error
+                clearPetDetails();
             });
     });
 
@@ -170,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedOption = this.options[this.selectedIndex];
         
         if (!this.value) {
-            clearPetDetails(); // Clear pet details when no pet is selected
+            clearPetDetails();
             return;
         }
         
@@ -179,19 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('pet_age').value = selectedOption.dataset.age || '';
     });
 
-    // Reason for Visit Handling
-    const selectedReasons = new Set();
-    const reasonButtons = document.querySelectorAll('.reason-btn');
-    const otherReasonBtn = document.getElementById('other-reason-btn');
-    const otherReasonGroup = document.getElementById('other_reason_group');
-    const otherReasonInput = document.getElementById('other_reason');
-    const addOtherReasonBtn = document.getElementById('add-other-reason');
-    const selectedReasonsContainer = document.getElementById('selected-reasons');
-    const reasonForVisitInput = document.getElementById('reason_for_visit');
-
     // Function to update the hidden input with selected reasons
     function updateReasonInput() {
-        reasonForVisitInput.value = JSON.stringify(Array.from(selectedReasons));
+        reasonForVisitInput.value = Array.from(selectedReasons).join(',');
     }
 
     // Function to create a reason badge
@@ -203,10 +212,17 @@ document.addEventListener('DOMContentLoaded', function() {
             <button type="button" class="btn-close btn-close-white" aria-label="Remove"></button>
         `;
 
-        // Handle remove button click
         badge.querySelector('.btn-close').addEventListener('click', function() {
             selectedReasons.delete(reason);
             badge.remove();
+            
+            // Update button state
+            const button = document.querySelector(`.reason-btn[data-reason="${reason}"]`);
+            if (button) {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-outline-primary');
+            }
+            
             updateReasonInput();
         });
 
@@ -219,21 +235,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const reason = this.dataset.reason;
             
             if (selectedReasons.has(reason)) {
-                // Remove reason if already selected
                 selectedReasons.delete(reason);
                 this.classList.remove('btn-primary');
                 this.classList.add('btn-outline-primary');
                 
-                // Remove the badge
                 const badge = selectedReasonsContainer.querySelector(`[data-reason="${reason}"]`);
                 if (badge) badge.remove();
             } else {
-                // Add new reason
                 selectedReasons.add(reason);
                 this.classList.remove('btn-outline-primary');
                 this.classList.add('btn-primary');
                 
-                // Add new badge
                 const badge = createReasonBadge(reason);
                 badge.dataset.reason = reason;
                 selectedReasonsContainer.appendChild(badge);
@@ -243,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle "Other" reason button
+    // Handle "Other" reason
     otherReasonBtn.addEventListener('click', function() {
         otherReasonGroup.style.display = otherReasonGroup.style.display === 'none' ? 'block' : 'none';
     });

@@ -8,6 +8,12 @@ return new class extends Migration
 {
     public function up()
     {
+        // First make the column nullable
+        Schema::table('pets', function (Blueprint $table) {
+            $table->string('type')->nullable()->change();
+        });
+
+        // Then remove it
         Schema::table('pets', function (Blueprint $table) {
             $table->dropColumn('type');
         });

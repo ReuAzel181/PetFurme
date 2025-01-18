@@ -41,7 +41,7 @@
                     <tr>
                         <th>Photo</th>
                         <th>Name</th>
-                        <th>Owner</th>
+                        <th>Pet Owner</th>
                         <th>Category</th>
                         <th>Gender</th>
                         <th>Breed</th>
@@ -63,7 +63,12 @@
                             @endif
                         </td>
                         <td>{{ $pet->name }}</td>
-                        <td>{{ $pet->user ? $pet->user->name : 'No registered owner' }}</td>
+                        <td>
+                            {{ $pet->user ? $pet->user->name : $pet->owner_name }}
+                            @if(!$pet->user)
+                                <br>(Not registered owner)
+                            @endif
+                        </td>
                         <td>{{ $pet->category }}</td>
                         <td>{{ $pet->gender }}</td>
                         <td>{{ $pet->breed }}</td>

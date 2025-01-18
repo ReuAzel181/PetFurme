@@ -9,14 +9,14 @@ return new class extends Migration
     public function up()
     {
         Schema::table('pets', function (Blueprint $table) {
-            $table->dropColumn('type');
+            $table->string('type')->default('client')->change();
         });
     }
 
     public function down()
     {
         Schema::table('pets', function (Blueprint $table) {
-            $table->string('type')->nullable();
+            $table->string('type')->change();
         });
     }
 }; 
