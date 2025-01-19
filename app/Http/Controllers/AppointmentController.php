@@ -19,7 +19,7 @@ class AppointmentController extends Controller
             ->select(
                 'appointment.*',
                 'pets.name as pet_name',
-                'pets.type as pet_type',
+                'pets.category as pet_type',
                 'pets.age as pet_age',
                 'users.name as user_name'
             )
@@ -33,7 +33,7 @@ class AppointmentController extends Controller
     {
         $users = User::where('role', 'pet_owner')
             ->with(['pets' => function($query) {
-                $query->select('id', 'user_id', 'name', 'type', 'age');
+                $query->select('id', 'user_id', 'name', 'category', 'age');
             }])
             ->get(['id', 'name', 'email']);
 
