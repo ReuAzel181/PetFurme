@@ -71,11 +71,14 @@ class DashboardController extends Controller
         // Upcoming appointments (next 7 days)
         $appointments = Appointment::select(
             'appointment_date as date',
-            DB::raw('"appointment" as type'),
+            DB::raw("'appointment' as type"),
             DB::raw("CONCAT(
                 COALESCE(owner_name, 'Unknown Owner'),
                 ' - ',
-                reason_for_visit,
+                CASE 
+                    WHEN reason_for_visit IS NOT NULL THEN JSON_UNQUOTE(reason_for_visit)
+                    ELSE 'No reason specified'
+                END,
                 ' at ',
                 TIME_FORMAT(appointment_time, '%h:%i %p')
             ) as description"),
@@ -85,7 +88,7 @@ class DashboardController extends Controller
         // Low stock products (below threshold)
         $lowStock = Product::select(
             DB::raw('CURRENT_DATE as date'),
-            DB::raw('"low_stock" as type'),
+            DB::raw("'low_stock' as type"),
             DB::raw("CONCAT(
                 name,
                 ' - Only ',
@@ -99,7 +102,7 @@ class DashboardController extends Controller
         // Out of stock products
         $outOfStock = Product::select(
             DB::raw('CURRENT_DATE as date'),
-            DB::raw('"out_of_stock" as type'),
+            DB::raw("'out_of_stock' as type"),
             DB::raw("CONCAT(
                 name,
                 ' is out of stock'
@@ -110,7 +113,7 @@ class DashboardController extends Controller
         // New products added today
         $newProducts = Product::select(
             DB::raw('DATE(created_at) as date'),
-            DB::raw('"new_product" as type'),
+            DB::raw("'new_product' as type"),
             DB::raw("CONCAT(
                 name,
                 ' - ',
@@ -123,10 +126,10 @@ class DashboardController extends Controller
         // Recent pets
         $pets = Pet::select(
             DB::raw('DATE(created_at) as date'),
-            DB::raw('"new_pet" as type'),
+            DB::raw("'new_pet' as type"),
             DB::raw("CONCAT(
                 name, 
-                ' (', COALESCE(type, 'Unknown Type'), ') - ', 
+                ' - ', 
                 COALESCE(breed, 'Unknown Breed'),
                 CASE 
                     WHEN age IS NOT NULL THEN CONCAT(', ', age, ' years old')
@@ -139,7 +142,7 @@ class DashboardController extends Controller
         // Recent pet owners
         $petOwners = User::select(
             DB::raw('DATE(created_at) as date'),
-            DB::raw('"new_pet_owner" as type'),
+            DB::raw("'new_pet_owner' as type"),
             DB::raw("CONCAT(
                 name,
                 CASE 
@@ -154,7 +157,7 @@ class DashboardController extends Controller
         // Recent orders
         $recentOrders = Order::select(
             DB::raw('DATE(created_at) as date'),
-            DB::raw('"new_order" as type'),
+            DB::raw("'new_order' as type"),
             DB::raw("CONCAT(
                 'Order #',
                 invoice_no,
