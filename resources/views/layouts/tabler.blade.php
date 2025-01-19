@@ -503,9 +503,8 @@
                             </li>
 
                             <!-- ORDERS -->
-                            <li class="nav-item dropdown {{ request()->is('orders*') ? 'active' : null }}">
-                                <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
+                            <li class="nav-item {{ request()->is('orders*') ? 'active' : null }}">
+                                <a class="nav-link" href="{{ route('orders.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
                                         <svg xmlns="http://www.w3.org/2000/svg"
                                             class="icon icon-tabler icon-tabler-package-export" width="24"
@@ -525,24 +524,6 @@
                                         {{ __('Orders') }}
                                     </span>
                                 </a>
-                                <div class="dropdown-menu">
-                                    <div class="dropdown-menu-columns">
-                                        <div class="dropdown-menu-column">
-                                            <a class="dropdown-item" href="{{ route('orders.index') }}">
-                                                {{ __('All') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('orders.complete') }}">
-                                                {{ __('Completed') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('orders.pending') }}">
-                                                {{ __('Pending') }}
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('due.index') }}">
-                                                {{ __('Due') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
                             </li>
 
                             <li class="nav-header">REPORTS</li>

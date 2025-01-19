@@ -179,8 +179,8 @@ class DashboardController extends Controller
 
         // Enhanced sorting with better context
         switch ($sortBy) {
-            case 'type':
-                $events = $events->orderBy('type')->orderByDesc('date');
+            case 'event_type':
+                $events = $events->orderBy('event_type')->orderByDesc('date');
                 break;
             case 'description':
                 $events = $events->orderBy('description')->orderByDesc('date');

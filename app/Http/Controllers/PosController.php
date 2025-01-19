@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\Cache;
 
 class PosController extends Controller
 {
@@ -24,31 +25,36 @@ class PosController extends Controller
         ]);
     }
 
-    public function addCartItem (Request $request)
+    public function addCartItem(Request $request)
     {
-        $request->all();
-        //dd($request);
+        try {
+            $product = Cache::remember('product_'.$request->id, 300, function () use ($request) {
+                return Product::select('id', 'name', 'selling_price', 'product_image')
+                    ->findOrFail($request->id);
+            });
+            
+            Cart::add([
+                'id' => $product->id,
+                'name' => $product->name,
+                'qty' => 1,
+                'price' => $product->selling_price,
+                'weight' => 0,
+                'options' => [
+                    'product_image' => $product->product_image
+                ]
+            ]);
 
-        $rules = [
-            'id' => 'required|numeric',
-            'name' => 'required|string',
-            'selling_price' => 'required|numeric',
-        ];
-
-        $validatedData = $request->validate($rules);
-
-        Cart::add(
-            $validatedData['id'],
-            $validatedData['name'],
-            1,
-            $validatedData['selling_price'],
-            1,
-            (array)$options = null
-        );
-
-        return redirect()
-            ->back()
-            ->with('success', 'Product has been added to cart!');
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added to cart successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Cart Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add product to cart'
+            ], 500);
+        }
     }
 
     public function updateCartItem(Request $request, $rowId)

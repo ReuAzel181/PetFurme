@@ -230,7 +230,7 @@
                                 </div>
                                 <select name="sort_by" class="form-select" style="width: auto;">
                                     <option value="date" {{ $sortBy === 'date' ? 'selected' : '' }}>Latest First</option>
-                                    <option value="type" {{ $sortBy === 'type' ? 'selected' : '' }}>By Activity Type</option>
+                                    <option value="event_type" {{ $sortBy === 'event_type' ? 'selected' : '' }}>By Activity Type</option>
                                     <option value="description" {{ $sortBy === 'description' ? 'selected' : '' }}>By Description</option>
                                 </select>
                                 <button type="submit" class="btn btn-primary">
@@ -267,7 +267,7 @@
                                                 </td>
                                                 <td>
                                                     @php
-                                                        $typeInfo = match($event->type) {
+                                                        $typeInfo = match($event->event_type) {
                                                             'appointment' => [
                                                                 'color' => 'blue',
                                                                 'icon' => 'calendar',
@@ -337,7 +337,7 @@
                                                         <div>
                                                             <div class="font-weight-medium">{{ $event->description }}</div>
                                                             <div class="text-muted small">
-                                                                @switch($event->type)
+                                                                @switch($event->event_type)
                                                                     @case('appointment')
                                                                         Scheduled appointment
                                                                         @break
@@ -353,7 +353,7 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    @switch($event->type)
+                                                    @switch($event->event_type)
                                                         @case('appointment')
                                                             <span class="status status-blue">
                                                                 Scheduled

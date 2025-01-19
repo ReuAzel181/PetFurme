@@ -289,3 +289,5 @@ Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
     Route::put('/{user}', [UserController::class, 'update'])->name('update');
     Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
 });
+
+Route::post('/pos/add-to-cart', [PosController::class, 'addCartItem'])->name('pos.addCartItem');

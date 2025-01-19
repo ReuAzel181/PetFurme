@@ -25,7 +25,10 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::where('user_id', auth()->id())->count();
+        $orders = Order::where('user_id', auth()->id())
+            ->with('customer')
+            ->latest()
+            ->get();
 
         return view('orders.index', [
             'orders' => $orders
@@ -34,15 +37,18 @@ class OrderController extends Controller
 
     public function create()
     {
-        $products = Product::where('user_id', auth()->id())->with(['category', 'unit'])->get();
+        $products = Product::where('user_id', auth()->id())
+            ->with(['category', 'unit'])
+            ->get();
 
-        $customers = Customer::where('user_id', auth()->id())->get(['id', 'name']);
+        // Fetch users with pet_owner role instead of customers
+        $users = User::where('role', 'pet_owner')->get();
 
         $carts = Cart::content();
 
         return view('orders.create', [
             'products' => $products,
-            'customers' => $customers,
+            'users' => $users,  // Pass users instead of customers
             'carts' => $carts,
         ]);
     }
@@ -50,6 +56,7 @@ class OrderController extends Controller
     public function store(OrderStoreRequest $request)
     {
         $order = Order::create([
+            'user_id' => auth()->id(),
             'customer_id' => $request->customer_id,
             'payment_type' => $request->payment_type,
             'pay' => $request->pay,
@@ -65,8 +72,8 @@ class OrderController extends Controller
                 'length' => 10,
                 'prefix' => 'INV-'
             ]),
+            'reference' => $request->reference,
             'due' => (Cart::total() - $request->pay),
-            'user_id' => auth()->id(),
             'uuid' => Str::uuid(),
         ]);
 
@@ -173,5 +180,39 @@ class OrderController extends Controller
                 'orders' => $orders
             ])
             ->with('success', 'Order has been canceled!');
+    }
+
+    public function addToCart(Request $request, Product $product)
+    {
+        try {
+            Cart::add([
+                'id' => $product->id,
+                'name' => $product->name,
+                'qty' => 1,
+                'price' => $product->selling_price,
+                'weight' => 0,
+                'options' => [
+                    'product_image' => $product->product_image
+                ]
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product added to cart successfully'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Product added to cart successfully');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to add product to cart'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Failed to add product to cart');
+        }
     }
 }
