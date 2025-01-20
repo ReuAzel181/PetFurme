@@ -3,9 +3,7 @@
 @section('content')
     <div class="page-header d-print-none">
         <div class="container-xl">
-
             <div class="row g-2 align-items-center">
-
                 <div class="col">
                     <div class="page-pretitle text-muted text-uppercase">
                         Overview
@@ -14,240 +12,137 @@
                         Dashboard
                     </h2>
                 </div>
-
-                <!-- Page title actions -->
-                <div class="col-auto ms-auto d-print-none">
-                    <div class="btn-list">
-                        <a href="{{ route('orders.create') }}" class="btn btn-primary d-none d-sm-inline-block">
-                            <x-icon.plus />
-                            Create new order
-                        </a>
-                        <a href="{{ route('orders.create') }}" class="btn btn-primary d-sm-none btn-icon"
-                            aria-label="Create new report">
-                            <x-icon.plus />
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
     <div class="page-body">
         <div class="container-xl">
-            <div class="row row-deck row-cards">
-
-                <!-- COMMENT MULA DITO -->
-                <!-- DELETED COMMENT #1 -->
-                <!-- COMMENT HANGGANG DITO -->
-
-                <!-- PETS -->
-
-                <div class="col-12">
-                    <div class="row row-cards">
-
+            <!-- Analytics Widgets -->
+            <div class="row g-2 mb-3">
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm" style="background-color: rgba(93, 74, 199, 0.40) !important;">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span
-                                                class="bg-violet text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
-                                                <img src="assets/img2/pet_icon.png" alt="Pet Icon"
-                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
-                                                    <path
-                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
-                                                    <path
-                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
-                                                </svg>
-                                            </span>
+                    <x-dashboard.modern-analytics-widget
+                        title="Total Pets"
+                        :value="$totalPets"
+                        :todayCount="$todayPets"
+                        :percentage="$petGrowth"
+                        :trend="$petGrowth > 0 ? 'up' : 'down'"
+                        icon="fas fa-paw"
+                        color="primary"
+                        route="{{ route('pets.index') }}"
+                    />
                                         </div>
-                                        <div class="col">
-                                            <div class="font-weight-medium">
-                                                {{ $totalPets ?? 0 }} Pets <!-- Use $totalPets for total count -->
+                <div class="col-sm-6 col-lg-3">
+                    <x-dashboard.modern-analytics-widget
+                        title="Appointments"
+                        :value="$appointments"
+                        :todayCount="$todayAppointments"
+                        :percentage="$appointmentGrowth"
+                        :trend="$appointmentGrowth > 0 ? 'up' : 'down'"
+                        icon="fas fa-calendar-check"
+                        color="info"
+                        route="{{ route('appointment.index') }}"
+                    />
                                             </div>
-                                            <div class="text-muted">
-                                                {{ $todayPets ?? 0 }} today <!-- Use $todayPets for today's count -->
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <x-dashboard.modern-analytics-widget
+                        title="Pet Owners"
+                        :value="$totalPetOwners"
+                        :todayCount="$todayPetOwners"
+                        :percentage="number_format(($totalPetOwners - $todayPetOwners) / ($todayPetOwners ?: 1) * 100, 1)"
+                        :trend="$todayPetOwners > 0 ? 'up' : 'down'"
+                        icon="fas fa-users"
+                        color="success"
+                        route="{{ url('user-management?role=pet_owner') }}"
+                    />
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                    <x-dashboard.modern-analytics-widget
+                        title="Today's Orders"
+                        :value="$todayOrders"
+                        :todayCount="$todayOrders"
+                        :percentage="number_format(($todayOrders - $orders) / ($orders ?: 1) * 100, 1)"
+                        :trend="$todayOrders > $orders ? 'up' : 'down'"
+                        icon="fas fa-shopping-cart"
+                        color="warning"
+                        route="{{ url('orders') }}"
+                    />
                             </div>
                         </div>
 
-
-                        <!-- PET OWNERS -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm" style="background-color: rgba(187, 88, 205, 0.40) !important;">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span
-                                                class="bg-orchid text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
-                                                <img src="assets/img2/user_icon.png" alt="Pet Owner Icon"
-                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
-                                                    <path
-                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
-                                                    <path
-                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <div class="col">
-                                        <div class="font-weight-medium">
-                                                {{ $totalPetOwners }} Pet Owners
-                                            </div>
-                                            <div class="text-muted">
-                                                {{ $todayPetOwners }} today
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- APPOINTMENTS -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm" style="background-color: rgba(238, 83, 79, 0.40) !important;">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span class="bg-crimson text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
-                                            <img src="assets/img2/apmt_icon.png" alt="Appointment Icon"
-                                                    class="icon icon-tabler icon-tabler-files" width="24" height="24"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
-                                                    <path
-                                                        d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z" />
-                                                    <path
-                                                        d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2" />
-                                            </svg>
-                                            </span>
-                                        </div>
-                                        <div class="col">
-                                            <div class="font-weight-medium">
-                                                {{ $appointments }} Appointments
-                                            </div>
-                                            <div class="text-muted">
-                                                {{ $todayAppointments }} today
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PRODUCTS -->
-                    
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="card card-sm" style="background-color: rgba(2, 84, 155, 0.40) !important;">
-                                <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span
-                                                class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
-                                                <img src="assets/img2/shop_icon.png" alt="Products Icon"
-                                                    class="icon icon-tabler icon-tabler-packages" width="24"
-                                                    height="24" viewBox="0 0 24 24" stroke-width="2"
-                                                    stroke="currentColor" fill="none" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M7 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
-                                                    <path d="M2 13.5v5.5l5 3" />
-                                                    <path d="M7 16.545l5 -3.03" />
-                                                    <path d="M17 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
-                                                    <path d="M12 19l5 3" />
-                                                    <path d="M17 16.5l5 -3" />
-                                                    <path d="M12 13.5v-5.5l-5 -3l5 -3l5 3v5.5" />
-                                                    <path d="M7 5.03v5.455" />
-                                                    <path d="M12 8l5 -3" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <div class="col">
-                                            <div class="font-weight-medium">
-                                                {{ $products }} Products
-                                            </div>
-                                            <div class="text-muted">
-                                                {{ $categories }} categories
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+            <div class="row g-2">
+                <!-- Calendar -->
+                <div class="col-lg-8 resizable-col">
+                    <div class="resize-handle"></div>
+                    <x-dashboard.appointment-calendar :appointments="$calendarAppointments" />
                 </div>
-                <div class="col-13">
-                    <div class="row row-cards">
-                        <div class="col-sm-6 col-lg-3">
+
+                <!-- Monthly Statistics -->
+                <div class="col-lg-4 resizable-col">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center py-2">
+                            <h3 class="card-title" style="font-size: 0.9rem;">Monthly Statistics</h3>
+                            <div class="d-flex gap-2">
+                                <select id="statsMonth" class="form-select form-select-sm" style="width: auto;">
+                                    @foreach(range(1, 12) as $month)
+                                        <option value="{{ $month }}" {{ now()->month == $month ? 'selected' : '' }}>
+                                            {{ date('F', mktime(0, 0, 0, $month, 1)) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <select id="statsYear" class="form-select form-select-sm" style="width: auto;">
+                                    @foreach(range(now()->year - 2, now()->year) as $year)
+                                        <option value="{{ $year }}" {{ now()->year == $year ? 'selected' : '' }}>
+                                            {{ $year }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body p-2">
+                            <canvas id="monthlyStats" style="height: 310px;"></canvas>
                         </div>
                     </div>
                 </div>
-
-                
             </div>
-        </div>
 
-        <div class="container-xl">
-            <div class="row row-deck row-cards">
+            <div class="row mt-3">
+                <div class="col-12">
                 <div class="card">
-                    <div class="card-header d-flex align-items-center justify-content-between">
+                    <div class="card-header sticky-top bg-white d-flex align-items-center justify-content-between">
                         <div>
                             <h3 class="card-title mb-0">Recent Activities</h3>
                             <small class="text-muted">Track all system activities</small>
                         </div>
                         <div class="ms-auto">
                             <form method="GET" class="d-flex gap-2">
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
-                                            <path d="M16 3v4" />
-                                            <path d="M8 3v4" />
-                                            <path d="M4 11h16" />
-                                        </svg>
-                                    </span>
-                                    <input type="date" class="form-control" name="from_date" value="{{ $fromDate }}">
+                                <div class="date-range-inputs">
+                                    <div class="input-group">
+                                        <span class="input-group-text">From</span>
+                                        <input type="date" class="form-control" name="from_date" value="{{ $fromDate }}">
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-text">to</span>
+                                        <input type="date" class="form-control" name="to_date" value="{{ $toDate }}">
+                                    </div>
                                 </div>
-                                <div class="input-group">
-                                    <span class="input-group-text">to</span>
-                                    <input type="date" class="form-control" name="to_date" value="{{ $toDate }}">
+                                <div class="filter-controls">
+                                    <select name="sort_by" class="form-select" style="width: auto;">
+                                        <option value="date" {{ $sortBy === 'date' ? 'selected' : '' }}>Latest First</option>
+                                        <option value="type" {{ $sortBy === 'type' ? 'selected' : '' }}>By Activity Type</option>
+                                        <option value="description" {{ $sortBy === 'description' ? 'selected' : '' }}>By Description</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-filter me-2"></i>
+                                        Filter
+                                    </button>
                                 </div>
-                                <select name="sort_by" class="form-select" style="width: auto;">
-                                    <option value="date" {{ $sortBy === 'date' ? 'selected' : '' }}>Latest First</option>
-                                    <option value="type" {{ $sortBy === 'type' ? 'selected' : '' }}>By Activity Type</option>
-                                    <option value="description" {{ $sortBy === 'description' ? 'selected' : '' }}>By Description</option>
-                                </select>
-                                <button type="submit" class="btn btn-primary">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                                        <path d="M21 21l-6 -6" />
-                                    </svg>
-                                    Filter
-                                </button>
                             </form>
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <div class="scrollable-container" style="max-height: 500px; overflow-y: auto;">
+                        <div class="activities-container">
                             <div class="table-responsive">
-                                <table class="table table-vcenter table-hover table-sticky">
+                                <table class="table table-vcenter table-hover table-sticky mb-0">
                                     <thead class="sticky-top bg-white">
                                         <tr>
                                             <th class="w-1">Time</th>
@@ -396,6 +291,9 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <button class="scroll-to-bottom" id="scrollToBottom" title="Scroll to bottom">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -661,4 +559,549 @@
     .table-hover tbody tr:hover {
         background-color: rgba(98, 105, 118, 0.06);
     }
+
+    /* Add these styles to make the dashboard scrollable */
+    .page-wrapper {
+        height: calc(100vh - 70px); /* Subtract header height */
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .container-xl {
+        max-width: 100%;
+        padding: 0 15px;
+    }
+
+    /* Smooth scrolling */
+    .page-wrapper {
+        scroll-behavior: smooth;
+    }
+
+    /* Custom scrollbar */
+    .page-wrapper::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .page-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .page-wrapper::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .page-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    .resizable-col {
+        position: relative;
+        transition: none; /* Remove transition for smoother resize */
+    }
+
+    /* Add smooth transition only for hover effect */
+    .resize-handle {
+        position: absolute;
+        right: -2px; /* Adjust position to be more grabbable */
+        top: 0;
+        bottom: 0;
+        width: 8px; /* Wider handle for easier grabbing */
+        background: transparent;
+        cursor: col-resize;
+        z-index: 100;
+        transition: background 0.2s ease;
+    }
+
+    .resize-handle:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .resizing {
+        user-select: none;
+        cursor: col-resize;
+    }
+
+    .resizing .calendar-card,
+    .resizing .card {
+        transition: none !important;
+    }
+
+    /* Activities Container Styles */
+    .activities-container {
+        max-height: calc(100vh - 500px);
+        min-height: 300px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        padding-bottom: 60px; /* Add padding at bottom */
+        position: relative; /* For scroll button positioning */
+    }
+
+    .activities-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .activities-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .activities-container::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    .activities-container::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Scroll to bottom button */
+    .scroll-to-bottom {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #206bc4;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .scroll-to-bottom:hover {
+        background: #1a569d;
+        transform: translateY(-2px);
+    }
+
+    .scroll-to-bottom.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .activities-container {
+            max-height: 400px;
+        }
+
+        .card-header form {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card-header .input-group {
+            width: 100%;
+        }
+
+        .card-header select,
+        .card-header button {
+            width: 100% !important;
+        }
+    }
+
+    /* Make table header sticky */
+    .table-sticky thead th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 1;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* Responsive adjustments for statistics and calendar */
+    @media (max-width: 992px) {
+        .resizable-col {
+            width: 100% !important;
+            margin-bottom: 1rem;
+        }
+
+        .resize-handle {
+            display: none;
+        }
+
+        .calendar-card {
+            height: 400px;
+        }
+
+        #monthlyStats {
+            height: 250px !important;
+        }
+    }
+
+    /* Adjust card paddings for smaller screens */
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 0.5rem;
+        }
+
+        .card-header {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .analytics-context {
+            font-size: 0.7rem;
+        }
+    }
+
+    /* Add these styles to your existing CSS */
+    .row.g-2.mb-3 {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .col-sm-6.col-lg-3 {
+        display: flex;
+        flex: 0 0 auto;
+        width: 25%;
+    }
+
+    @media (max-width: 992px) {
+        .col-sm-6.col-lg-3 {
+            width: 50%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .col-sm-6.col-lg-3 {
+            width: 100%;
+        }
+    }
+
+    .modern-analytics-card {
+        width: 100%;
+        min-height: 160px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modern-analytics-card .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Update the form styles */
+    .card-header form {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .date-range-inputs {
+        display: flex;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .filter-controls {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+        .card-header form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .date-range-inputs {
+            min-width: 100%;
+        }
+    }
+
+    /* Add these styles */
+    .calendar-card .card-header {
+        position: relative;
+        z-index: 1050; /* Higher than default dropdown z-index */
+    }
+
+    .calendar-card .dropdown-menu {
+        z-index: 1051; /* Even higher than the header */
+    }
+
+    .calendar-card .dropdown {
+        position: static; /* This helps with dropdown positioning */
+    }
+
+    .calendar-card .dropdown-menu {
+        position: absolute;
+        margin-top: 2px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    /* Ensure dropdowns appear above calendar */
+    .fc-view-harness {
+        z-index: 1;
+    }
 </style>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('monthlyStats').getContext('2d');
+let monthlyStatsChart;
+
+function initChart(data) {
+    if (monthlyStatsChart) {
+        monthlyStatsChart.destroy();
+    }
+    
+    const colors = {
+        pets: {
+            border: '#1e40af',  // navy blue
+            background: 'rgba(30, 64, 175, 0.1)'
+        },
+        appointments: {
+            border: '#0ea5e9',  // sky blue
+            background: 'rgba(14, 165, 233, 0.1)'
+        },
+        petOwners: {
+            border: '#16a34a',  // green
+            background: 'rgba(22, 163, 74, 0.1)'
+        },
+        orders: {
+            border: '#f97316',  // orange
+            background: 'rgba(249, 115, 22, 0.1)'
+        }
+    };
+
+    monthlyStatsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'New Pets',
+                data: data.pets,
+                borderColor: colors.pets.border,
+                backgroundColor: colors.pets.background,
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Appointments',
+                data: data.appointments,
+                borderColor: colors.appointments.border,
+                backgroundColor: colors.appointments.background,
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Pet Owners',
+                data: data.petOwners,
+                borderColor: colors.petOwners.border,
+                backgroundColor: colors.petOwners.background,
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Orders',
+                data: data.orders,
+                borderColor: colors.orders.border,
+                backgroundColor: colors.orders.background,
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 8,
+                        font: { size: 11 },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    titleFont: {
+                        size: 13
+                    },
+                    bodyFont: {
+                        size: 12
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.parsed.y || '0';
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        font: { size: 10 },
+                        precision: 0
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: { size: 10 }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+}
+
+// Initialize with current data
+initChart({
+    labels: @json($monthlyStats->pluck('month')),
+    appointments: @json($monthlyStats->pluck('appointments')),
+    pets: @json($monthlyStats->pluck('pets')),
+    orders: @json($monthlyStats->pluck('orders')),
+    petOwners: @json($monthlyStats->pluck('petOwners'))
+});
+
+// Add event listeners for month/year selectors
+document.getElementById('statsMonth').addEventListener('change', updateStatistics);
+document.getElementById('statsYear').addEventListener('change', updateStatistics);
+
+function updateStatistics() {
+    const month = document.getElementById('statsMonth').value;
+    const year = document.getElementById('statsYear').value;
+    
+    // Show loading state
+    const chartContainer = document.getElementById('monthlyStats').parentElement;
+    chartContainer.style.opacity = '0.5';
+    chartContainer.style.pointerEvents = 'none';
+    
+    fetch(`/api/statistics?month=${month}&year=${year}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            initChart(data);
+        })
+        .catch(error => {
+            console.error('Error fetching statistics:', error);
+            alert('Failed to update statistics. Please try again.');
+        })
+        .finally(() => {
+            // Remove loading state
+            chartContainer.style.opacity = '';
+            chartContainer.style.pointerEvents = '';
+        });
+}
+
+// Make columns resizable
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarCol = document.querySelector('.col-lg-8');
+    const statsCol = document.querySelector('.col-lg-4');
+    const handle = document.querySelector('.resize-handle');
+    let isResizing = false;
+    let startX, startWidth;
+    let resizeTimeout;
+
+    handle.addEventListener('mousedown', function(e) {
+        isResizing = true;
+        startX = e.pageX;
+        startWidth = calendarCol.offsetWidth;
+        document.body.classList.add('resizing');
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isResizing) return;
+
+        // Use requestAnimationFrame for smooth resizing
+        cancelAnimationFrame(resizeTimeout);
+        resizeTimeout = requestAnimationFrame(() => {
+            const width = startWidth + (e.pageX - startX);
+            const totalWidth = calendarCol.parentElement.offsetWidth;
+            const minWidth = totalWidth * 0.3;
+            const maxWidth = totalWidth * 0.7;
+
+            if (width >= minWidth && width <= maxWidth) {
+                const percentage = (width / totalWidth) * 100;
+                calendarCol.style.width = `${percentage}%`;
+                statsCol.style.width = `${100 - percentage}%`;
+            }
+        });
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (!isResizing) return;
+        
+        isResizing = false;
+        document.body.classList.remove('resizing');
+        
+        // Update components after resize is complete
+        if (monthlyStatsChart) {
+            monthlyStatsChart.resize();
+        }
+        if (window.calendar) {
+            window.calendar.updateSize();
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const activitiesContainer = document.querySelector('.activities-container');
+    const scrollButton = document.getElementById('scrollToBottom');
+
+    if (activitiesContainer && scrollButton) {
+        activitiesContainer.addEventListener('scroll', function() {
+            const maxScroll = this.scrollHeight - this.clientHeight;
+            const currentScroll = this.scrollTop;
+            
+            if (maxScroll - currentScroll > 100) {
+                scrollButton.classList.add('visible');
+            } else {
+                scrollButton.classList.remove('visible');
+            }
+        });
+
+        scrollButton.addEventListener('click', function() {
+            activitiesContainer.scrollTo({
+                top: activitiesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+    }
+});
+</script>
+@endpush

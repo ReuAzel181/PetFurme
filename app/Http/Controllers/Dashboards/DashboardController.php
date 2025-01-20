@@ -47,22 +47,84 @@ class DashboardController extends Controller
 
         $recentEvents = $this->getRecentEvents($fromDate, $toDate, $sortBy);
 
+        // Calculate growth percentages
+        $lastMonthPets = Pet::whereMonth('created_at', now()->subMonth()->month)
+            ->whereYear('created_at', now()->subMonth()->year)
+            ->count();
+        $petGrowth = $lastMonthPets > 0 ? (($totalPets - $lastMonthPets) / $lastMonthPets) * 100 : 0;
+
+        // Calculate appointment growth
+        $lastMonthAppointments = Appointment::whereMonth('created_at', now()->subMonth()->month)
+            ->whereYear('created_at', now()->subMonth()->year)
+            ->count();
+        $appointmentGrowth = $lastMonthAppointments > 0 
+            ? (($appointments - $lastMonthAppointments) / $lastMonthAppointments) * 100 
+            : 0;
+
+        $averageOrders = Order::whereDate('created_at', '>=', now()->subDays(30))
+            ->whereDate('created_at', '<', today())
+            ->count() / 30;
+        $orderGrowth = $averageOrders > 0 ? (($todayOrders - $averageOrders) / $averageOrders) * 100 : 0;
+
+        $ownerGrowth = $todayPetOwners > 0 ? (($totalPetOwners - $todayPetOwners) / $todayPetOwners) * 100 : 0;
+
+        // Format appointments for calendar
+        $calendarAppointments = Appointment::select(
+            'id',
+            'appointment_date as start',
+            'reason_for_visit as title',
+            'appointment_time',
+            'owner_name',
+            'pet_name',
+            DB::raw("CONCAT(
+                'Owner: ', owner_name,
+                '\nPet: ', COALESCE(pet_name, 'Not specified'),
+                '\nTime: ', TIME_FORMAT(appointment_time, '%h:%i %p'),
+                '\nReason: ', reason_for_visit
+            ) as description")
+        )->get()->map(function($appointment) {
+            return [
+                'id' => $appointment->id,
+                'title' => $appointment->title,
+                'start' => $appointment->start,
+                'description' => $appointment->description,
+                'backgroundColor' => '#3788d8',
+                'borderColor' => '#3788d8',
+                'textColor' => '#ffffff',
+                'extendedProps' => [
+                    'time' => $appointment->appointment_time,
+                    'owner' => $appointment->owner_name,
+                    'pet' => $appointment->pet_name,
+                    'description' => $appointment->description
+                ]
+            ];
+        });
+
+        // Get monthly statistics
+        $monthlyStats = $this->getMonthlyStats();
+
         return view('dashboard', compact(
             'totalPets',
             'todayPets',
+            'petGrowth',
             'appointments',
             'todayAppointments',
-            'totalPetOwners', 
+            'appointmentGrowth',
+            'orderGrowth',
+            'totalPetOwners',
             'todayPetOwners',
-            'products', 
-            'orders', 
-            'todayProducts',  
-            'todayOrders', 
+            'products',
+            'orders',
+            'todayProducts',
+            'todayOrders',
             'categories',
             'recentEvents',
             'fromDate',
             'toDate',
-            'sortBy'
+            'sortBy',
+            'calendarAppointments',
+            'monthlyStats',
+            'ownerGrowth'
         ));
     }
 
@@ -126,7 +188,7 @@ class DashboardController extends Controller
             DB::raw('"new_pet" as type'),
             DB::raw("CONCAT(
                 name, 
-                ' (', COALESCE(type, 'Unknown Type'), ') - ', 
+                ' - ', 
                 COALESCE(breed, 'Unknown Breed'),
                 CASE 
                     WHEN age IS NOT NULL THEN CONCAT(', ', age, ' years old')
@@ -189,5 +251,75 @@ class DashboardController extends Controller
         }
 
         return $events->get();
+    }
+
+    private function getMonthlyStats()
+    {
+        $months = collect(range(1, 12))->map(function($month) {
+            $date = now()->month($month);
+            return [
+                'month' => $date->format('M'),
+                'appointments' => Appointment::whereMonth('created_at', $month)
+                    ->whereYear('created_at', now()->year)
+                    ->count(),
+                'pets' => Pet::whereMonth('created_at', $month)
+                    ->whereYear('created_at', now()->year)
+                    ->count(),
+                'orders' => Order::whereMonth('created_at', $month)
+                    ->whereYear('created_at', now()->year)
+                    ->count(),
+                'petOwners' => User::where('role', 'pet_owner')
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', now()->year)
+                    ->count(),
+            ];
+        });
+
+        return $months;
+    }
+
+    public function getStatistics(Request $request)
+    {
+        $month = $request->get('month', now()->month);
+        $year = $request->get('year', now()->year);
+
+        $statistics = $this->getMonthlyStatistics($month, $year);
+
+        return response()->json([
+            'labels' => $statistics->pluck('month'),
+            'appointments' => $statistics->pluck('appointments'),
+            'pets' => $statistics->pluck('pets'),
+            'orders' => $statistics->pluck('orders'),
+            'petOwners' => $statistics->pluck('petOwners'),
+        ]);
+    }
+
+    private function getMonthlyStatistics($month, $year)
+    {
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $months = collect();
+
+        // Get data for the last 12 months from the selected month
+        for ($i = 11; $i >= 0; $i--) {
+            $currentDate = $startDate->copy()->subMonths($i);
+            $months->push([
+                'month' => $currentDate->format('M'),
+                'appointments' => Appointment::whereYear('created_at', $currentDate->year)
+                    ->whereMonth('created_at', $currentDate->month)
+                    ->count(),
+                'pets' => Pet::whereYear('created_at', $currentDate->year)
+                    ->whereMonth('created_at', $currentDate->month)
+                    ->count(),
+                'orders' => Order::whereYear('created_at', $currentDate->year)
+                    ->whereMonth('created_at', $currentDate->month)
+                    ->count(),
+                'petOwners' => User::where('role', 'pet_owner')
+                    ->whereYear('created_at', $currentDate->year)
+                    ->whereMonth('created_at', $currentDate->month)
+                    ->count(),
+            ]);
+        }
+
+        return $months;
     }
 }

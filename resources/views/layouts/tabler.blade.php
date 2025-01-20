@@ -17,6 +17,7 @@
     <link href="{{ asset('dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('dist/css/demo.min.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     <style>
         @import url('https://rsms.me/inter/inter.css');
@@ -66,17 +67,51 @@
             transition: margin 0.3s ease;
             margin-left: 400px;
             width: calc(100% - 400px);
-            padding: 20px;
-            position: fixed; /* Fix the position */
-            top: 70px; /* Height of the header */
-            right: 0;
-            bottom: 0;
-            overflow-y: hidden; /* Allow scrolling within main content */
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            position: fixed;
+            top: 70px;
+            padding-top: 0; /* Remove top padding */
         }
 
         #main-content.expanded {
             margin-left: 0;
             width: 100%;
+        }
+
+        /* Smooth scrolling */
+        #main-content {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        #main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #main-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #main-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        #main-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Ensure content fills available space */
+        .container-fluid {
+            min-height: 100%;
+            padding: 20px;
+        }
+
+        /* Remove conflicting styles */
+        .page-wrapper {
+            height: auto;
+            overflow: visible;
         }
 
         /* Page wrapper styles */
@@ -145,6 +180,16 @@
 
         .nav-link-title {
             font-weight: 500;
+        }
+
+        /* Update main content spacing */
+        .page-header {
+            margin-bottom: 0.5rem; /* Reduce space after header */
+            padding: 0.5rem 0; /* Reduce header padding */
+        }
+
+        .page-body {
+            padding-top: 0.5rem; /* Reduce top padding */
         }
     </style>
 
@@ -691,6 +736,8 @@
         }
     });
     </script>
+
+    @stack('scripts')
 </body>
 
 </html>

@@ -8,6 +8,7 @@
     
     // Bwiset eto lang pala
     use App\Http\Controllers\MessageController;
+    use App\Http\Controllers\Dashboards\DashboardController;
 
     // For the login and logout routes
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('api.login');
@@ -31,3 +32,5 @@
     Route::get('/users/{user}/pets', function (App\Models\User $user) {
         return $user->pets;
     })->name('api.user.pets');
+
+    Route::get('/statistics', [DashboardController::class, 'getStatistics'])->name('api.statistics');
