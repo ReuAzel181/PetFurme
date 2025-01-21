@@ -221,7 +221,7 @@ class DashboardController extends Controller
                 'Order #',
                 invoice_no,
                 ' - ',
-                COALESCE(pay, 0),
+                COALESCE(total, 0),
                 ' PHP'
             ) as description"),
             'created_at'

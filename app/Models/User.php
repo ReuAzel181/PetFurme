@@ -11,6 +11,11 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    // Add role constants
+    const ROLE_PET_OWNER = 'pet_owner';
+    const ROLE_ADMIN = 'admin';
+    const ROLE_STAFF = 'staff';
+
     protected $fillable = [
         'username',
         'name',
@@ -30,7 +35,14 @@ class User extends Authenticatable
     // Cast attributes
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'role' => 'string',
     ];
+
+    // Add a scope for pet owners
+    public function scopePetOwners($query)
+    {
+        return $query->where('role', self::ROLE_PET_OWNER);
+    }
 
     // A user can have many pets
     public function pets(): HasMany
@@ -54,5 +66,15 @@ class User extends Authenticatable
     public function receivedMessages(): HasMany
     {
         return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'customer_id', 'id');
     }
 }

@@ -24,53 +24,46 @@ class PosController extends Controller
         ]);
     }
 
-    public function addCartItem (Request $request)
+    public function addCartItem(Request $request)
     {
-        $request->all();
-        //dd($request);
-
-        $rules = [
+        $validatedData = $request->validate([
             'id' => 'required|numeric',
             'name' => 'required|string',
             'selling_price' => 'required|numeric',
-        ];
+        ]);
 
-        $validatedData = $request->validate($rules);
+        Cart::add([
+            'id' => $validatedData['id'],
+            'name' => $validatedData['name'],
+            'qty' => 1,
+            'price' => $validatedData['selling_price'],
+            'weight' => 1,
+            'options' => []
+        ]);
 
-        Cart::add(
-            $validatedData['id'],
-            $validatedData['name'],
-            1,
-            $validatedData['selling_price'],
-            1,
-            (array)$options = null
-        );
-
-        return redirect()
-            ->back()
-            ->with('success', 'Product has been added to cart!');
+        return redirect()->back()->with('success', 'Product added to cart!');
     }
 
     public function updateCartItem(Request $request, $rowId)
     {
-        $rules = [
-            'qty' => 'required|numeric',
-            'product_id' => 'numeric'
-        ];
-        
-        $validatedData = $request->validate($rules);
-        if ($validatedData['qty'] > Product::where('id', intval($validatedData['product_id']))->value('quantity')) {
-            return redirect()
-            ->back()
-            ->with('error', 'The requested quantity is not available in stock.');
+        $validatedData = $request->validate([
+            'qty' => 'required|numeric|min:1'
+        ]);
+
+        try {
+            Cart::update($rowId, $validatedData['qty']);
+
+            return response()->json([
+                'success' => true,
+                'subtotal' => number_format(Cart::subtotal(), 2),
+                'total' => number_format(Cart::total(), 2)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update cart'
+            ], 500);
         }
-        
-
-        Cart::update($rowId, $validatedData['qty']);
-
-        return redirect()
-            ->back()
-            ->with('success', 'Product has been updated from cart!');
     }
 
     public function deleteCartItem(String $rowId)
@@ -80,5 +73,13 @@ class PosController extends Controller
         return redirect()
             ->back()
             ->with('success', 'Product has been deleted from cart!');
+    }
+
+    public function getCartTotals()
+    {
+        return response()->json([
+            'subtotal' => number_format(Cart::subtotal(), 2),
+            'total' => number_format(Cart::total(), 2)
+        ]);
     }
 }

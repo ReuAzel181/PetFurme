@@ -197,6 +197,158 @@
         .text-muted {
             color: #6c757d !important;
         }
+
+        /* Animation for new notifications */
+        @keyframes notificationPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .new-notification {
+            animation: notificationPulse 2s infinite;
+        }
+
+        /* Notification counter bounce animation */
+        @keyframes counterBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .badge.notification-counter {
+            animation: counterBounce 2s ease infinite;
+        }
+
+        /* Highlight effect for new items */
+        .highlight-new {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-new::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Notification Indicator */
+        .notification-indicator {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .notification-dot {
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background-color: #dc3545;
+            border-radius: 50%;
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                transform: translateY(-50%) scale(0.95);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+            
+            70% {
+                transform: translateY(-50%) scale(1);
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+            
+            100% {
+                transform: translateY(-50%) scale(0.95);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
     </style>
+    @endpush
+
+    @push('scripts')
+    <script>
+        // Browser Notifications
+        document.addEventListener('DOMContentLoaded', function() {
+            // Request notification permission
+            if ("Notification" in window) {
+                Notification.requestPermission();
+            }
+
+            // Function to show browser notification
+            function showNotification(title, message) {
+                if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification(title, {
+                        body: message,
+                        icon: '/path/to/your/icon.png' // Add your notification icon path
+                    });
+                }
+            }
+
+            // Function to update notification indicators
+            function updateNotificationIndicators(hasNewNotifications) {
+                const indicators = document.querySelectorAll('.notification-indicator');
+                indicators.forEach(indicator => {
+                    const dot = indicator.querySelector('.notification-dot');
+                    if (hasNewNotifications) {
+                        if (!dot) {
+                            const newDot = document.createElement('span');
+                            newDot.className = 'notification-dot';
+                            indicator.appendChild(newDot);
+                        }
+                    } else {
+                        if (dot) {
+                            dot.remove();
+                        }
+                    }
+                });
+            }
+
+            // Check for new notifications and update indicators
+            function checkNewNotifications() {
+                fetch('/api/check-notifications')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.hasNew) {
+                            showNotification('New Alert', data.message);
+                            updateNotificationIndicators(true);
+                            document.querySelectorAll('.list-group-item.new').forEach(item => {
+                                item.classList.add('highlight-new');
+                            });
+                        } else {
+                            updateNotificationIndicators(false);
+                        }
+                    });
+            }
+
+            // Start checking for new notifications
+            setInterval(checkNewNotifications, 30000);
+
+            // Initial check
+            checkNewNotifications();
+
+            // Update indicators when marking all as read
+            document.querySelector('form[action*="markAllRead"]').addEventListener('submit', function(e) {
+                document.querySelectorAll('.list-group-item').forEach(item => {
+                    item.style.transition = 'opacity 0.5s ease';
+                    item.style.opacity = '0.5';
+                });
+                updateNotificationIndicators(false);
+            });
+        });
+    </script>
     @endpush
 @endsection

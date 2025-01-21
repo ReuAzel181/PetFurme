@@ -1,41 +1,56 @@
 <div class="card calendar-card">
     <div class="card-header position-relative">
-        <div class="d-flex justify-content-between align-items-center">
-            <h3 class="card-title">Appointments Calendar</h3>
-            <div class="d-flex align-items-center gap-3">
-                <button id="prevMonth" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <span class="current-month text-dark fw-medium">January</span>
-                <button id="nextMonth" class="btn btn-sm btn-outline-secondary">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+        <div class="header-content">
+            <!-- Left Section -->
+            <div class="header-section">
+                <h3 class="card-title">Appointments Calendar</h3>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <button id="today" class="btn btn-sm btn-primary">Today</button>
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="monthSelect" data-bs-toggle="dropdown" aria-expanded="false">
-                        January
+
+            <!-- Center Section -->
+            <div class="header-section">
+                <div class="d-flex align-items-center gap-3">
+                    <button id="prevMonth" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-chevron-left"></i>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="monthSelect">
-                        @foreach(range(1, 12) as $month)
-                            <option class="dropdown-item month-item" data-month="{{ $month - 1 }}" {{ now()->month == $month ? 'selected' : '' }}>
-                                {{ date('F', mktime(0, 0, 0, $month, 1)) }}
-                            </option>
-                        @endforeach
-                    </ul>
+                    <span class="current-month text-dark fw-medium">January</span>
+                    <button id="nextMonth" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="yearSelect" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ now()->year }}
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="yearSelect">
-                        @for($year = now()->year - 2; $year <= now()->year + 2; $year++)
-                            <option class="dropdown-item year-item" data-year="{{ $year }}" {{ now()->year == $year ? 'selected' : '' }}>
-                                {{ $year }}
-                            </option>
-                        @endfor
-                    </ul>
+            </div>
+
+            <!-- Right Section -->
+            <div class="header-section">
+                <div class="d-flex align-items-center gap-2 calendar-controls">
+                    <button id="today" class="btn btn-sm btn-primary">Today</button>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="monthSelect" data-bs-toggle="dropdown" aria-expanded="false">
+                            January
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="monthSelect">
+                            @foreach(range(1, 12) as $month)
+                                <li>
+                                    <button class="dropdown-item month-item" data-month="{{ $month - 1 }}" {{ now()->month == $month ? 'selected' : '' }}>
+                                        {{ date('F', mktime(0, 0, 0, $month, 1)) }}
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="yearSelect" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ now()->year }}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="yearSelect">
+                            @for($year = now()->year - 2; $year <= now()->year + 2; $year++)
+                                <li>
+                                    <button class="dropdown-item year-item" data-year="{{ $year }}" {{ now()->year == $year ? 'selected' : '' }}>
+                                        {{ $year }}
+                                    </button>
+                                </li>
+                            @endfor
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,7 +64,9 @@
 .calendar-container {
     max-height: none;
     padding: 1rem;
-    height: calc(100% - 60px); /* Subtract header height */
+    height: 300px;
+    position: relative;
+    z-index: 1;
 }
 
 .calendar-wrapper {
@@ -58,7 +75,8 @@
 }
 
 #calendar {
-    font-size: 0.7em;
+    font-size: 0.8em; /* Slightly smaller font for better fit */
+    height: 100%;
 }
 
 /* Hide the default FullCalendar header */
@@ -67,17 +85,97 @@
 }
 
 .fc .fc-daygrid-day {
-    height: 10px !important;
+    min-height: 35px !important; /* Reduced minimum height */
+    height: auto !important;
 }
 
 .calendar-card {
-    height: 370px;
-    overflow: visible !important; /* Ensure dropdowns can overflow */
+    position: relative;
+    min-height: 370px;
+    z-index: 1;
 }
 
+.calendar-card .card-header {
+    overflow: visible;
+    position: relative;
+    z-index: 2 !important; /* Higher than calendar container */
+}
+
+/* Dropdown container */
+.calendar-card .dropdown {
+    position: relative !important;
+}
+
+/* Dropdown button */
+.calendar-card .dropdown-toggle {
+    position: relative;
+    z-index: 3 !important;
+}
+
+/* Dropdown menu */
+.calendar-card .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    z-index: 4 !important; /* Highest in the stack */
+    margin-top: 2px;
+    max-height: 200px;
+    overflow-y: auto;
+    min-width: 120px;
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+}
+
+/* Calendar view */
 .fc-view-harness {
-    height: 250px !important;
-    z-index: 1;
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* Ensure dropdowns don't get cut off */
+.dropdown-menu.show {
+    transform: none !important;
+    display: block !important;
+}
+
+/* Month/Year dropdown items */
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+}
+
+/* Fix calendar positioning */
+.flatpickr-calendar {
+    z-index: 1060 !important;
+}
+
+/* Ensure proper stacking context */
+.calendar-navigation {
+    position: relative;
+    z-index: 1070 !important;
+}
+
+/* Calendar controls */
+.calendar-controls {
+    position: relative;
+    z-index: 3 !important; /* Higher than header */
+}
+
+/* Make dropdowns more prominent */
+.btn-outline-secondary.dropdown-toggle {
+    background-color: var(--tblr-bg-surface);
+    border-color: var(--tblr-border-color);
+}
+
+.btn-outline-secondary.dropdown-toggle:hover,
+.btn-outline-secondary.dropdown-toggle:focus {
+    background-color: var(--tblr-bg-surface-secondary);
 }
 
 /* Custom select styles */
@@ -184,7 +282,7 @@
     overflow: hidden;
     border-bottom: 1px solid rgba(0,0,0,.075);
     position: relative;
-    z-index: 1060; /* Increase z-index */
+    z-index: 2 !important; /* Higher than calendar container */
 }
 
 .calendar-navigation {
@@ -195,7 +293,7 @@
 }
 
 .calendar-controls {
-    z-index: 2;
+    z-index: 3 !important; /* Higher than header */
 }
 
 .dropdown-menu {
@@ -369,7 +467,7 @@
 .fc-daygrid-day.fc-day-has-events::after {
     content: '';
     position: absolute;
-    bottom: 4px;
+    bottom: 1px;
     left: 50%;
     transform: translateX(-50%);
     width: 4px;
@@ -409,6 +507,275 @@
 
 .calendar-card {
     overflow: visible !important; /* Ensure dropdowns can overflow */
+}
+
+/* Make sure the calendar grid fills the space */
+.fc-daygrid-body {
+    height: 100% !important;
+}
+
+.fc-scrollgrid-sync-table {
+    height: 100% !important;
+}
+
+/* Adjust day cell frame spacing */
+.fc-daygrid-day-frame {
+    padding: 1px !important;
+    min-height: 35px !important; /* Match the day cell height */
+}
+
+/* Optional: Adjust day number size for smaller cells */
+.fc-daygrid-day-number {
+    font-size: 0.75em;
+    padding: 2px !important;
+}
+
+/* Adjust event dot size */
+.fc-daygrid-event-dot {
+    width: 4px !important;
+    height: 4px !important;
+}
+
+/* Add these styles */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.header-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+/* Left section alignment */
+.header-section:first-child {
+    justify-content: flex-start;
+}
+
+/* Center section alignment */
+.header-section:nth-child(2) {
+    justify-content: center;
+}
+
+/* Right section alignment */
+.header-section:last-child {
+    justify-content: flex-end;
+}
+
+/* Ensure the card title doesn't grow too wide */
+.card-title {
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* Keep the calendar controls from growing too wide */
+.calendar-controls {
+    white-space: nowrap;
+}
+
+/* Remove any overflow restrictions from parent elements */
+.card-body {
+    overflow: visible !important;
+}
+
+/* Optional: Adjust dropdown position for better visibility */
+.calendar-controls .dropdown-menu {
+    overflow-x: hidden;
+    min-width: 120px;
+    max-width: 200px;
+}
+
+/* Ensure parent containers don't clip dropdowns */
+.card-body,
+.calendar-container,
+.calendar-wrapper {
+    overflow: visible !important;
+}
+
+/* Optional: Adjust dropdown appearance */
+.calendar-controls .dropdown-menu {
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* Update dark mode styles for activities */
+.activities-container {
+    /* Existing styles */
+    background: var(--tblr-bg-surface);
+    color: var(--tblr-body-color);
+}
+
+/* Activity item styles */
+.activity-item {
+    border-left: 2px solid var(--tblr-border-color);
+    padding: 0.75rem 1rem;
+    position: relative;
+    background: var(--tblr-bg-surface);
+}
+
+.activity-item:hover {
+    background: var(--tblr-bg-surface-secondary);
+}
+
+/* Activity content styles */
+.activity-content {
+    color: var(--tblr-body-color);
+}
+
+/* Activity meta text */
+.activity-meta {
+    color: var(--tblr-muted);
+    font-size: 0.875rem;
+}
+
+/* Activity icons */
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    background: var(--tblr-primary);
+    color: #ffffff;
+}
+
+/* Activity types */
+.activity-appointment {
+    border-left-color: var(--tblr-primary);
+}
+
+.activity-order {
+    border-left-color: var(--tblr-success);
+}
+
+.activity-user {
+    border-left-color: var(--tblr-info);
+}
+
+.activity-product {
+    border-left-color: var(--tblr-warning);
+}
+
+/* Activity links */
+.activity-item a {
+    color: var(--tblr-primary);
+    text-decoration: none;
+}
+
+.activity-item a:hover {
+    text-decoration: underline;
+}
+
+/* Time stamp */
+.activity-time {
+    color: var(--tblr-muted);
+    font-size: 0.75rem;
+}
+
+/* Status badges */
+.activity-status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-pending {
+    background: var(--tblr-warning-subtle);
+    color: var(--tblr-warning);
+}
+
+.status-completed {
+    background: var(--tblr-success-subtle);
+    color: var(--tblr-success);
+}
+
+.status-cancelled {
+    background: var(--tblr-danger-subtle);
+    color: var(--tblr-danger);
+}
+
+/* Dark mode compatibility styles */
+[data-bs-theme="dark"] .card-header {
+    background-color: var(--tblr-bg-surface) !important;
+    border-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .sticky-top {
+    background-color: var(--tblr-bg-surface) !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    border-color: var(--tblr-border-color);
+    color: var(--tblr-body-color);
+    background-color: var(--tblr-bg-surface);
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+    border-color: var(--tblr-border-color);
+    color: var(--tblr-body-color);
+}
+
+[data-bs-theme="dark"] .current-month {
+    color: var(--tblr-body-color);
+}
+
+[data-bs-theme="dark"] .card-title {
+    color: var(--tblr-body-color);
+}
+
+[data-bs-theme="dark"] .fc-day-today {
+    background: rgba(var(--tblr-primary-rgb), 0.1) !important;
+}
+
+[data-bs-theme="dark"] .fc-daygrid-day.fc-day-has-events {
+    background-color: rgba(var(--tblr-primary-rgb), 0.1);
+}
+
+[data-bs-theme="dark"] .fc-daygrid-day-number {
+    color: var(--tblr-body-color);
+}
+
+[data-bs-theme="dark"] .fc th {
+    color: var(--tblr-muted);
+}
+
+/* Update dropdown styles for dark mode */
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: var(--tblr-bg-surface);
+    border-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: var(--tblr-body-color);
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+    background-color: var(--tblr-bg-surface-secondary);
+    color: var(--tblr-body-color);
+}
+
+/* Update tooltip styles for dark mode */
+[data-bs-theme="dark"] .tippy-box {
+    background-color: var(--tblr-bg-surface);
+    border-color: var(--tblr-border-color);
+    color: var(--tblr-body-color);
+}
+
+/* Calendar grid lines for dark mode */
+[data-bs-theme="dark"] .fc-theme-standard td,
+[data-bs-theme="dark"] .fc-theme-standard th {
+    border-color: var(--tblr-border-color);
+}
+
+[data-bs-theme="dark"] .fc-theme-standard .fc-scrollgrid {
+    border-color: var(--tblr-border-color);
 }
 </style>
 

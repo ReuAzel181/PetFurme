@@ -32,6 +32,8 @@ use App\Http\Controllers\MessageController;
 use App\Services\MessageService;
 
 use Supabase\CreateClient;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\CartController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -210,7 +212,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('/customers', CustomerController::class);
     Route::resource('/suppliers', SupplierController::class);
     Route::resource('/categories', CategoryController::class);
     Route::resource('/units', UnitController::class);
@@ -225,34 +226,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route POS
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
-    Route::post('/pos/cart/add', [PosController::class, 'addCartItem'])->name('pos.addCartItem');
+    Route::post('/pos/add-to-cart/{product}', [PosController::class, 'addCartItem'])->name('pos.addCartItem');
     Route::post('/pos/cart/update/{rowId}', [PosController::class, 'updateCartItem'])->name('pos.updateCartItem');
     Route::delete('/pos/cart/delete/{rowId}', [PosController::class, 'deleteCartItem'])->name('pos.deleteCartItem');
 
     //Route::post('/pos/invoice', [PosController::class, 'createInvoice'])->name('pos.createInvoice');
-    Route::post('invoice/create/', [InvoiceController::class, 'create'])->name('invoice.create');
+    Route::delete('/cart/{rowId}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
+    Route::get('/cart/totals', [CartController::class, 'getCartTotals'])->name('cart.totals');
 
-    // Route Orders
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/pending', OrderPendingController::class)->name('orders.pending');
-    Route::get('/orders/complete', OrderCompleteController::class)->name('orders.complete');
-
-    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
-    Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
-
-    // SHOW ORDER
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::put('/orders/update/{order}', [OrderController::class, 'update'])->name('orders.update');
-    Route::delete('/orders/cancel/{order}', [OrderController::class, 'cancel'])->name('orders.cancel');
-
-    // DUES
-    Route::get('due/orders/', [DueOrderController::class, 'index'])->name('due.index');
-    Route::get('due/order/view/{order}', [DueOrderController::class, 'show'])->name('due.show');
-    Route::get('due/order/edit/{order}', [DueOrderController::class, 'edit'])->name('due.edit');
-    Route::put('due/order/update/{order}', [DueOrderController::class, 'update'])->name('due.update');
-
-    // TODO: Remove from OrderController
-    Route::get('/orders/details/{order_id}/download', [OrderController::class, 'downloadInvoice'])->name('order.downloadInvoice');
+    // Orders routes
+    Route::prefix('orders')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/create', [OrderController::class, 'create'])->name('orders.create');
+        Route::post('/store', [OrderController::class, 'store'])->name('orders.store');
+        Route::get('/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::put('/{order}', [OrderController::class, 'update'])->name('orders.update');
+        Route::delete('/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+        Route::get('/pending', [OrderController::class, 'pending'])->name('orders.pending');
+    });
 
     // Add these routes for appointments
     Route::resource('appointment', AppointmentController::class);
@@ -290,6 +283,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
     })->name('api.user.pets');
 
+    Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
+
 });
 
 require __DIR__.'/auth.php';
@@ -309,3 +304,22 @@ Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
     Route::put('/{user}', [UserController::class, 'update'])->name('update');
     Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
 });
+
+// Add this with your other routes
+Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+
+// Add this temporarily for debugging
+Route::get('orders/debug/{id}', function($id) {
+    $order = \App\Models\Order::find($id);
+    dd([
+        'id' => $id,
+        'order_exists' => $order ? true : false,
+        'order' => $order
+    ]);
+});
+
+// Update this route to use the controller method directly
+Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
+
+Route::patch('/orders/{order}/mark-as-paid', [OrderController::class, 'markAsPaid'])->name('orders.mark-as-paid');

@@ -10723,7 +10723,7 @@ body[data-bs-theme=dark] [data-bs-theme=light] .btn-close {
 
 .flex-column {
     flex-direction: column !important;
-    background-color: #99b9ff;
+    background-color: #fcfcfc;
 }
 
 .flex-row-reverse {
