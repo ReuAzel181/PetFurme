@@ -245,6 +245,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/{order}', [OrderController::class, 'update'])->name('orders.update');
         Route::delete('/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::get('/pending', [OrderController::class, 'pending'])->name('orders.pending');
+        Route::get('/{order}/print-invoice', [OrderController::class, 'printInvoice'])
+            ->name('orders.print-invoice');
     });
 
     // Add these routes for appointments
@@ -322,4 +324,10 @@ Route::get('orders/debug/{id}', function($id) {
 // Update this route to use the controller method directly
 Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
 
-Route::patch('/orders/{order}/mark-as-paid', [OrderController::class, 'markAsPaid'])->name('orders.mark-as-paid');
+Route::patch('/orders/{order:uuid}/mark-as-paid', [App\Http\Controllers\OrderController::class, 'markAsPaid'])
+    ->name('orders.mark-as-paid');
+
+Route::get('/sales/export', [SalesController::class, 'export'])->name('sales.export');
+
+Route::get('/orders/{uuid}/revert-status', [OrderController::class, 'revertStatus'])
+    ->name('orders.revert-status');

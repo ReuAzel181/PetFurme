@@ -22,11 +22,12 @@ class Order extends Model
         'total',
         'invoice_no',
         'reference',
+        'note',
+        'order_status',
         'is_paid',
         'amount_received',
         'change_amount',
-        'paid_at',
-        'payment_note'
+        'paid_at'
     ];
 
     protected $casts = [
@@ -36,12 +37,15 @@ class Order extends Model
         'is_paid' => 'boolean',
         'paid_at' => 'datetime',
         'amount_received' => 'decimal:2',
-        'change_amount' => 'decimal:2'
+        'change_amount' => 'decimal:2',
+        'completed_at' => 'datetime'
     ];
+
+    protected $with = ['details', 'details.product'];
 
     public function details()
     {
-        return $this->hasMany(OrderDetails::class);
+        return $this->hasMany(OrderDetail::class);
     }
 
     public function scopeSearch($query, $value): void
@@ -57,5 +61,46 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
+
+    public function getPaymentStatusAttribute()
+    {
+        if ($this->is_paid) {
+            return 'paid';
+        }
+        if ($this->order_status === 'completed') {
+            return 'completed';
+        }
+        return 'pending';
+    }
+
+    public function getPaymentStatusColorAttribute()
+    {
+        return [
+            'paid' => 'success',
+            'completed' => 'success',
+            'pending' => 'warning'
+        ][$this->payment_status];
+    }
+
+    public function markAsIncomplete()
+    {
+        $this->update([
+            'order_status' => 'pending',
+            'completed_at' => null
+        ]);
+    }
+
+    public function markAsComplete()
+    {
+        $this->update([
+            'order_status' => 'completed',
+            'completed_at' => now()
+        ]);
     }
 }

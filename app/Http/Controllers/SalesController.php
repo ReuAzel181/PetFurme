@@ -7,13 +7,30 @@ use Illuminate\Http\Request;
 
 class SalesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            // Get all orders first without the where clause
-            $sales = Order::with('user')
-                ->latest('created_at')
-                ->paginate(10);
+            // Get completed orders with filters
+            $query = Order::with(['user', 'details'])
+                ->where('order_status', 'completed')
+                ->latest('created_at');
+
+            // Date range filter
+            if ($request->filled(['start_date', 'end_date'])) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($request->start_date)->startOfDay(),
+                    Carbon::parse($request->end_date)->endOfDay()
+                ]);
+            }
+
+            // Customer filter
+            if ($request->filled('customer')) {
+                $query->whereHas('user', function($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->customer . '%');
+                });
+            }
+
+            $sales = $query->paginate(10);
 
             // Calculate sales statistics
             $today = Carbon::today();
@@ -21,26 +38,32 @@ class SalesController extends Controller
             $monthStart = Carbon::now()->startOfMonth();
 
             // Today's sales
-            $todaySales = Order::whereDate('created_at', $today)
+            $todaySales = $query->clone()
+                ->whereDate('created_at', $today)
                 ->sum('total');
-            $todayOrders = Order::whereDate('created_at', $today)
+            $todayOrders = $query->clone()
+                ->whereDate('created_at', $today)
                 ->count();
 
             // Weekly sales
-            $weeklySales = Order::where('created_at', '>=', $weekStart)
+            $weeklySales = $query->clone()
+                ->where('created_at', '>=', $weekStart)
                 ->sum('total');
-            $weeklyOrders = Order::where('created_at', '>=', $weekStart)
+            $weeklyOrders = $query->clone()
+                ->where('created_at', '>=', $weekStart)
                 ->count();
 
             // Monthly sales
-            $monthlySales = Order::where('created_at', '>=', $monthStart)
+            $monthlySales = $query->clone()
+                ->where('created_at', '>=', $monthStart)
                 ->sum('total');
-            $monthlyOrders = Order::where('created_at', '>=', $monthStart)
+            $monthlyOrders = $query->clone()
+                ->where('created_at', '>=', $monthStart)
                 ->count();
 
             // Total sales
-            $totalSales = Order::sum('total');
-            $totalOrders = Order::count();
+            $totalSales = $query->clone()->sum('total');
+            $totalOrders = $query->clone()->count();
 
             return view('sales.index', compact(
                 'sales',
@@ -55,6 +78,53 @@ class SalesController extends Controller
             ));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error loading sales data: ' . $e->getMessage());
+        }
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $query = Order::with(['user', 'details'])
+                ->where('order_status', 'completed');
+
+            if ($request->filled(['start_date', 'end_date'])) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($request->start_date)->startOfDay(),
+                    Carbon::parse($request->end_date)->endOfDay()
+                ]);
+            }
+
+            $sales = $query->get();
+
+            return response()->streamDownload(function() use ($sales) {
+                $handle = fopen('php://output', 'w');
+                
+                // Headers
+                fputcsv($handle, [
+                    'Invoice No.',
+                    'Customer',
+                    'Date',
+                    'Items',
+                    'Total Amount',
+                    'Payment Status'
+                ]);
+
+                foreach ($sales as $sale) {
+                    fputcsv($handle, [
+                        $sale->invoice_no,
+                        $sale->user->name,
+                        $sale->created_at->format('M d, Y H:i'),
+                        $sale->details->count(),
+                        number_format($sale->total, 2),
+                        $sale->is_paid ? 'Paid' : 'Pending'
+                    ]);
+                }
+
+                fclose($handle);
+            }, 'sales-report-' . now()->format('Y-m-d') . '.csv');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error exporting sales data: ' . $e->getMessage());
         }
     }
 }

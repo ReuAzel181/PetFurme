@@ -27,7 +27,7 @@
                             </a>
                         </div>
                     </div>
-                    <form action="{{ route('orders.store') }}" method="POST" id="orderForm">
+                    <form action="{{ route('orders.store') }}" method="POST" id="orderForm" onsubmit="return false;">
                     @csrf
                         <div class="card-body">
                             <div class="row gx-3 mb-3">
@@ -87,6 +87,21 @@
                                            readonly>
 
                                     @error('reference')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label class="form-label" for="note">{{ __('Order Note') }}</label>
+                                    <textarea 
+                                        class="form-control @error('note') is-invalid @enderror" 
+                                        id="note" 
+                                        name="note" 
+                                        rows="3" 
+                                        placeholder="Add any notes about this order...">{{ old('note') }}</textarea>
+                                    @error('note')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
@@ -177,8 +192,9 @@
                                             data-bs-toggle="modal" 
                                             data-bs-target="#paymentModal"
                                             id="placeOrderBtn" 
-                                            style="display: none;">
-                                        Add Order
+                                            style="display: none;"
+                                            onclick="updateModalFields()">
+                                        Process Payment
                                     </button>
                                 </div>
                             </div>
@@ -253,12 +269,12 @@
     <input type="hidden" name="price" id="product_price">
 </form>
 
-<!-- Replace the existing modal with this updated version -->
-<div class="modal" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+<!-- Replace the existing payment modal with this updated version -->
+<div class="modal modal-blur fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="paymentModalLabel">Confirm Order</h5>
+                <h5 class="modal-title" id="paymentModalLabel">Process Payment</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('orders.store') }}" method="POST" id="paymentForm">
@@ -275,22 +291,40 @@
                 <input type="hidden" name="vat" value="{{ Cart::tax() }}">
                 <input type="hidden" name="total" value="{{ Cart::total() }}">
                 <input type="hidden" name="invoice_no" value="INV-{{ strtoupper(uniqid()) }}">
+                <input type="hidden" name="note" id="form_note">
 
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Order Notes (Optional)</label>
-                        <textarea name="notes" class="form-control" rows="3" placeholder="Any special instructions..."></textarea>
+                        <label class="form-label">Total Amount Due</label>
+                        <input type="text" class="form-control" value="₱{{ number_format(Cart::total(), 2) }}" readonly>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount Received</label>
+                        <input type="number" 
+                               class="form-control" 
+                               name="amount_received" 
+                               step="0.01" 
+                               min="{{ Cart::total() }}"
+                               onchange="calculateChange(this.value, {{ Cart::total() }})"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Change</label>
+                        <input type="text" class="form-control" id="changeAmount" readonly>
+                    </div>
+
                     <div class="alert alert-info">
                         <h4 class="alert-title">Order Summary</h4>
                         <p>Total Items: {{ Cart::count() }}</p>
-                        <p>Total Amount: ₱<span id="modal-total">{{ number_format(Cart::total(), 2) }}</span></p>
+                        <p class="mb-0">Subtotal: ₱{{ number_format(Cart::subtotal(), 2) }}</p>
+                        <p class="mb-0">VAT (12%): ₱{{ number_format(Cart::tax(), 2) }}</p>
+                        <p class="mb-0"><strong>Total Amount: ₱{{ number_format(Cart::total(), 2) }}</strong></p>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="confirmOrderBtn">
-                        Confirm Order
+                    <button type="submit" class="btn btn-primary" id="confirmPaymentBtn" disabled>
+                        Process Payment
                     </button>
                 </div>
             </form>
@@ -680,6 +714,36 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification('Failed to add item to cart', 'error');
         }
     }
+
+    function calculateChange(amountReceived, total) {
+        const change = parseFloat(amountReceived) - parseFloat(total);
+        const changeInput = document.getElementById('changeAmount');
+        const submitBtn = document.getElementById('confirmPaymentBtn');
+        
+        if (change >= 0) {
+            changeInput.value = '₱' + change.toFixed(2);
+            submitBtn.disabled = false;
+        } else {
+            changeInput.value = 'Insufficient amount';
+            submitBtn.disabled = true;
+        }
+    }
+
+    // Update form note when modal opens
+    document.getElementById('paymentModal').addEventListener('show.bs.modal', function () {
+        const noteContent = document.getElementById('note').value;
+        document.getElementById('form_note').value = noteContent;
+    });
+
+    // Remove extra modal backdrop
+    document.getElementById('paymentModal').addEventListener('hidden.bs.modal', function () {
+        const extraBackdrops = document.querySelectorAll('.modal-backdrop');
+        if (extraBackdrops.length > 1) {
+            extraBackdrops.forEach((backdrop, index) => {
+                if (index > 0) backdrop.remove();
+            });
+        }
+    });
 });
 </script>
 
@@ -794,3 +858,59 @@ document.addEventListener('DOMContentLoaded', function() {
     to { transform: rotate(360deg); }
 }
 </style>
+
+@push('page-scripts')
+<script>
+// Function to remove extra modal backdrops
+function removeExtraBackdrops() {
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => {
+        backdrop.remove();
+    });
+}
+
+// Add event listener for modal hidden
+document.getElementById('paymentModal').addEventListener('hidden.bs.modal', function () {
+    removeExtraBackdrops();
+});
+
+// Function to calculate change
+function calculateChange(amountReceived, total) {
+    const change = parseFloat(amountReceived) - parseFloat(total);
+    const changeInput = document.getElementById('changeAmount');
+    const submitBtn = document.getElementById('confirmPaymentBtn');
+    
+    if (change >= 0) {
+        changeInput.value = '₱' + change.toFixed(2);
+        submitBtn.disabled = false;
+    } else {
+        changeInput.value = 'Insufficient amount';
+        submitBtn.disabled = true;
+    }
+}
+
+// Update form note when modal opens
+document.getElementById('paymentModal').addEventListener('show.bs.modal', function () {
+    const noteContent = document.getElementById('note').value;
+    document.getElementById('form_note').value = noteContent;
+    removeExtraBackdrops(); // Remove any existing backdrops before showing new modal
+});
+
+// Add this to handle the order modal
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove any existing modal backdrops on page load
+    removeExtraBackdrops();
+});
+</script>
+
+<style>
+/* Add this CSS to ensure proper modal display */
+.modal-backdrop {
+    display: none !important;
+}
+
+.modal {
+    background: rgba(0, 0, 0, 0.5);
+}
+</style>
+@endpush

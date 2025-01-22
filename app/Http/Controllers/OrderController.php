@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Str;
 use App\Models\OrderDetail;
+use App\Models\Sale;
 
 class OrderController extends Controller
 {
@@ -25,63 +26,46 @@ class OrderController extends Controller
 
         $carts = Cart::content();
 
-        return view('orders.create', [
-            'products' => Product::where('status', 'active')->get(),
-            'petOwners' => $petOwners,
-            'reference' => $reference,
-            'carts' => $carts,
-        ]);
+        return view('orders.create', compact('petOwners', 'reference', 'carts'));
     }
 
     public function store(Request $request)
     {
-        // Validate the request
-        $validated = $request->validate([
-            'id' => 'required|exists:users,id',
-            'order_date' => 'required|date',
-            'reference' => 'required|string',
-            'total_products' => 'required|numeric',
-            'sub_total' => 'required|numeric',
-            'vat' => 'required|numeric',
-            'total' => 'required|numeric',
-        ]);
-
         try {
             DB::beginTransaction();
             
-            // Create the order
             $order = Order::create([
                 'uuid' => Str::uuid(),
-                'user_id' => $request->id, // This is the pet owner's ID
-                'customer_id' => null, // Set to null since we're not using it
-                'order_date' => $request->order_date,
+                'user_id' => $request->id,
+                'order_date' => now(), // This ensures accurate timestamp
+                'total_products' => Cart::count(),
+                'sub_total' => Cart::subtotal(),
+                'vat' => Cart::tax(),
+                'total' => Cart::total(),
+                'invoice_no' => 'INV-' . strtoupper(uniqid()),
                 'reference' => $request->reference,
-                'total_products' => $request->total_products,
-                'sub_total' => $request->sub_total,
-                'vat' => $request->vat,
-                'total' => $request->total,
-                'invoice_no' => $request->invoice_no,
+                'note' => $request->note
             ]);
 
-            // Create order details for each cart item
             foreach (Cart::content() as $item) {
                 OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $item->id,
                     'quantity' => $item->qty,
                     'unitcost' => $item->price,
-                    'total' => $item->subtotal,
+                    'total' => $item->subtotal
                 ]);
             }
 
-            // Clear the cart
             Cart::destroy();
-
             DB::commit();
+
+            // Load relationships after creation
+            $order->load(['details.product']);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Order placed successfully!',
+                'message' => 'Order created successfully!',
                 'redirect' => route('orders.show', $order->uuid)
             ]);
 
@@ -123,39 +107,97 @@ class OrderController extends Controller
 
     public function index()
     {
-        $orders = Order::select([
-            'id', 
-            'uuid', 
-            'user_id', 
-            'order_date', 
-            'total', 
-            'invoice_no', 
-            'is_paid'
-        ])
-        ->with('user:id,name')
-        ->latest()
-        ->paginate(10);
+        $orders = Order::with(['user:id,name', 'details.product'])
+            ->latest()
+            ->paginate(10);
 
         return view('orders.index', compact('orders'));
     }
 
+    public function show(Order $order)
+    {
+        // Load the relationships
+        $order->load(['user:id,name', 'details.product']);
+        return view('orders.show', compact('order'));
+    }
+
     public function markAsPaid(Request $request, Order $order)
     {
+        try {
+            DB::beginTransaction();
+
+            // Update order status
+            $order->update([
+                'order_status' => 'completed'  // Make sure 'order_status' is in your $fillable array
+            ]);
+
+            // Create sale record
+            $sale = Sale::create([
+                'uuid' => Str::uuid(),
+                'order_id' => $order->id,
+                'user_id' => $order->user_id,
+                'invoice_no' => $order->invoice_no,
+                'amount_received' => $request->amount_received,
+                'change_amount' => $request->amount_received - $order->total,
+                'total_amount' => $order->total,
+                'payment_note' => $request->payment_note,
+                'payment_date' => now()
+            ]);
+
+            DB::commit();
+            return redirect()
+                ->route('orders.index')
+                ->with('success', 'Payment processed successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->route('orders.index')
+                ->with('error', 'Failed to process payment: ' . $e->getMessage());
+        }
+    }
+
+    public function printInvoice(Order $order)
+    {
+        return view('orders.print-invoice', [
+            'order' => $order
+        ]);
+    }
+
+    public function update(Request $request, Order $order)
+    {
         $request->validate([
-            'amount_received' => 'required|numeric|min:' . $order->total,
-            'note' => 'nullable|string|max:500'
+            'status' => 'required|in:completed,cancelled'
         ]);
 
-        $order->update([
-            'is_paid' => true,
-            'amount_received' => $request->amount_received,
-            'change_amount' => $request->amount_received - $order->total,
-            'paid_at' => now(),
-            'payment_note' => $request->note
-        ]);
-        
-        return redirect()
-            ->back()
-            ->with('success', 'Payment processed successfully');
+        try {
+            DB::beginTransaction();
+
+            $order->update([
+                'order_status' => $request->status,
+                'completed_at' => $request->status === 'completed' ? now() : null
+            ]);
+
+            // Load relationships after update
+            $order->load(['details.product']);
+
+            DB::commit();
+
+            $message = $request->status === 'completed' 
+                ? 'Order completed successfully'
+                : 'Order cancelled successfully';
+
+            return redirect()
+                ->route('orders.index')
+                ->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Order status update failed: ' . $e->getMessage());
+            
+            return redirect()
+                ->route('orders.index')
+                ->with('error', 'Error updating order: ' . $e->getMessage());
+        }
     }
 } 

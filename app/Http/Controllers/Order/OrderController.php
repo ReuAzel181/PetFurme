@@ -176,4 +176,47 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
+
+    public function revertStatus($uuid)
+    {
+        try {
+            $order = Order::where('uuid', $uuid)->firstOrFail();
+            
+            if ($order->is_paid) {
+                return redirect()->back()->with('error', 'Cannot revert a paid order.');
+            }
+
+            $order->markAsIncomplete();
+
+            return redirect()->back()->with('success', 'Order status reverted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error reverting order status: ' . $e->getMessage());
+        }
+    }
+
+    public function markAsPaid(Request $request, Order $order)
+    {
+        try {
+            DB::beginTransaction();
+
+            $order->update([
+                'is_paid' => true,
+                'paid_at' => now(),
+                'amount_received' => $request->amount_received,
+                'change_amount' => $request->amount_received - $order->total,
+                'payment_note' => $request->payment_note
+            ]);
+
+            DB::commit();
+            
+            return redirect()
+                ->back()
+                ->with('success', 'Payment recorded successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->back()
+                ->with('error', 'Error recording payment: ' . $e->getMessage());
+        }
+    }
 }
