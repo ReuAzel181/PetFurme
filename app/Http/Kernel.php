@@ -27,6 +27,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // Other middleware
         'checkConversationAccess' => \App\Http\Middleware\CheckConversationAccess::class,
+        'role' => \App\Http\Middleware\CheckRole::class,
     ];
     
 

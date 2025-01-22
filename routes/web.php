@@ -7,6 +7,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\SalesController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\PagesController;
 
 use App\Http\Controllers\Dashboards\DashboardController;
 use App\Http\Controllers\InvoiceController;
@@ -366,3 +368,17 @@ Route::get('/orders/{order:uuid}/print-invoice', [OrderController::class, 'print
     ->name('orders.print-invoice');
 
 Route::get('/orders/deleted', [OrderController::class, 'deleted'])->name('orders.deleted');
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
+    Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    
+    // Add other settings routes if needed
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/store', [SettingsController::class, 'store'])->name('store');
+        Route::get('/invoice', [SettingsController::class, 'invoice'])->name('invoice');
+        Route::get('/notifications', [SettingsController::class, 'notifications'])->name('notifications');
+        Route::get('/backup', [SettingsController::class, 'backup'])->name('backup');
+    });
+});
