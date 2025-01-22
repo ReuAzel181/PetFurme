@@ -10,9 +10,7 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         try {
-            // Get completed orders with filters
             $query = Order::with(['user', 'details'])
-                ->where('order_status', 'completed')
                 ->latest('created_at');
 
             // Date range filter
@@ -30,54 +28,43 @@ class SalesController extends Controller
                 });
             }
 
+            // Status filter
+            if ($request->filled('status')) {
+                if ($request->status === 'deleted') {
+                    $query->whereNotNull('deleted_at');
+                } else {
+                    $query->whereNull('deleted_at')
+                        ->where('order_status', $request->status);
+                }
+            }
+
             $sales = $query->paginate(10);
 
-            // Calculate sales statistics
-            $today = Carbon::today();
-            $weekStart = Carbon::now()->startOfWeek();
-            $monthStart = Carbon::now()->startOfMonth();
+            // Calculate totals
+            $totals = [
+                'today' => [
+                    'sales' => $query->clone()->whereDate('created_at', today())->sum('total'),
+                    'orders' => $query->clone()->whereDate('created_at', today())->count(),
+                ],
+                'weekly' => [
+                    'sales' => $query->clone()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('total'),
+                    'orders' => $query->clone()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+                ],
+                'monthly' => [
+                    'sales' => $query->clone()->whereMonth('created_at', now()->month)->sum('total'),
+                    'orders' => $query->clone()->whereMonth('created_at', now()->month)->count(),
+                ],
+                'total' => [
+                    'sales' => $query->clone()->sum('total'),
+                    'orders' => $query->clone()->count(),
+                ],
+                'deleted' => $query->clone()->whereNotNull('deleted_at')->count(),
+            ];
 
-            // Today's sales
-            $todaySales = $query->clone()
-                ->whereDate('created_at', $today)
-                ->sum('total');
-            $todayOrders = $query->clone()
-                ->whereDate('created_at', $today)
-                ->count();
-
-            // Weekly sales
-            $weeklySales = $query->clone()
-                ->where('created_at', '>=', $weekStart)
-                ->sum('total');
-            $weeklyOrders = $query->clone()
-                ->where('created_at', '>=', $weekStart)
-                ->count();
-
-            // Monthly sales
-            $monthlySales = $query->clone()
-                ->where('created_at', '>=', $monthStart)
-                ->sum('total');
-            $monthlyOrders = $query->clone()
-                ->where('created_at', '>=', $monthStart)
-                ->count();
-
-            // Total sales
-            $totalSales = $query->clone()->sum('total');
-            $totalOrders = $query->clone()->count();
-
-            return view('sales.index', compact(
-                'sales',
-                'todaySales',
-                'todayOrders',
-                'weeklySales',
-                'weeklyOrders',
-                'monthlySales',
-                'monthlyOrders',
-                'totalSales',
-                'totalOrders'
-            ));
+            return view('sales.index', compact('sales', 'totals'));
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error loading sales data: ' . $e->getMessage());
+            \Log::error('Sales index error: ' . $e->getMessage());
+            return back()->with('error', 'Error loading sales data');
         }
     }
 

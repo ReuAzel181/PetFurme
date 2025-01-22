@@ -10,9 +10,9 @@ use App\Http\Controllers\SalesController;
 
 use App\Http\Controllers\Dashboards\DashboardController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Order\DueOrderController;
 use App\Http\Controllers\Order\OrderCompleteController;
-use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Order\OrderPendingController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\Product\ProductController;
@@ -236,18 +236,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/cart/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
     Route::get('/cart/totals', [CartController::class, 'getCartTotals'])->name('cart.totals');
 
-    // Orders routes
-    Route::prefix('orders')->group(function () {
-        Route::get('/', [OrderController::class, 'index'])->name('orders.index');
-        Route::get('/create', [OrderController::class, 'create'])->name('orders.create');
-        Route::post('/store', [OrderController::class, 'store'])->name('orders.store');
-        Route::get('/{order}', [OrderController::class, 'show'])->name('orders.show');
-        Route::put('/{order}', [OrderController::class, 'update'])->name('orders.update');
-        Route::delete('/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
-        Route::get('/pending', [OrderController::class, 'pending'])->name('orders.pending');
-        Route::get('/{order}/print-invoice', [OrderController::class, 'printInvoice'])
-            ->name('orders.print-invoice');
-    });
+    // Orders routes - make sure archived route is before resource route
+    Route::get('/orders/archived', [OrderController::class, 'archived'])->name('orders.archived');
+    Route::delete('/orders/{uuid}/delete', [OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::resource('orders', OrderController::class)->except(['destroy']);
 
     // Add these routes for appointments
     Route::resource('appointment', AppointmentController::class);
@@ -331,3 +323,46 @@ Route::get('/sales/export', [SalesController::class, 'export'])->name('sales.exp
 
 Route::get('/orders/{uuid}/revert-status', [OrderController::class, 'revertStatus'])
     ->name('orders.revert-status');
+
+Route::get('/pages', function () {
+    return view('pages.index');
+})->name('pages.index');
+
+// Settings Routes
+Route::prefix('settings')->name('settings.')->group(function () {
+    Route::get('/', function () {
+        return view('settings.index');
+    })->name('index');
+    
+    Route::get('/store', function () {
+        return view('settings.store');
+    })->name('store');
+    
+    Route::get('/invoice', function () {
+        return view('settings.invoice');
+    })->name('invoice');
+    
+    Route::get('/notifications', function () {
+        return view('settings.notifications');
+    })->name('notifications');
+    
+    Route::get('/backup', function () {
+        return view('settings.backup');
+    })->name('backup');
+});
+
+Route::get('/appointments/archived', [AppointmentController::class, 'archived'])->name('appointment.archived');
+Route::patch('/appointments/{appointment}/restore', [AppointmentController::class, 'restore'])->name('appointment.restore');
+Route::patch('/appointments/{appointment}/complete', [AppointmentController::class, 'markAsCompleted'])->name('appointment.complete');
+Route::get('/appointments/completed', [AppointmentController::class, 'completed'])->name('appointment.completed');
+
+Route::patch('/orders/{order}/complete', [OrderController::class, 'markAsCompleted'])
+    ->name('orders.complete');
+
+Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
+// Add this route inside your authenticated routes group
+Route::get('/orders/{order:uuid}/print-invoice', [OrderController::class, 'printInvoice'])
+    ->name('orders.print-invoice');
+
+Route::get('/orders/deleted', [OrderController::class, 'deleted'])->name('orders.deleted');

@@ -7,20 +7,40 @@
             <div class="row">
                 <div class="col">
                     @include('partials._page_header', [
-                        'title' => __('Appointments'),
+                        'title' => $showArchived ? __('Archived Appointments') : __('Appointments'),
                         'section' => 'OVERVIEW'
                     ])
                 </div>
             </div>
         </div>
-        <div class="card-header d-flex align-items-center">
-                <a href="{{ route('appointment.create') }}" class="btn btn-primary ms-auto">
+        <div class="card-header d-flex align-items-center gap-2">
+            @if($showArchived)
+                <a href="{{ route('appointment.index') }}" class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M9 6l11 0" /><path d="M9 12l11 0" /><path d="M9 18l11 0" />
+                        <path d="M5 6l0 .01" /><path d="M5 12l0 .01" /><path d="M5 18l0 .01" />
+                    </svg>
+                    Active Appointments
+                </a>
+            @else
+                <a href="{{ route('appointment.archived') }}" class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" />
+                        <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+                        <path d="M10 12l4 0" />
+                    </svg>
+                    View Archive
+                </a>
+            @endif
+            <a href="{{ route('appointment.create') }}" class="btn btn-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M12 5l0 14"></path>
-                    <path d="M5 12l14 0"></path>
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 5l0 14"/><path d="M5 12l14 0"/>
                 </svg>
-                Add Appointment</a>
+                Add Appointment
+            </a>
         </div>
     </div>
 
@@ -67,12 +87,20 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('appointment.edit', $appointment->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                        <form action="{{ route('appointment.destroy', $appointment->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
+                                        @if($showArchived)
+                                            <form action="{{ route('appointment.restore', $appointment->id) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-success btn-sm">Restore</button>
+                                            </form>
+                                        @else
+                                            <a href="{{ route('appointment.edit', $appointment->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                            <form action="{{ route('appointment.destroy', $appointment->id) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm">Archive</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

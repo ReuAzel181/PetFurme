@@ -11,12 +11,17 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Str;
 use App\Models\OrderDetail;
 use App\Models\Sale;
+use App\Models\ArchivedOrder;
+use App\Models\ArchivedOrderDetail;
 
 class OrderController extends Controller
 {
     public function create()
     {
-        // Get users who are pet owners using the User model with proper model instances
+        // Get products with their relationships
+        $products = Product::with(['category', 'unit'])->get();
+
+        // Get users who are pet owners
         $petOwners = User::query()
             ->where('role', 'pet_owner')
             ->get(['id', 'name', 'email', 'role']);
@@ -26,7 +31,7 @@ class OrderController extends Controller
 
         $carts = Cart::content();
 
-        return view('orders.create', compact('petOwners', 'reference', 'carts'));
+        return view('orders.create', compact('products', 'petOwners', 'reference', 'carts'));
     }
 
     public function store(Request $request)
@@ -37,11 +42,11 @@ class OrderController extends Controller
             $order = Order::create([
                 'uuid' => Str::uuid(),
                 'user_id' => $request->id,
-                'order_date' => now(), // This ensures accurate timestamp
+                'order_date' => now(),
                 'total_products' => Cart::count(),
-                'sub_total' => Cart::subtotal(),
-                'vat' => Cart::tax(),
-                'total' => Cart::total(),
+                'sub_total' => Cart::subtotal(2, '.', ''),
+                'vat' => Cart::tax(2, '.', ''),
+                'total' => Cart::total(2, '.', ''),
                 'invoice_no' => 'INV-' . strtoupper(uniqid()),
                 'reference' => $request->reference,
                 'note' => $request->note
@@ -80,27 +85,32 @@ class OrderController extends Controller
         }
     }
 
-    public function destroy(Order $order)
+    public function destroy($uuid)
     {
         try {
             DB::beginTransaction();
-            
-            // Delete order details first
-            $order->details()->delete();
-            
-            // Then delete the order
-            $order->delete();
-            
+
+            // Find the order by uuid
+            $order = Order::where('uuid', $uuid)->firstOrFail();
+
+            // Instead of deleting, update the status and add deleted_at timestamp
+            $order->update([
+                'deleted_at' => now(),
+                'deletion_reason' => request('reason', 'Order deleted by user')
+            ]);
+
             DB::commit();
             
-            return redirect()
-                ->route('orders.index')
-                ->with('success', "Order #{$order->invoice_no} deleted successfully");
-                
+            return redirect()->route('orders.index')
+                ->with('success', "Order #{$order->invoice_no} has been marked as deleted.");
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()
-                ->route('orders.index')
+            \Log::error('Delete error:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('orders.index')
                 ->with('error', 'Error deleting order: ' . $e->getMessage());
         }
     }
@@ -108,6 +118,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with(['user:id,name', 'details.product'])
+            ->whereNull('deleted_at')  // Only show non-deleted orders
             ->latest()
             ->paginate(10);
 
@@ -159,6 +170,8 @@ class OrderController extends Controller
 
     public function printInvoice(Order $order)
     {
+        $order->load(['user', 'details.product']); // Eager load relationships
+        
         return view('orders.print-invoice', [
             'order' => $order
         ]);
@@ -199,5 +212,140 @@ class OrderController extends Controller
                 ->route('orders.index')
                 ->with('error', 'Error updating order: ' . $e->getMessage());
         }
+    }
+
+    public function archived()
+    {
+        $query = ArchivedOrder::with('archivedDetails')
+            ->when(request('filter'), function($query, $filter) {
+                if (in_array($filter, ['completed', 'cancelled'])) {
+                    $query->where('archive_reason', $filter);
+                }
+            })
+            ->latest('archived_at');
+
+        // Debug query
+        \Log::info('Archive Query:', [
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+            'total_records' => $query->count()
+        ]);
+
+        $archivedOrders = $query->paginate(10);
+
+        return view('orders.archived', compact('archivedOrders'));
+    }
+
+    public function markAsCompleted(Order $order)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Archive the order
+            $archivedOrder = ArchivedOrder::create([
+                'uuid' => $order->uuid,
+                'original_id' => $order->id,
+                'user_id' => $order->user_id,
+                'customer_name' => $order->user->name,
+                'order_date' => $order->order_date,
+                'total_products' => $order->total_products,
+                'sub_total' => $order->sub_total,
+                'vat' => $order->vat,
+                'total' => $order->total,
+                'invoice_no' => $order->invoice_no,
+                'note' => $order->note,
+                'is_paid' => $order->is_paid,
+                'amount_received' => $order->amount_received,
+                'change_amount' => $order->change_amount,
+                'paid_at' => $order->paid_at,
+                'payment_note' => $order->payment_note,
+                'archive_reason' => 'completed',
+                'archived_at' => now(),
+            ]);
+
+            // Archive order details
+            foreach ($order->details as $detail) {
+                ArchivedOrderDetail::create([
+                    'archived_order_id' => $archivedOrder->id,
+                    'product_name' => $detail->product->name,
+                    'quantity' => $detail->quantity,
+                    'unit_price' => $detail->unitcost,
+                    'total' => $detail->total
+                ]);
+            }
+
+            // Delete the original order
+            $order->details()->delete();
+            $order->delete();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Order marked as completed and archived.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to complete order: ' . $e->getMessage());
+        }
+    }
+
+    public function cancel(Request $request, Order $order)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Archive the order
+            $archivedOrder = ArchivedOrder::create([
+                'uuid' => $order->uuid,
+                'original_id' => $order->id,
+                'user_id' => $order->user_id,
+                'customer_name' => $order->user->name,
+                'order_date' => $order->order_date,
+                'total_products' => $order->total_products,
+                'sub_total' => $order->sub_total,
+                'vat' => $order->vat,
+                'total' => $order->total,
+                'invoice_no' => $order->invoice_no,
+                'note' => $order->note,
+                'is_paid' => $order->is_paid,
+                'amount_received' => $order->amount_received,
+                'change_amount' => $order->change_amount,
+                'paid_at' => $order->paid_at,
+                'payment_note' => $order->payment_note,
+                'archive_reason' => 'cancelled',
+                'archive_note' => $request->cancellation_reason,
+                'archived_at' => now(),
+            ]);
+
+            // Archive order details
+            foreach ($order->details as $detail) {
+                ArchivedOrderDetail::create([
+                    'archived_order_id' => $archivedOrder->id,
+                    'product_name' => $detail->product->name,
+                    'quantity' => $detail->quantity,
+                    'unit_price' => $detail->unitcost,
+                    'total' => $detail->total
+                ]);
+            }
+
+            // Delete the original order
+            $order->details()->delete();
+            $order->delete();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Order cancelled and archived.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to cancel order: ' . $e->getMessage());
+        }
+    }
+
+    public function deleted()
+    {
+        $orders = Order::with(['user:id,name', 'details.product'])
+            ->whereNotNull('deleted_at')
+            ->latest('deleted_at')
+            ->paginate(10);
+
+        return view('orders.deleted', compact('orders'));
     }
 } 

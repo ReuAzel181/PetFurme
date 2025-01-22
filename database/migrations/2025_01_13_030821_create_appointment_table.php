@@ -17,9 +17,13 @@ return new class extends Migration
                 $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
                 $table->foreignId('pet_id')->nullable()->constrained('pets')->onDelete('cascade');
                 $table->string('owner_name')->nullable();
+                $table->string('pet_name')->nullable();
                 $table->date('appointment_date');
                 $table->time('appointment_time');
                 $table->text('reason_for_visit');
+                $table->enum('status', ['scheduled', 'completed', 'cancelled'])->default('scheduled');
+                $table->text('notes')->nullable();
+                $table->timestamp('completed_at')->nullable();
                 $table->timestamps();
             });
         }

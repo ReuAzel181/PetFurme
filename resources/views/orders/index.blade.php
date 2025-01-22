@@ -50,6 +50,15 @@
                         <h3 class="card-title">{{ __('Orders') }}</h3>
                     </div>
                     <div class="card-actions">
+                        <a href="{{ route('orders.archived') }}" class="btn btn-outline-primary me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/>
+                                <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10"/>
+                                <path d="M10 12l4 0"/>
+                            </svg>
+                            {{ __('View Archive') }}
+                        </a>
                         <a href="{{ route('orders.create') }}" class="btn btn-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -79,8 +88,7 @@
                                 <tr class="cursor-pointer" 
                                     data-order-row 
                                     data-order-id="{{ $order->id }}"
-                                    data-is-paid="{{ $order->is_paid ? '1' : '0' }}"
-                                    onclick="handleRowClick(event, '{{ $order->uuid }}', {{ $order->id }})">
+                                    data-is-paid="{{ $order->is_paid ? '1' : '0' }}">
                                     <td>
                                         <span class="text-blue fw-bold">{{ $order->invoice_no }}</span>
                                     </td>
@@ -105,15 +113,39 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('orders.show', $order->uuid) }}" 
-                                           class="btn btn-icon btn-ghost-primary"
-                                           onclick="event.stopPropagation()">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
-                                                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>
-                                            </svg>
-                                        </a>
+                                        <div class="btn-group">
+                                            <a href="{{ route('orders.show', $order->uuid) }}" 
+                                               class="btn btn-icon btn-ghost-primary"
+                                               title="View Order">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
+                                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>
+                                                </svg>
+                                            </a>
+
+                                            <button type="button" 
+                                                    class="btn btn-icon btn-ghost-danger" 
+                                                    title="Delete Order"
+                                                    onclick="event.stopPropagation(); confirmDelete('{{ $order->id }}', '{{ $order->invoice_no }}')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M4 7l16 0"/>
+                                                    <path d="M10 11l0 6"/>
+                                                    <path d="M14 11l0 6"/>
+                                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                                                </svg>
+                                            </button>
+
+                                            <form id="deleteForm{{ $order->id }}" 
+                                                  action="{{ route('orders.destroy', $order->uuid) }}" 
+                                                  method="POST" 
+                                                  style="display: none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -208,6 +240,38 @@
                                     disabled>
                                 Process Payment
                             </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    <!-- Cancel Order Modal -->
+    @foreach($orders as $order)
+        <div class="modal modal-blur fade" id="cancelOrderModal{{ $order->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cancel Order #{{ $order->invoice_no }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ route('orders.cancel', $order) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label required">Reason for Cancellation</label>
+                                <textarea class="form-control" 
+                                          name="cancellation_reason" 
+                                          rows="3" 
+                                          placeholder="Please provide a reason for cancelling this order..."
+                                          required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Yes, Cancel Order</button>
                         </div>
                     </form>
                 </div>
@@ -356,47 +420,24 @@ function calculateChange(amountReceived, total, orderId) {
     }
 }
 
-function handleRowClick(event, uuid, orderId) {
-    // If clicking the eye icon or its parent button, don't do anything (it has its own link)
-    if (event.target.closest('.btn-ghost-primary')) {
-        return;
-    }
-    
-    // For unpaid orders, show payment modal
-    const row = event.currentTarget;
-    if (row.dataset.isPaid !== '1') {
-        const paymentModal = new bootstrap.Modal(document.getElementById(`paymentModal${orderId}`));
-        paymentModal.show();
-        
-        // Remove any extra backdrops
-        const backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach(backdrop => {
-            backdrop.remove();
-        });
-    } else {
-        // For paid orders, navigate to order details
-        window.location.href = `/orders/${uuid}`;
+function confirmDelete(orderId, invoiceNo) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (confirm(`Are you sure you want to delete Order #${invoiceNo}? It will be moved to the archive.`)) {
+        document.getElementById('deleteForm' + orderId).submit();
     }
 }
 
-// Add this to handle form submission
-document.querySelectorAll('form[action*="mark-as-paid"]').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        const submitBtn = this.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `
-            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-            Processing...
-        `;
+// Add click handler to rows, excluding buttons
+document.querySelectorAll('[data-order-row]').forEach(row => {
+    row.addEventListener('click', (e) => {
+        // Don't trigger if clicking a button or form
+        if (!e.target.closest('button') && !e.target.closest('form')) {
+            const uuid = row.querySelector('a[href*="orders/show"]').getAttribute('href').split('/').pop();
+            window.location.href = `/orders/${uuid}`;
+        }
     });
 });
-
-// If there's a success message, refresh the page after 3 seconds
-@if(session('success'))
-    setTimeout(() => {
-        window.location.reload();
-    }, 3000);
-@endif
 </script>
 @endpush
 @endsection

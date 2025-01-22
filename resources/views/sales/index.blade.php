@@ -67,6 +67,7 @@
 
     /* Ensure the table fills the available space */
     .table-responsive {
+        overflow-x: visible;
         height: auto !important; /* Remove fixed height */
         overflow-x: auto;
         padding: 0;
@@ -221,9 +222,9 @@
                         <div class="d-flex align-items-center">
                             <div class="subheader">Today's Sales</div>
                         </div>
-                        <div class="h1 mb-3">₱{{ number_format($todaySales, 2) }}</div>
+                        <div class="h1 mb-3">₱{{ number_format($totals['today']['sales'], 2) }}</div>
                         <div class="d-flex mb-2">
-                            <div>Orders: {{ $todayOrders }}</div>
+                            <div>Orders: {{ $totals['today']['orders'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -234,9 +235,9 @@
                         <div class="d-flex align-items-center">
                             <div class="subheader">Weekly Sales</div>
                         </div>
-                        <div class="h1 mb-3">₱{{ number_format($weeklySales, 2) }}</div>
+                        <div class="h1 mb-3">₱{{ number_format($totals['weekly']['sales'], 2) }}</div>
                         <div class="d-flex mb-2">
-                            <div>Orders: {{ $weeklyOrders }}</div>
+                            <div>Orders: {{ $totals['weekly']['orders'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -247,9 +248,9 @@
                         <div class="d-flex align-items-center">
                             <div class="subheader">Monthly Sales</div>
                         </div>
-                        <div class="h1 mb-3">₱{{ number_format($monthlySales, 2) }}</div>
+                        <div class="h1 mb-3">₱{{ number_format($totals['monthly']['sales'], 2) }}</div>
                         <div class="d-flex mb-2">
-                            <div>Orders: {{ $monthlyOrders }}</div>
+                            <div>Orders: {{ $totals['monthly']['orders'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -260,9 +261,14 @@
                         <div class="d-flex align-items-center">
                             <div class="subheader">Total Sales</div>
                         </div>
-                        <div class="h1 mb-3">₱{{ number_format($totalSales, 2) }}</div>
+                        <div class="h1 mb-3">₱{{ number_format($totals['total']['sales'], 2) }}</div>
                         <div class="d-flex mb-2">
-                            <div>Orders: {{ $totalOrders }}</div>
+                            <div>Orders: {{ $totals['total']['orders'] }}</div>
+                            @if($totals['deleted'] > 0)
+                                <div class="ms-auto text-danger">
+                                    Deleted: {{ $totals['deleted'] }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -274,30 +280,31 @@
             <div class="card-body">
                 <form action="{{ route('sales.index') }}" method="GET" class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label">Date Range</label>
-                        <div class="input-group">
-                            <input type="date" class="form-control" name="start_date" value="{{ request('start_date') }}">
-                            <span class="input-group-text">to</span>
-                            <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
                         <label class="form-label">Customer</label>
                         <input type="text" class="form-control" name="customer" value="{{ request('customer') }}" placeholder="Search customer...">
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Payment Status</label>
-                        <select name="payment_status" class="form-select">
-                            <option value="">All</option>
-                            <option value="paid" {{ request('payment_status') === 'paid' ? 'selected' : '' }}>Paid</option>
-                            <option value="unpaid" {{ request('payment_status') === 'unpaid' ? 'selected' : '' }}>Unpaid</option>
+                    <div class="col-md-4">
+                        <label class="form-label">Order Status</label>
+                        <select name="status" class="form-select">
+                            <option value="">All Orders</option>
+                            <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            <option value="deleted" {{ request('status') === 'deleted' ? 'selected' : '' }}>Deleted</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">&nbsp;</label>
-                        <div class="d-flex">
-                            <button type="submit" class="btn btn-primary me-2">Filter</button>
-                            <a href="{{ route('sales.index') }}" class="btn btn-link">Reset</a>
+                    <div class="col-md-4">
+                        <label class="form-label">Date Range</label>
+                        <div class="d-flex gap-2">
+                            <input type="date" class="form-control" name="start_date" value="{{ request('start_date') }}">
+                            <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}">
+                            <button type="submit" class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                    <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                    <path d="M21 21l-6 -6" />
+                                </svg>
+                                Filter
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -305,12 +312,9 @@
         </div>
 
         <!-- Sales Table -->
-        <div class="card card-table-container">
-            <div class="card-header border-bottom p-4">
-                <h3 class="card-title m-0" style="font-size: 1.25rem; font-weight: 600;">Completed Orders</h3>
-            </div>
+        <div class="card">
             <div class="table-responsive">
-                <table class="table sales-table">
+                <table class="table table-vcenter card-table">
                     <thead>
                         <tr>
                             <th>Invoice No.</th>
@@ -338,67 +342,59 @@
                                 <td class="text-center">{{ $sale->details->count() }}</td>
                                 <td class="text-end fw-bold">₱{{ number_format($sale->total, 2) }}</td>
                                 <td class="text-center">
-                                    <span class="status-badge bg-{{ $sale->payment_status_color }} text-white">
-                                        {{ $sale->payment_status }}
-                                    </span>
+                                    @if($sale->deleted_at)
+                                        <span class="badge bg-danger text-white">
+                                            Deleted
+                                            <span class="d-block small">{{ $sale->deleted_at->format('M d, Y') }}</span>
+                                        </span>
+                                    @else
+                                        <span class="badge bg-{{ $sale->order_status_color }} text-white">
+                                            {{ ucfirst($sale->order_status) }}
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="text-end">
-                                    <div class="actions-dropdown">
-                                        <button type="button" class="actions-btn" data-bs-toggle="dropdown">
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary dropdown-toggle align-text-top" data-bs-toggle="dropdown">
                                             Actions
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M6 9l6 6l6 -6" />
-                                            </svg>
                                         </button>
-                                        <div class="dropdown-menu actions-menu dropdown-menu-end">
+                                        <div class="dropdown-menu dropdown-menu-end">
                                             <a href="{{ route('orders.show', $sale->uuid) }}" class="dropdown-item">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
-                                                </svg>
                                                 View Details
                                             </a>
-                                            @if(!$sale->is_paid)
-                                                <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#paymentModal-{{ $sale->id }}">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                        <path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" />
-                                                        <path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" />
-                                                    </svg>
-                                                    Record Payment
-                                                </a>
-                                                <a href="{{ route('orders.revert-status', $sale->uuid) }}" 
-                                                   class="dropdown-item"
-                                                   onclick="return confirm('Are you sure you want to revert this order to pending?')">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                        <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
-                                                    </svg>
-                                                    Revert to Pending
+                                            @if(!$sale->deleted_at)
+                                                <a href="{{ route('orders.print-invoice', $sale->uuid) }}" class="dropdown-item">
+                                                    Print Invoice
                                                 </a>
                                             @endif
-                                            <a href="{{ route('orders.print-invoice', $sale->uuid) }}" class="dropdown-item">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-secondary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                    <path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" />
-                                                    <path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" />
-                                                    <path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" />
-                                                </svg>
-                                                Print Invoice
-                                            </a>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">
-                                    No sales records found
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="empty">
+                                        <div class="empty-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+                                                <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+                                                <path d="M9 12h6" />
+                                                <path d="M9 16h6" />
+                                            </svg>
+                                        </div>
+                                        <p class="empty-title">No sales records found</p>
+                                        <p class="empty-subtitle text-secondary">
+                                            Try adjusting your search or filter to find what you're looking for.
+                                        </p>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer border-top p-3">
+            <div class="card-footer d-flex align-items-center">
                 {{ $sales->links() }}
             </div>
         </div>

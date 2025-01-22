@@ -9,7 +9,7 @@ class Appointment extends Model
 {
     use HasFactory;
 
-    protected $table = 'appointment'; // Specify the table name explicitly
+    protected $table = 'appointment';
 
     protected $fillable = [
         'user_id',

@@ -27,7 +27,9 @@ class Order extends Model
         'is_paid',
         'amount_received',
         'change_amount',
-        'paid_at'
+        'paid_at',
+        'deleted_at',
+        'deletion_reason'
     ];
 
     protected $casts = [
@@ -38,7 +40,8 @@ class Order extends Model
         'paid_at' => 'datetime',
         'amount_received' => 'decimal:2',
         'change_amount' => 'decimal:2',
-        'completed_at' => 'datetime'
+        'completed_at' => 'datetime',
+        'deleted_at' => 'datetime'
     ];
 
     protected $with = ['details', 'details.product'];
@@ -102,5 +105,33 @@ class Order extends Model
             'order_status' => 'completed',
             'completed_at' => now()
         ]);
+    }
+
+    public const STATUSES = [
+        'pending' => 'pending',
+        'completed' => 'completed',
+        'cancelled' => 'cancelled'
+    ];
+
+    public function getStatusAttribute()
+    {
+        if ($this->deleted_at) {
+            return 'deleted';
+        }
+        return $this->order_status;
+    }
+
+    public function getOrderStatusColorAttribute()
+    {
+        if ($this->deleted_at) {
+            return 'danger';
+        }
+        
+        return match($this->order_status) {
+            'completed' => 'success',
+            'pending' => 'warning',
+            'cancelled' => 'danger',
+            default => 'secondary'
+        };
     }
 }

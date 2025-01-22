@@ -12,23 +12,41 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = DB::table('appointment')
-            ->leftJoin('pets', 'appointment.pet_id', '=', 'pets.id')
-            ->leftJoin('users', 'appointment.user_id', '=', 'users.id')
+        $appointments = Appointment::with(['pet', 'user'])
             ->select(
                 'appointment.*',
-                'pets.name as pet_name',
-                'pets.category as pet_type',
-                'pets.age as pet_age',
-                'users.name as owner_name',
                 DB::raw('CASE 
                     WHEN users.id IS NOT NULL THEN users.name
-                    ELSE CONCAT(appointment.owner_name, " (No Account)")
+                    ELSE appointment.owner_name
                 END as display_name')
             )
+            ->leftJoin('users', 'appointment.user_id', '=', 'users.id')
             ->get();
     
-        return view('appointment.index', ['appointments' => $appointments]);
+        return view('appointment.index', [
+            'appointments' => $appointments,
+            'showArchived' => false
+        ]);
+    }
+
+    public function archived()
+    {
+        $archivedAppointments = DB::table('archived_appointments')
+            ->leftJoin('users', 'archived_appointments.user_id', '=', 'users.id')
+            ->select(
+                'archived_appointments.*',
+                DB::raw('CASE 
+                    WHEN users.id IS NOT NULL THEN users.name
+                    ELSE archived_appointments.owner_name
+                END as display_name')
+            )
+            ->orderBy('archived_at', 'desc')
+            ->get();
+
+        return view('appointment.archived', [
+            'appointments' => $archivedAppointments,
+            'showArchived' => true
+        ]);
     }
 
     public function create()
@@ -114,12 +132,104 @@ class AppointmentController extends Controller
             ->with('success', 'Appointment updated successfully');
     }
 
+    public function restore($id)
+    {
+        $archived = DB::table('archived_appointments')->where('id', $id)->first();
+        
+        if (!$archived) {
+            return redirect()->back()->with('error', 'Archived appointment not found.');
+        }
+
+        // Restore to appointments table
+        Appointment::create([
+            'user_id' => $archived->user_id,
+            'pet_id' => $archived->pet_id,
+            'owner_name' => $archived->owner_name,
+            'pet_name' => $archived->pet_name,
+            'appointment_date' => $archived->appointment_date,
+            'appointment_time' => $archived->appointment_time,
+            'reason_for_visit' => $archived->reason_for_visit
+        ]);
+
+        // Remove from archive
+        DB::table('archived_appointments')->where('id', $id)->delete();
+
+        return redirect()->route('appointment.index')
+            ->with('success', 'Appointment restored successfully.');
+    }
+
     public function destroy($id)
     {
         $appointment = Appointment::findOrFail($id);
+        
+        // Insert into archived_appointments as cancelled
+        DB::table('archived_appointments')->insert([
+            'original_id' => $appointment->id,
+            'user_id' => $appointment->user_id,
+            'pet_id' => $appointment->pet_id,
+            'owner_name' => $appointment->owner_name,
+            'pet_name' => $appointment->pet_name,
+            'appointment_date' => $appointment->appointment_date,
+            'appointment_time' => $appointment->appointment_time,
+            'reason_for_visit' => $appointment->reason_for_visit,
+            'status' => 'cancelled',
+            'archived_at' => now(),
+            'created_at' => $appointment->created_at,
+            'updated_at' => now()
+        ]);
+
+        // Delete from original table
         $appointment->delete();
 
         return redirect()->route('appointment.index')
-            ->with('success', 'Appointment deleted successfully.');
+            ->with('success', 'Appointment cancelled and archived.');
+    }
+
+    public function markAsCompleted(Request $request, $id)
+    {
+        $appointment = Appointment::findOrFail($id);
+        
+        // Insert into archived_appointments as completed
+        DB::table('archived_appointments')->insert([
+            'original_id' => $appointment->id,
+            'user_id' => $appointment->user_id,
+            'pet_id' => $appointment->pet_id,
+            'owner_name' => $appointment->owner_name,
+            'pet_name' => $appointment->pet_name,
+            'appointment_date' => $appointment->appointment_date,
+            'appointment_time' => $appointment->appointment_time,
+            'reason_for_visit' => $appointment->reason_for_visit,
+            'status' => 'completed',
+            'notes' => $request->notes,
+            'completed_at' => now(),
+            'archived_at' => now(),
+            'created_at' => $appointment->created_at,
+            'updated_at' => now()
+        ]);
+
+        // Delete the original appointment
+        $appointment->delete();
+
+        return redirect()->route('appointment.index')
+            ->with('success', 'Appointment marked as completed.');
+    }
+
+    public function completed()
+    {
+        $completedAppointments = DB::table('completed_appointments')
+            ->leftJoin('users', 'completed_appointments.user_id', '=', 'users.id')
+            ->select(
+                'completed_appointments.*',
+                DB::raw('CASE 
+                    WHEN users.id IS NOT NULL THEN users.name
+                    ELSE completed_appointments.owner_name
+                END as display_name')
+            )
+            ->orderBy('completed_at', 'desc')
+            ->get();
+
+        return view('appointment.completed', [
+            'appointments' => $completedAppointments
+        ]);
     }
 }

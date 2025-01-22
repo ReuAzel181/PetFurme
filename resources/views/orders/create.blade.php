@@ -93,19 +93,12 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-12 mb-3">
-                                    <label class="form-label" for="note">{{ __('Order Note') }}</label>
-                                    <textarea 
-                                        class="form-control @error('note') is-invalid @enderror" 
-                                        id="note" 
-                                        name="note" 
-                                        rows="3" 
-                                        placeholder="Add any notes about this order...">{{ old('note') }}</textarea>
-                                    @error('note')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                    @enderror
+                                <div class="mb-3">
+                                    <label class="form-label">Order Note</label>
+                                    <textarea class="form-control" 
+                                              name="note" 
+                                              rows="3" 
+                                              placeholder="Add any notes about this order..."></textarea>
                                 </div>
                             </div>
 
