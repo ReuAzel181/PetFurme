@@ -2,14 +2,17 @@
 
 namespace Database\Factories;
 
-use Haruncpi\LaravelIdGenerator\IdGenerator;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
  */
 class ProductFactory extends Factory
 {
+    protected $model = Product::class;
+
     /**
      * Define the model's default state.
      *
@@ -18,15 +21,17 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->word(),
-            'category_id' => fake()->randomElement([1, 2, 3, 4, 5]),
-            'unit_id' => fake()->randomElement([1, 2, 3]),
-            'quantity' => fake()->randomNumber(2),
-            'buying_price' => fake()->randomNumber(2),
-            'selling_price' => fake()->randomNumber(2),
-            'quantity_alert' => fake()->randomElement([5,10,15]),
-            'tax' => fake()->randomElement([5,10,15,20,25]),
-            'tax_type' => fake()->randomElement([1,2]),
+            'uuid' => Str::uuid(),
+            'user_id' => 1,
+            'name' => $this->faker->word,
+            'slug' => $this->faker->slug,
+            'code' => 'PRD-' . $this->faker->unique()->numberBetween(1000, 9999),
+            'quantity' => $this->faker->numberBetween(10, 100),
+            'buying_price' => $this->faker->numberBetween(100, 1000),
+            'selling_price' => $this->faker->numberBetween(1000, 2000),
+            'quantity_alert' => 10,
+            'category_id' => 1,
+            'unit_id' => 1,
         ];
     }
 }

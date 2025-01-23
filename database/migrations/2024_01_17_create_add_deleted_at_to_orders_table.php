@@ -9,15 +9,20 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->timestamp('deleted_at')->nullable();
-            $table->string('deletion_reason')->nullable();
+            if (!Schema::hasColumn('orders', 'deleted_at')) {
+                $table->softDeletes();
+            }
+            if (!Schema::hasColumn('orders', 'deletion_reason')) {
+                $table->string('deletion_reason')->nullable();
+            }
         });
     }
 
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn(['deleted_at', 'deletion_reason']);
+            $table->dropSoftDeletes();
+            $table->dropColumn('deletion_reason');
         });
     }
 }; 
