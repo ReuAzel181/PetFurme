@@ -36,6 +36,8 @@ use App\Services\MessageService;
 use Supabase\CreateClient;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\RegisterController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -382,3 +384,23 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/backup', [SettingsController::class, 'backup'])->name('backup');
     });
 });
+
+// Update these routes
+Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])
+    ->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendOTP'])
+    ->name('password.email');
+Route::get('/verify-otp', [PasswordResetController::class, 'showOTPForm'])
+    ->name('password.otp');
+Route::post('/verify-otp', [PasswordResetController::class, 'verifyOTP'])
+    ->name('password.verify-otp');
+Route::match(['get', 'post'], '/reset-password', [PasswordResetController::class, 'showResetForm'])
+    ->name('password.reset');
+Route::post('/reset-password/update', [PasswordResetController::class, 'resetPassword'])
+    ->name('password.update');
+
+// Add these registration routes
+Route::post('/register/send-otp', [RegisterController::class, 'sendOTP'])
+    ->name('register.send-otp');
+Route::post('/register/verify-otp', [RegisterController::class, 'verifyOTP'])
+    ->name('register.verify-otp');
