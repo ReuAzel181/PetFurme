@@ -36,9 +36,8 @@ use App\Services\MessageService;
 use Supabase\CreateClient;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\AnalyticsController;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\ArchivesController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\RegisterController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
