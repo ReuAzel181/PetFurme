@@ -102,7 +102,7 @@
                     </div>
                 @endif
 
-                @if (!session('verify_otp'))
+                @if (!session('verify_otp') && !old('verify_otp'))
                 <!-- Registration Form -->
                 <form action="{{ route('register.send-otp') }}" method="POST" autocomplete="off">
                     @csrf

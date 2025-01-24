@@ -9,16 +9,16 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->softDeletes();
-            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            if (!Schema::hasColumn('users', 'role')) {
+                $table->string('role')->default('pet_owner');
+            }
         });
     }
 
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-            $table->dropConstrainedForeignId('deleted_by');
+            $table->dropColumn('role');
         });
     }
 }; 

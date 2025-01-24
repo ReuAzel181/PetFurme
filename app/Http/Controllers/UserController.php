@@ -138,10 +138,11 @@ class UserController extends Controller
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
             if ($user->photo) {
-                Storage::delete('public/' . $user->photo);
+                Storage::disk('public')->delete($user->photo);
             }
-            $photoPath = $request->file('photo')->store('user_photos', 'public');
-            $user->photo = $photoPath;
+            
+            // Store new photo
+            $user->photo = $request->file('photo')->store('user_photos', 'public');
         }
 
         // Update user fields
@@ -163,5 +164,16 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('user-management.index')->with('success', 'User deleted successfully.');
+    }
+
+    public function restore($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User restored successfully'
+        ]);
     }
 }

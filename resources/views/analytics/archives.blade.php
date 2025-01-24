@@ -20,7 +20,22 @@
         <div class="card mb-3">
             <div class="card-body">
                 <div class="btn-group w-100" role="group">
-                    <input type="radio" class="btn-check" name="archive-type" id="pets" value="pets" checked>
+                    <input type="radio" class="btn-check" name="archive-type" id="users" value="users" checked>
+                    <label class="btn btn-outline-primary users-btn" for="users" style="border-color: #2FB344; color: #2FB344;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                            <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/>
+                        </svg>
+                        Users
+                        <span class="badge ms-2" style="background-color: rgba(47, 179, 68, 0.1) !important; color: #2FB344;">
+                            {{ $archivedUsers->total() }}
+                        </span>
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="archive-type" id="pets" value="pets">
                     <label class="btn btn-outline-primary pets-btn" for="pets" style="border-color: #0054a6; color: #0054a6;">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pet" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -30,11 +45,13 @@
                             <path d="M12 15a3 3 0 0 1 -3 -3"/>
                         </svg>
                         Pets
-                        <span class="badge bg-blue-lt ms-2" style="background-color: #0054a6 !important; color: white;">{{ $archivedPets->total() }}</span>
+                        <span class="badge ms-2" style="background-color: rgba(0, 84, 166, 0.1) !important; color: #0054a6;">
+                            {{ $archivedPets->total() }}
+                        </span>
                     </label>
                     
                     <input type="radio" class="btn-check" name="archive-type" id="orders" value="orders">
-                    <label class="btn btn-outline-primary orders-btn" for="orders" style="border-color: #f76707; color: #f76707;">
+                    <label class="btn btn-outline-primary orders-btn" for="orders" style="border-color: #F76707; color: #F76707;">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-cart" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
@@ -43,11 +60,13 @@
                             <path d="M6 5l14 1l-1 7h-13"/>
                         </svg>
                         Orders
-                        <span class="badge bg-orange-lt ms-2" style="background-color: rgba(247, 103, 7, 0.1) !important; color: #f76707;">{{ $archivedOrders->total() }}</span>
+                        <span class="badge ms-2" style="background-color: rgba(247, 103, 7, 0.1) !important; color: #F76707;">
+                            {{ $archivedOrders->total() }}
+                        </span>
                     </label>
                     
                     <input type="radio" class="btn-check" name="archive-type" id="appointments" value="appointments">
-                    <label class="btn btn-outline-primary appointments-btn" for="appointments" style="border-color: #4299e1; color: #4299e1;">
+                    <label class="btn btn-outline-primary appointments-btn" for="appointments" style="border-color: #4299E1; color: #4299E1;">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/>
@@ -57,11 +76,143 @@
                             <path d="M8 15h2v2h-2z"/>
                         </svg>
                         Appointments
-                        <span class="badge bg-blue-lt ms-2" style="background-color: rgba(66, 153, 225, 0.1) !important; color: #4299e1;">{{ $archivedAppointments->count() }}</span>
+                        <span class="badge ms-2" style="background-color: rgba(66, 153, 225, 0.1) !important; color: #4299E1;">
+                            {{ $archivedAppointments->count() }}
+                        </span>
                     </label>
                 </div>
             </div>
         </div>
+
+        <!-- Archived Users Table -->
+        <div class="card" id="users-archive">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th class="text-center">Archive Date</th>
+                                <th class="text-center">Deleted By</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($archivedUsers as $user)
+                                <tr>
+                                    <td>{{ $user->id }}</td>
+                                    <td>
+                                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : asset('default-avatar.png') }}" 
+                                             alt="Avatar" class="avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                                    </td>
+                                    <td>{{ $user->name }}</td>
+                                    <td>{{ $user->email }}</td>
+                                    <td>{{ ucfirst($user->role) }}</td>
+                                    <td class="text-center">
+                                        {{ $user->deleted_at->format('M d, Y g:i A') }}
+                                        <div class="text-muted small">
+                                            {{ $user->deleted_at->diffForHumans() }}
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        @if($user->deletedBy)
+                                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-blue-lt">
+                                                    {{ strtoupper(substr($user->deletedBy->name, 0, 1)) }}
+                                                </span>
+                                                <span>{{ $user->deletedBy->name }}</span>
+                                            </div>
+                                        @else
+                                            <span class="text-muted">System</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <button class="btn btn-icon btn-outline-primary btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#viewUserModal{{ $user->id }}"
+                                                    title="View Details">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
+                                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>
+                                                </svg>
+                                            </button>
+                                            <button class="btn btn-icon btn-outline-primary btn-sm" 
+                                                    onclick="restoreUser('{{ $user->id }}')" 
+                                                    title="Restore User">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rotate-clockwise" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M4.05 11a8 8 0 1 1 .5 4m-.5 5v-5h5"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="empty">
+                                            <div class="empty-icon">
+                                                <i class="fas fa-archive text-muted" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                            <p class="empty-title">No archived users found</p>
+                                            <p class="empty-subtitle text-muted">
+                                                There are no archived user records in the system at this time.
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if($archivedUsers->hasPages())
+                    <div class="card-footer d-flex align-items-center">
+                        {{ $archivedUsers->links() }}
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- User Details Modal -->
+        @foreach($archivedUsers as $user)
+            <div class="modal modal-blur fade" id="viewUserModal{{ $user->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">User Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <div class="form-control-plaintext">{{ $user->name }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <div class="form-control-plaintext">{{ $user->email }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Role</label>
+                                <div class="form-control-plaintext">{{ ucfirst($user->role) }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Archived Date</label>
+                                <div class="form-control-plaintext">{{ $user->deleted_at->format('M d, Y H:i') }}</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
 
         <!-- Archived Pets Table -->
         <div class="card" id="pets-archive">
@@ -70,10 +221,10 @@
                     <table class="table table-vcenter card-table">
                         <thead>
                             <tr>
-                                <th>Pet Name</th>
-                                <th>Owner</th>
-                                <th>Category</th>
-                                <th>Breed</th>
+                                <th class="text-center">Pet Name</th>
+                                <th class="text-center">Owner</th>
+                                <th class="text-center">Category</th>
+                                <th class="text-center">Breed</th>
                                 <th class="text-center">Archive Date</th>
                                 <th class="text-center">Deleted By</th>
                                 <th class="text-center">Actions</th>
@@ -82,31 +233,26 @@
                         <tbody>
                             @forelse($archivedPets as $pet)
                                 <tr>
-                                    <td class="fw-bold">{{ $pet->name }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
+                                    <td class="text-center">{{ $pet->name }}</td>
+                                    <td class="text-center">
+                                        <div class="d-flex align-items-center justify-content-center gap-2">
                                             @if($pet->user)
                                                 <span class="avatar avatar-sm rounded-circle bg-primary-lt">
                                                     {{ strtoupper(substr($pet->user->name, 0, 1)) }}
                                                 </span>
                                                 <span>{{ $pet->user->name }}</span>
-                                            @elseif($pet->owner_name)
-                                                <span class="avatar avatar-sm rounded-circle bg-secondary-lt">
-                                                    {{ strtoupper(substr($pet->owner_name, 0, 1)) }}
-                                                </span>
-                                                <span>{{ $pet->owner_name }}</span>
                                             @else
-                                                <span class="avatar avatar-sm rounded-circle bg-muted">
+                                                <span class="avatar avatar-sm rounded-circle bg-secondary-lt">
                                                     <i class="fas fa-question"></i>
                                                 </span>
-                                                <span class="text-muted">Unknown Owner</span>
+                                                <span>Unknown Owner</span>
                                             @endif
                                         </div>
                                     </td>
-                                    <td>{{ $pet->category }}</td>
-                                    <td>{{ $pet->breed }}</td>
+                                    <td class="text-center">{{ $pet->category }}</td>
+                                    <td class="text-center">{{ $pet->breed }}</td>
                                     <td class="text-center">
-                                        {{ $pet->deleted_at->format('M d, Y H:i') }}
+                                        {{ $pet->deleted_at->format('M d, Y g:i A') }}
                                         <div class="text-muted small">
                                             {{ $pet->deleted_at->diffForHumans() }}
                                         </div>
@@ -145,7 +291,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-4">
+                                    <td colspan="7" class="text-center py-4">
                                         <div class="empty">
                                             <div class="empty-icon">
                                                 <i class="fas fa-archive text-muted" style="font-size: 2.5rem;"></i>
@@ -259,7 +405,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-4">
+                                    <td colspan="6" class="text-center py-4">
                                         <div class="empty">
                                             <div class="empty-icon">
                                                 <i class="fas fa-archive text-muted" style="font-size: 2.5rem;"></i>
@@ -370,7 +516,17 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">No archived appointments found</td>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="empty">
+                                            <div class="empty-icon">
+                                                <i class="fas fa-archive text-muted" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                            <p class="empty-title">No archived appointments found</p>
+                                            <p class="empty-subtitle text-muted">
+                                                There are no archived appointment records in the system at this time.
+                                            </p>
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -444,32 +600,55 @@ function removeBackdrop() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const petsRadio = document.getElementById('pets');
-    const ordersRadio = document.getElementById('orders');
-    const appointmentsRadio = document.getElementById('appointments');
+    // Get all archive sections
     const petsArchive = document.getElementById('pets-archive');
     const ordersArchive = document.getElementById('orders-archive');
     const appointmentsArchive = document.getElementById('appointments-archive');
+    const usersArchive = document.getElementById('users-archive');
+
+    // Hide all sections except users initially
+    petsArchive.style.display = 'none';
+    ordersArchive.style.display = 'none';
+    appointmentsArchive.style.display = 'none';
+    usersArchive.style.display = 'block';  // Show users section by default
 
     function toggleArchives() {
-        if (petsRadio.checked) {
+        if (usersRadio.checked) {
+            usersArchive.style.display = 'block';
+            petsArchive.style.display = 'none';
+            ordersArchive.style.display = 'none';
+            appointmentsArchive.style.display = 'none';
+        } else if (petsRadio.checked) {
+            usersArchive.style.display = 'none';
             petsArchive.style.display = 'block';
             ordersArchive.style.display = 'none';
             appointmentsArchive.style.display = 'none';
         } else if (ordersRadio.checked) {
+            usersArchive.style.display = 'none';
             petsArchive.style.display = 'none';
             ordersArchive.style.display = 'block';
             appointmentsArchive.style.display = 'none';
         } else if (appointmentsRadio.checked) {
+            usersArchive.style.display = 'none';
             petsArchive.style.display = 'none';
             ordersArchive.style.display = 'none';
             appointmentsArchive.style.display = 'block';
         }
     }
 
+    // Add event listeners for radio buttons
+    const usersRadio = document.getElementById('users');
+    const petsRadio = document.getElementById('pets');
+    const ordersRadio = document.getElementById('orders');
+    const appointmentsRadio = document.getElementById('appointments');
+
+    usersRadio.addEventListener('change', toggleArchives);
     petsRadio.addEventListener('change', toggleArchives);
     ordersRadio.addEventListener('change', toggleArchives);
     appointmentsRadio.addEventListener('change', toggleArchives);
+
+    // Call toggleArchives initially to set correct visibility
+    toggleArchives();
 
     // Add click handlers for all eye buttons
     const viewButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
@@ -577,6 +756,31 @@ function restoreOrder(orderId) {
         });
     }
 }
+
+function restoreUser(userId) {
+    if (confirm('Are you sure you want to restore this user?')) {
+        fetch(`/users/${userId}/restore`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Failed to restore user. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while restoring the user.');
+        });
+    }
+}
 </script>
 @endpush
 
@@ -587,7 +791,20 @@ function restoreOrder(orderId) {
         overflow: hidden;
     }
 
-    /* Pets button states */
+    /* Users button states (Green) */
+    .users-btn:hover, .users-btn:focus {
+        background-color: rgba(47, 179, 68, 0.1) !important;
+        border-color: #2FB344 !important;
+        color: #2FB344 !important;
+    }
+    
+    .users-btn.active, input[name="archive-type"]:checked + .users-btn {
+        background-color: #2FB344 !important;
+        border-color: #2FB344 !important;
+        color: white !important;
+    }
+
+    /* Pets button states (Blue) */
     .pets-btn:hover, .pets-btn:focus {
         background-color: rgba(0, 84, 166, 0.1) !important;
         border-color: #0054a6 !important;
@@ -600,37 +817,72 @@ function restoreOrder(orderId) {
         color: white !important;
     }
 
-    /* Orders button states */
+    /* Orders button states (Orange) */
     .orders-btn:hover, .orders-btn:focus {
         background-color: rgba(247, 103, 7, 0.1) !important;
-        border-color: #f76707 !important;
-        color: #f76707 !important;
+        border-color: #F76707 !important;
+        color: #F76707 !important;
     }
     
     .orders-btn.active, input[name="archive-type"]:checked + .orders-btn {
-        background-color: #f76707 !important;
-        border-color: #f76707 !important;
+        background-color: #F76707 !important;
+        border-color: #F76707 !important;
         color: white !important;
     }
 
-    /* Appointments button states */
+    /* Appointments button states (Sky Blue) */
     .appointments-btn:hover, .appointments-btn:focus {
         background-color: rgba(66, 153, 225, 0.1) !important;
-        border-color: #4299e1 !important;
-        color: #4299e1 !important;
+        border-color: #4299E1 !important;
+        color: #4299E1 !important;
     }
     
     .appointments-btn.active, input[name="archive-type"]:checked + .appointments-btn {
-        background-color: #4299e1 !important;
-        border-color: #4299e1 !important;
+        background-color: #4299E1 !important;
+        border-color: #4299E1 !important;
         color: white !important;
     }
 
-    /* When button is checked, make its badge more visible */
-    input[name="archive-type"]:checked + .btn .badge {
+    /* Badge styles when button is not active */
+    .users-btn .badge {
+        background-color: rgba(47, 179, 68, 0.1) !important;
+        color: #2FB344 !important;
+    }
+
+    .pets-btn .badge {
+        background-color: rgba(0, 84, 166, 0.1) !important;
+        color: #0054a6 !important;
+    }
+
+    .orders-btn .badge {
+        background-color: rgba(247, 103, 7, 0.1) !important;
+        color: #F76707 !important;
+    }
+
+    .appointments-btn .badge {
+        background-color: rgba(66, 153, 225, 0.1) !important;
+        color: #4299E1 !important;
+    }
+
+    /* Badge styles when button is active */
+    input[name="archive-type"]:checked + .users-btn .badge {
         background-color: rgba(255, 255, 255, 0.2) !important;
         color: white !important;
-        border-color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    input[name="archive-type"]:checked + .pets-btn .badge {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+
+    input[name="archive-type"]:checked + .orders-btn .badge {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+
+    input[name="archive-type"]:checked + .appointments-btn .badge {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
     }
 
     .table {

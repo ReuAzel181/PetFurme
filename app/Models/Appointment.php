@@ -23,7 +23,8 @@ class Appointment extends Model
         'appointment_time',
         'reason_for_visit',
         'deleted_by',
-        'notes'
+        'notes',
+        'status'
     ];
 
     protected $dates = [
@@ -37,6 +38,10 @@ class Appointment extends Model
         'reason_for_visit' => 'array',
         'appointment_date' => 'datetime',
         'deleted_at' => 'datetime'
+    ];
+
+    protected $attributes = [
+        'status' => 'pending',  // Set default status
     ];
 
     public function user()

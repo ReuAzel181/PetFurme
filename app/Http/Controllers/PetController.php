@@ -94,14 +94,13 @@ class PetController extends Controller
 
         // Handle photo upload
         if ($request->hasFile('photo')) {
-            $photo = $request->file('photo');
-            $filename = time() . '_' . $photo->getClientOriginalName();
+            // Delete old photo if exists
+            if ($pet->photo) {
+                Storage::disk('public')->delete($pet->photo);
+            }
             
-            // Store the file in the public disk under pet_photos directory
-            $path = $photo->storeAs('pet_photos', $filename, 'public');
-            
-            // Add the path to the data array
-            $data['photo'] = $path;
+            // Store new photo
+            $data['photo'] = $request->file('photo')->store('pet_photos', 'public');
         }
 
         // Create the pet record
@@ -128,14 +127,12 @@ class PetController extends Controller
         // Update the image handling
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
-            if ($pet->photo && Storage::disk('public')->exists($pet->photo)) {
+            if ($pet->photo) {
                 Storage::disk('public')->delete($pet->photo);
             }
             
-            $file = $request->file('photo');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $photoPath = $file->storeAs('pet_photos', $filename, 'public');
-            $pet->photo = $photoPath;
+            // Store new photo
+            $data['photo'] = $request->file('photo')->store('pet_photos', 'public');
         }
 
         // Convert age to months if years is selected

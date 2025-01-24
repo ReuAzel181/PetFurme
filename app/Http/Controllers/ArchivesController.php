@@ -6,6 +6,7 @@ use App\Models\Pet;
 use App\Models\Order;
 use App\Models\Appointment;
 use App\Models\ArchivedOrder;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,43 +14,32 @@ class ArchivesController extends Controller
 {
     public function index()
     {
+        $archivedUsers = User::onlyTrashed()
+            ->with(['deletedBy'])
+            ->latest('deleted_at')
+            ->paginate(10, ['*'], 'users_page');
+
         $archivedPets = Pet::onlyTrashed()
             ->with(['user', 'deletedBy'])
-            ->orderBy('deleted_at', 'desc')
-            ->paginate(10);
+            ->latest('deleted_at')
+            ->paginate(10, ['*'], 'pets_page');
 
-        $archivedOrders = ArchivedOrder::with(['archivedDetails', 'deletedBy'])
-            ->orderBy('archived_at', 'desc')
-            ->paginate(10);
+        $archivedOrders = Order::onlyTrashed()
+            ->with(['user', 'deletedBy'])
+            ->latest('deleted_at')
+            ->paginate(10, ['*'], 'orders_page');
 
         $archivedAppointments = Appointment::onlyTrashed()
-            ->with(['user' => function($query) {
-                $query->withTrashed();
-            }, 'deletedBy' => function($query) {
-                $query->withTrashed();
-            }])
-            ->orderBy('deleted_at', 'desc')
-            ->paginate(10)
-            ->through(function ($appointment) {
-                $appointment->deleted_at = $appointment->deleted_at ? \Carbon\Carbon::parse($appointment->deleted_at) : null;
-                
-                // Determine status based on appointment date and deletion date
-                if ($appointment->appointment_date->isPast()) {
-                    $appointment->status = 'completed';
-                    $appointment->status_color = 'success';
-                } else {
-                    $appointment->status = 'cancelled';
-                    $appointment->status_color = 'danger';
-                }
-                
-                return $appointment;
-            });
+            ->with(['user', 'deletedBy'])
+            ->latest('deleted_at')
+            ->paginate(10, ['*'], 'appointments_page');
 
-        return view('analytics.archives', [
-            'archivedPets' => $archivedPets,
-            'archivedOrders' => $archivedOrders,
-            'archivedAppointments' => $archivedAppointments,
-        ]);
+        return view('analytics.archives', compact(
+            'archivedUsers',
+            'archivedPets',
+            'archivedOrders',
+            'archivedAppointments'
+        ));
     }
 
     public function restoreAppointment($id)

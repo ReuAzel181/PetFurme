@@ -18,13 +18,15 @@ class User extends Authenticatable
     const ROLE_STAFF = 'staff';
 
     protected $fillable = [
-        'username',
         'name',
         'email',
-        'phone',
-        'photo',
         'password',
-        'role',
+        'phone',
+        'address',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'profile_completed',
+        'role'
     ];
 
     // Hidden fields when the user is serialized
@@ -36,6 +38,7 @@ class User extends Authenticatable
     // Cast attributes
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'profile_completed' => 'boolean',
         'role' => 'string',
     ];
 
@@ -77,5 +80,24 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class, 'customer_id', 'id');
+    }
+
+    /**
+     * Get the user who deleted this user
+     */
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    // Add a helper method to check role
+    public function isPetOwner()
+    {
+        return $this->role === 'pet_owner';
+    }
+
+    public function settings()
+    {
+        return $this->hasOne(UserSettings::class);
     }
 }

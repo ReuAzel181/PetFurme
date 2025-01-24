@@ -16,18 +16,22 @@ class RegisterController extends Controller
     public function sendOTP(Request $request)
     {
         $request->validate([
-            'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'terms' => ['required', 'accepted'],
+            'username' => 'required|unique:users',
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8|confirmed',
+            'terms' => 'required',
         ]);
 
         // Generate 6 digit OTP
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         
-        // Store registration data and OTP in session
-        $request->session()->put('registration_data', $request->all());
+        // Store the registration data and verify_otp flag in session
+        $request->session()->put([
+            'verify_otp' => true,
+            'registration_data' => $request->except('password_confirmation', 'terms'),
+            'email' => $request->email
+        ]);
         
         // Store OTP in database
         PasswordResetOtp::updateOrCreate(
@@ -44,44 +48,36 @@ class RegisterController extends Controller
             $message->subject('Registration OTP Verification');
         });
 
-        return back()->with([
-            'verify_otp' => true,
-            'email' => $request->email,
-            'status' => 'We have sent an OTP to your email address.'
-        ]);
+        return back()->with('status', 'OTP has been sent to your email.');
     }
 
     public function verifyOTP(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'otp' => 'required|string|size:6',
+            'otp' => 'required|digits:6'
         ]);
 
-        $passwordReset = PasswordResetOtp::where('email', $request->email)
-            ->where('otp', $request->otp)
-            ->where('expires_at', '>', Carbon::now())
-            ->first();
-
-        if (!$passwordReset) {
-            return back()->withErrors([
-                'otp' => 'Invalid or expired OTP.'
-            ]);
+        if (!$this->verifyOTPCode($request->otp)) {
+            return back()
+                ->withInput()
+                ->withErrors(['otp' => 'Invalid or expired OTP.'])
+                ->with('verify_otp', true);
         }
 
         // Get registration data from session
         $data = $request->session()->get('registration_data');
         
-        // Create user
+        // Create user with pet_owner role
         $user = User::create([
             'username' => $data['username'],
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'role' => 'pet_owner'  // Set the role here
         ]);
 
         // Delete used OTP
-        $passwordReset->delete();
+        PasswordResetOtp::where('email', session('email'))->delete();
         
         // Clear session data
         $request->session()->forget(['registration_data', 'verify_otp']);
@@ -89,7 +85,23 @@ class RegisterController extends Controller
         // Log the user in
         Auth::login($user);
 
-        return redirect()->route('dashboard')
+        return redirect()->route('pet-owner.dashboard')
             ->with('status', 'Your account has been created successfully!');
+    }
+
+    /**
+     * Verify if the OTP code is valid
+     * 
+     * @param string $otp
+     * @return bool
+     */
+    private function verifyOTPCode($otp)
+    {
+        $passwordReset = PasswordResetOtp::where('email', session('email'))
+            ->where('otp', $otp)
+            ->where('expires_at', '>', Carbon::now())
+            ->first();
+
+        return $passwordReset !== null;
     }
 } 

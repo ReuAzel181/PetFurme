@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    /**
+     * Display the login view.
+     *
+     * @return \Illuminate\View\View
+     */
     public function create(): View
     {
         return view('auth.login');
@@ -16,38 +23,40 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Handle an incoming authentication request.
+     *
+     * @param  \App\Http\Requests\Auth\LoginRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $request->authenticate();
+        $request->session()->regenerate();
 
-        // Attempt to authenticate the user
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            // Redirect the user to the intended page (or dashboard)
-            return redirect()->intended('/dashboard');
+        // Redirect based on user role
+        $user = auth()->user();
+        
+        if ($user->role === 'pet_owner') {
+            return redirect()->route('pet-owner.dashboard');
         }
-
-        // Return unauthorized response if authentication fails
-        return redirect()->back()
-            ->withErrors(['email' => 'The provided credentials are incorrect.'])
-            ->withInput();
+        
+        // All other roles (admin and sub_admin) go to main dashboard
+        return redirect()->route('dashboard');
     }
 
     /**
      * Destroy an authenticated session.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
+
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/');
     }
 }

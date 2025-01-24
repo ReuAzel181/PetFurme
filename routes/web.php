@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 
@@ -39,6 +40,11 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ArchivesController;
+
+use App\Http\Controllers\PetOwner;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -156,11 +162,15 @@ Route::get('php/', function () {
 });
 
 Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect('/dashboard');
+    if (auth()->check()) {
+        if (auth()->user()->role === 'pet_owner') {
+            return redirect()->route('pet-owner.dashboard');
+        }
+        return redirect()->route('dashboard');
     }
-    return redirect('/login');
-});
+    // Show login page for unauthenticated users
+    return view('auth.login');
+})->name('home');
 
 // Apply cache.response middleware to specific asset routes
 Route::middleware('cache.response')->group(function () {
@@ -393,15 +403,13 @@ Route::post('/pets/{pet}/restore', [PetController::class, 'restore'])->name('pet
 Route::delete('/pets/{id}/force-delete', [PetController::class, 'forceDelete'])->name('pets.forceDelete');
 
 Route::get('/storage-test', function() {
-    $path = 'pet_photos/test.txt';
-    
-    // Try to write a test file
+    $path = 'test.txt';
     Storage::disk('public')->put($path, 'test');
     
     return [
-        'file_written' => Storage::disk('public')->exists($path),
+        'file_exists' => Storage::disk('public')->exists($path),
         'storage_path' => Storage::disk('public')->path($path),
-        'public_url' => asset('storage/' . $path),
+        'public_url' => Storage::url($path),
         'storage_link_exists' => file_exists(public_path('storage')),
     ];
 });
@@ -424,3 +432,94 @@ Route::get('appointments/create/{pet_id?}', [AppointmentController::class, 'crea
 Route::get('/analytics/archives', [ArchivesController::class, 'index'])->name('analytics.archives');
 Route::get('/appointments/{id}/restore', [ArchivesController::class, 'restoreAppointment'])->name('appointments.restore');
 Route::get('/appointments/{id}/view', [ArchivesController::class, 'viewAppointment'])->name('appointments.view');
+
+Route::post('/users/{user}/restore', [UserController::class, 'restore'])
+    ->name('users.restore')
+    ->withTrashed();
+
+// Authentication routes
+Route::middleware('guest')->group(function () {
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('register', [RegisteredUserController::class, 'store']);
+});
+
+// Pet owner routes
+Route::middleware(['auth', 'role:pet_owner'])->prefix('pet-owner')->name('pet-owner.')->group(function () {
+    Route::get('/dashboard', [PetOwner\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Profile routes
+    Route::get('/profile', [PetOwner\ProfileController::class, 'index'])->name('profile');
+    Route::get('/profile/setup', [PetOwner\ProfileController::class, 'setup'])->name('profile.setup');
+    Route::post('/profile/setup', [PetOwner\ProfileController::class, 'storeSetup'])->name('profile.setup.store');
+    Route::put('/profile', [PetOwner\ProfileController::class, 'update'])->name('profile.update');
+    
+    // Settings routes
+    Route::get('/settings', [PetOwner\SettingsController::class, 'index'])->name('settings');
+    Route::post('/settings', [PetOwner\SettingsController::class, 'update'])->name('settings.update');
+    
+    // Pet routes
+    Route::resource('pets', PetOwner\PetController::class);
+    
+    // Appointment routes
+    Route::resource('appointments', PetOwner\AppointmentController::class);
+});
+
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
+
+Route::get('/storage-debug', function() {
+    $testFile = 'test.txt';
+    $disk = Storage::disk('public');
+    
+    // Try to write a test file
+    $disk->put($testFile, 'test');
+    
+    return [
+        'app_url' => config('app.url'),
+        'storage_path' => storage_path('app/public'),
+        'public_path' => public_path('storage'),
+        'file_written' => $disk->exists($testFile),
+        'storage_link_exists' => file_exists(public_path('storage')),
+        'storage_directory_writable' => is_writable(storage_path('app/public')),
+        'example_image_path' => $disk->path($testFile),
+        'example_image_url' => Storage::url($testFile)
+    ];
+});
+
+Route::get('/check-storage', function() {
+    // Create test files in each directory
+    $directories = ['user_photos', 'pet_photos', 'products'];
+    $results = [];
+    
+    foreach ($directories as $dir) {
+        $testFile = $dir . '/test.txt';
+        $disk = Storage::disk('public');
+        
+        // Try to create directory if it doesn't exist
+        if (!$disk->exists($dir)) {
+            $disk->makeDirectory($dir);
+        }
+        
+        // Try to write a test file
+        $disk->put($testFile, 'test');
+        
+        $results[$dir] = [
+            'directory_exists' => $disk->exists($dir),
+            'directory_path' => storage_path('app/public/' . $dir),
+            'directory_writable' => is_writable(storage_path('app/public/' . $dir)),
+            'test_file_exists' => $disk->exists($testFile),
+            'test_file_url' => Storage::url($testFile)
+        ];
+    }
+    
+    return [
+        'app_url' => config('app.url'),
+        'storage_link_exists' => file_exists(public_path('storage')),
+        'storage_path' => storage_path('app/public'),
+        'public_path' => public_path('storage'),
+        'directories' => $results
+    ];
+});

@@ -37,4 +37,15 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
         });
     }
+
+    public static function redirectTo()
+    {
+        if (auth()->check()) {
+            if (auth()->user()->isPetOwner()) {
+                return route('pet-owner.dashboard');
+            }
+            return route('dashboard');
+        }
+        return '/login';
+    }
 }

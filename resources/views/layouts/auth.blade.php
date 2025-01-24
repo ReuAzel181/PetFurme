@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
         <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ config('app.name') }}</title>
+        <title>{{ config('app.name', 'VetCare') }}</title>
         {{--- <script defer data-api="/stats/api/event" data-domain="preview.tabler.io" src="{{ asset('stats/js/script.js') }}"></script> ---}}
         <meta name="msapplication-TileColor" content="#0054a6"/>
         <meta name="theme-color" content="#0054a6"/>
@@ -37,6 +37,8 @@
         <link href="{{ asset('dist/css/tabler-payments.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('dist/css/tabler-vendors.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('dist/css/demo.min.css') }}" rel="stylesheet"/>
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
             @import url('https://rsms.me/inter/inter.css');
             :root {
@@ -51,27 +53,19 @@
     <body class="d-flex flex-column">
         <script src="{{ asset('dist/js/demo-theme.min.js') }}"></script>
 
-        <div class="page page-center">
-            <div class="container container-tight py-4">
-                <!-- <div class="text-center mb-4">
-                    <a href="{{ url('/') }}" class="navbar-brand navbar-brand-autodark">
-                        <img src="{{ asset('static/logo.svg') }}" width="110" height="32" alt="Tabler" class="navbar-brand-image">
-                    </a>
-                </div> -->
+        <div class="page">
+            @include('components.alert')
 
-                @include('components.alert')
+            @if (session('status'))
+                <div class="alert alert-info alert-dismissible" role="alert">
+                    <h3 class="mb-1">Success</h3>
+                    <p>{{ session('status') }}</p>
 
-                @if (session('status'))
-                    <div class="alert alert-info alert-dismissible" role="alert">
-                        <h3 class="mb-1">Success</h3>
-                        <p>{{ session('status') }}</p>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+            @endif
 
-                        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-                    </div>
-                @endif
-
-                @yield('content')
-            </div>
+            @yield('content')
         </div>
 
         <!-- Libs JS -->

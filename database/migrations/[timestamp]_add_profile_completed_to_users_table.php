@@ -9,16 +9,18 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->softDeletes();
-            $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
+            if (!Schema::hasColumn('users', 'profile_completed')) {
+                $table->boolean('profile_completed')->default(false);
+            }
         });
     }
 
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-            $table->dropConstrainedForeignId('deleted_by');
+            if (Schema::hasColumn('users', 'profile_completed')) {
+                $table->dropColumn('profile_completed');
+            }
         });
     }
 }; 

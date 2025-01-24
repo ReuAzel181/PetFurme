@@ -1039,6 +1039,20 @@
         [data-bs-theme="dark"] .activities-container::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
         }
+
+        .nav-section {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .nav-section-header {
+            padding: 0.5rem 1rem;
+        }
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
     </style>
 
     {{-- - Page Styles - --}}
@@ -1111,31 +1125,58 @@
                             <!-- User Menu -->
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0 user-menu" data-bs-toggle="dropdown">
-                                    <span class="avatar avatar-sm" style="background-image: url('{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('default-avatar.png') }}')"></span>
-                                    <div class="d-none d-xl-block ps-2 user-info">
-                                        <div class="fw-bold">{{ Auth::user()->name }}</div>
-                                        <div class="mt-1 small text-muted">{{ Auth::user()->role ?? 'User' }}</div>
-                                    </div>
+                                    @auth
+                                        <span class="avatar avatar-sm" style="background-image: url('{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('assets/img2/default-avatar.png') }}')"></span>
+                                        <div class="d-none d-xl-block ps-2 user-info">
+                                            <div class="fw-bold">{{ Auth::user()->name }}</div>
+                                            <div class="mt-1 small text-muted">{{ Auth::user()->role ?? 'User' }}</div>
+                                        </div>
+                                    @else
+                                        <span class="avatar avatar-sm" style="background-image: url('{{ asset('assets/img2/default-avatar.png') }}')"></span>
+                                        <div class="d-none d-xl-block ps-2 user-info">
+                                            <div class="fw-bold">Guest</div>
+                                            <div class="mt-1 small text-muted">Not logged in</div>
+                                        </div>
+                                    @endauth
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <a href="{{ route('profile.edit') }}" class="dropdown-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0 -2.573-1.066c-1.543 .94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 001.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/>
-                                            <path d="M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 0 0 -6 0"/>
-                                        </svg>
-                                        Account Settings
-                                    </a>
-                                    <form action="{{ route('logout') }}" method="post">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">
+                                    @auth
+                                        <a href="{{ route('profile.edit') }}" class="dropdown-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0 -2.573-1.066c-1.543 .94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 001.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/>
+                                                <path d="M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 0 0 -6 0"/>
+                                            </svg>
+                                            Account Settings
+                                        </a>
+                                        <form action="{{ route('logout') }}" method="post">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/>
+                                                    <path d="M9 12h12l-3-3"/>
+                                                    <path d="M18 15l3-3"/>
+                                                </svg>
+                                                Logout
+                                            </button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('login') }}" class="dropdown-item">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/>
-                                                <path d="M9 12h12l-3-3"/>
-                                                <path d="M18 15l3-3"/>
+                                                <path d="M20 12h-13l3-3m0 6l-3-3"/>
                                             </svg>
-                                            Logout
-                                        </button>
-                                    </form>
+                                            Login
+                                        </a>
+                                        <a href="{{ route('register') }}" class="dropdown-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/>
+                                                <path d="M16 19h6"/>
+                                                <path d="M19 16v6"/>
+                                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4"/>
+                                            </svg>
+                                            Register
+                                        </a>
+                                    @endauth
                                 </div>
                             </div>
                         </div>
@@ -1147,280 +1188,153 @@
         <!-- here -->
         <div class="content-sd">
             <div class="collapse navbar-collapse show" id="navbar-menu">
-                <div class="navbar">
+                <div class="navbar navbar-light">
                     <div class="container-xl">
-                        <ul class="navbar-nav" style="margin: 0; position: relative; left: 70px; padding-top: 20px">
+                        <ul class="navbar-nav">
+                            @if(auth()->check())
+                                @if(auth()->user()->role === 'pet_owner')
+                                    <!-- Pet Owner Navigation -->
+                                    <li class="nav-item {{ request()->routeIs('pet-owner.dashboard') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('pet-owner.dashboard') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-home"></i>
+                                            </span>
+                                            <span class="nav-link-title">Dashboard</span>
+                                        </a>
+                                    </li>
+                                    <!-- Other pet owner menu items -->
+                                @else
+                                    <!-- HOME Section -->
+                                    <li class="nav-item nav-section">
+                                        <div class="nav-section-header">
+                                            <span class="nav-section-title">HOME</span>
+                                        </div>
+                                    </li>
+                                    
+                                    <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('dashboard') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-home"></i>
+                                            </span>
+                                            <span class="nav-link-title">Dashboard</span>
+                                        </a>
+                                    </li>
 
-                            <li class="nav-header">HOME</li>
+                                    <li class="nav-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('notifications.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-bell"></i>
+                                            </span>
+                                            <span class="nav-link-title">Notifications</span>
+                                        </a>
+                                    </li>
 
-                            <!-- DASHBOARD -->
+                                    <li class="nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('messages.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-comments"></i>
+                                            </span>
+                                            <span class="nav-link-title">Messages</span>
+                                        </a>
+                                    </li>
 
-                            <li class="nav-item {{ request()->is('dashboard*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('dashboard') }}">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
-                                            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
-                                            <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        {{ __('Dashboard') }}
-                                    </span>
-                                </a>
-                            </li>
+                                    <li class="nav-item {{ request()->routeIs('appointments.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('appointments.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                            <span class="nav-link-title">Appointments</span>
+                                        </a>
+                                    </li>
 
+                                    <!-- MANAGE Section -->
+                                    <li class="nav-item nav-section">
+                                        <div class="nav-section-header">
+                                            <span class="nav-section-title">MANAGE</span>
+                                        </div>
+                                    </li>
 
-                            <!-- NOTIFICATION -->
+                                    <li class="nav-item {{ request()->routeIs('user-management.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('user-management.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-users"></i>
+                                            </span>
+                                            <span class="nav-link-title">Users</span>
+                                        </a>
+                                    </li>
 
-                            <li class="nav-item {{ request()->is('notifications*') ? 'active' : null }}">
-                                <a href="{{ route('notifications.index') }}" class="nav-link">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- <img src="{{ asset('assets/img2/bell.png') }}" alt="Bell"> -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-bell">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 
-                                            4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                                            <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1">
-                                        {{ __('Notifications') }}
-                                    </span>
-                                </a>
-                            </li>
-                            
- 
-                            <!-- MESSAGES -->
-                          
-                            <li class="nav-item {{ request()->is('message*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('messages.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Bell Icon SVG -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" 
-                                        height="24" viewBox="0 0 24 24" fill="none" 
-                                        stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                                        stroke-linejoin="round" 
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-message-dots">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M12 11v.01" />
-                                            <path d="M8 11v.01" />
-                                            <path d="M16 11v.01" />
-                                            <path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 
-                                            3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3z" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1">
-                                        {{ __('Messages') }}
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            <!-- APPOINTMENTS -->
-                
-                            <li class="nav-item {{ request()->is('appointment*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('appointment.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-clock">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M10.5 21h-4.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v3" />
-                                        <path d="M16 3v4" />
-                                        <path d="M8 3v4" />
-                                        <path d="M4 11h10" />
-                                        <path d="M18 18m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                                        <path d="M18 16.5v1.5l.5 .5" />
-                                    </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Appointments') }}
-                                    </span>
-                                </a>
-                            </li>
+                                    <li class="nav-item {{ request()->routeIs('pets.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('pets.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-paw"></i>
+                                            </span>
+                                            <span class="nav-link-title">Pets</span>
+                                        </a>
+                                    </li>
 
-                            <li class="nav-header">MANAGE</li>
+                                    <li class="nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('products.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-box"></i>
+                                            </span>
+                                            <span class="nav-link-title">Products</span>
+                                        </a>
+                                    </li>
 
-                            <li class="nav-item {{ request()->is('user-management-index') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('user-management.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-user-edit">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                            <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
-                                            <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        {{ __('Users') }}
-                                    </span>
-                                </a>
-                            </li>
+                                    <li class="nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('orders.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-shopping-cart"></i>
+                                            </span>
+                                            <span class="nav-link-title">Orders</span>
+                                        </a>
+                                    </li>
 
+                                    <!-- REPORTS Section -->
+                                    <li class="nav-item nav-section">
+                                        <div class="nav-section-header">
+                                            <span class="nav-section-title">REPORTS</span>
+                                        </div>
+                                    </li>
 
+                                    @if(auth()->user()->role === 'admin')
+                                        <li class="nav-item {{ request()->routeIs('sales.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('sales.index') }}">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </span>
+                                                <span class="nav-link-title">Sales</span>
+                                            </a>
+                                        </li>
 
-                            <!-- PETS -->
+                                        <li class="nav-item {{ request()->routeIs('analytics.archives') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('analytics.archives') }}">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-archive"></i>
+                                                </span>
+                                                <span class="nav-link-title">Archives</span>
+                                            </a>
+                                        </li>
 
-                            <li class="nav-item {{ request()->is('pet*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('pet.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" 
-                                    height="24" viewBox="0 0 24 24" fill="none" 
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                                    stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-paw">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M14.7 13.5c-1.1 -2 -1.441 -2.5 -2.7 -2.5c-1.259 0 -1.736 .755 -2.836 2.747c-.942 1.703 -2.846 1.845 -3.321 3.291c-.097 .265 -.145 .677 -.143 .962c0 1.176 .787 2 1.8 2c1.259 0 3 -1 4.5 -1s3.241 1 4.5 1c1.013 0 1.8 -.823 1.8 -2c0 -.285 -.049 -.697 -.146 -.962c-.475 -1.451 -2.512 -1.835 -3.454 -3.538z" />
-                                    <path d="M20.188 8.082a1.039 1.039 0 0 0 -.406 -.082h-.015c-.735 .012 -1.56 .75 -1.993 1.866c-.519 1.335 -.28 2.7 .538 3.052c.129 .055 .267 .082 .406 .082c.739 0 1.575 -.742 2.011 -1.866c.516 -1.335 .273 -2.7 -.54 -3.052z" />
-                                    <path d="M9.474 9c.055 0 .109 0 .163 -.011c.944 -.128 1.533 -1.346 1.32 -2.722c-.203 -1.297 -1.047 -2.267 -1.932 -2.267c-.055 0 -.109 0 -.163 .011c-.944 .128 -1.533 1.346 -1.32 2.722c.204 1.293 1.048 2.267 1.933 2.267z" />
-                                    <path d="M16.456 6.733c.214 -1.376 -.375 -2.594 -1.32 -2.722a1.164 1.164 0 0 0 -.162 -.011c-.885 0 -1.728 .97 -1.93 2.267c-.214 1.376 .375 2.594 1.32 2.722c.054 .007 .108 .011 .162 .011c.885 0 1.73 -.974 1.93 -2.267z" />
-                                    <path d="M5.69 12.918c.816 -.352 1.054 -1.719 .536 -3.052c-.436 -1.124 -1.271 -1.866 -2.009 -1.866c-.14 0 -.277 .027 -.407 .082c-.816 .352 -1.054 1.719 -.536 3.052c.436 1.124 1.271 1.866 2.009 1.866c.14 0 .277 -.027 .407 -.082z" />
-                                    </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Pets') }}
-                                    </span>
-                                </a>
-                            </li>
+                                        <li class="nav-item {{ request()->routeIs('pages.*') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('pages.index') }}">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-file"></i>
+                                                </span>
+                                                <span class="nav-link-title">Pages</span>
+                                            </a>
+                                        </li>
+                                    @endif
 
-                            <!-- PRODUCT -->
-
-                            <li class="nav-item {{ request()->is('products*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('products.index') }}">
-                                    <span
-                                        class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-packages" width="24"
-                                            height="24" viewBox="0 0 24 24" stroke-width="2"
-                                            stroke="currentColor" fill="none" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M7 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
-                                            <path d="M2 13.5v5.5l5 3" />
-                                            <path d="M7 16.545l5 -3.03" />
-                                            <path d="M17 16.5l-5 -3l5 -3l5 3v5.5l-5 3z" />
-                                            <path d="M12 19l5 3" />
-                                            <path d="M17 16.5l5 -3" />
-                                            <path d="M12 13.5v-5.5l-5 -3l5 -3l5 3v5.5" />
-                                            <path d="M7 5.03v5.455" />
-                                            <path d="M12 8l5 -3" />
-                                        </svg>
-                                    </span>
-                                    <span class="nav-link-title" style="z-index: 1;">
-                                        {{ __('Products') }}
-                                    </span>
-                                </a>
-                            </li>
-
-                            <!-- ORDERS -->
-                            <li class="nav-item {{ request()->is('orders*') ? 'active' : null }}">
-                                <a class="nav-link" href="{{ route('orders.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" 
-                                            class="icon icon-tabler icon-tabler-package-export" 
-                                            width="24" height="24" viewBox="0 0 24 24" 
-                                            stroke-width="2" stroke="currentColor" 
-                                            fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5" />
-                                            <path d="M12 12l8 -4.5" />
-                                </svg>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        {{ __('Orders') }}
-                                    </span>
-                                </a>
-                            </li>
-
-                            @if(Auth::user()->role === 'admin')
-                                <li class="nav-header">REPORTS</li>
-
-                                <!-- SALES -->
-                                <li class="nav-item {{ request()->is('sales*') ? 'active' : null }}">
-                                    <a class="nav-link" href="{{ route('sales.index') }}">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" 
-                                                height="24" viewBox="0 0 24 24" fill="none" 
-                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                                                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-report-money">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-                                                <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
-                                                <path d="M14 11h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5" />
-                                                <path d="M12 17v1m0 -8v1" />
-                                            </svg>
-                                        </span>
-                                        <span class="nav-link-title">
-                                            {{ __('Sales') }}
-                                        </span>
-                                    </a>
-                                </li>
-
-                                <!-- ANALYTICS -->
-                                <li class="nav-item {{ request()->is('analytics*') ? 'active' : null }}">
-                                    <a class="nav-link" href="{{ route('analytics.archives') }}">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" />
-                                                <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
-                                                <path d="M10 12l4 0" />
-                                            </svg>
-                                        </span>
-                                        <span class="nav-link-title">
-                                            {{ __('Archives') }}
-                                        </span>
-                                    </a>
-                                </li>
-
-                                <!-- PAGES -->
-                                <li class="nav-item {{ request()->is('pages*', 'suppliers*', 'categories*', 'units*') ? 'active' : null }}">
-                                    <a class="nav-link" href="{{ route('pages.index') }}">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="icon icon-tabler icon-tabler-layers-subtract" width="24"
-                                                height="24" viewBox="0 0 24 24" stroke-width="2"
-                                                stroke="currentColor" fill="none" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path
-                                                    d="M8 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
-                                                <path d="M16 16v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-8a2 2 0 0 1 2 -2h2" />
-                                            </svg>
-                                        </span>
-                                        <span class="nav-link-title" style="z-index: 1;">
-                                            {{ __('Pages') }}
-                                        </span>
-                                    </a>
-                                </li>
-
-                                <!-- SETTINGS -->
-                                <li class="nav-item {{ request()->is('settings*') ? 'active' : null }}">
-                                    <a class="nav-link" href="{{ route('settings.index') }}">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
-                                                <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-                                            </svg>
-                                        </span>
-                                        <span class="nav-link-title" style="z-index: 1;">
-                                            {{ __('Settings') }}
-                                        </span>
-                                    </a>
-                                </li>
+                                    <li class="nav-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('settings.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="fas fa-cog"></i>
+                                            </span>
+                                            <span class="nav-link-title">Settings</span>
+                                        </a>
+                                    </li>
+                                @endif
                             @endif
                         </ul>
                     </div>
