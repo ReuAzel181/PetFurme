@@ -40,38 +40,20 @@
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
-            @import url('https://rsms.me/inter/inter.css');
             :root {
-                --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
-            }
-            body {
-                font-feature-settings: "cv03", "cv04", "cv11";
+                --tblr-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             }
         </style>
-        @stack('page-styles')
+        @stack('styles')
     </head>
-    <body class="d-flex flex-column">
-        <script src="{{ asset('dist/js/demo-theme.min.js') }}"></script>
-
+    <body>
         <div class="page">
             @include('components.alert')
-
-            @if (session('status'))
-                <div class="alert alert-info alert-dismissible" role="alert">
-                    <h3 class="mb-1">Success</h3>
-                    <p>{{ session('status') }}</p>
-
-                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-                </div>
-            @endif
-
             @yield('content')
         </div>
 
-        <!-- Libs JS -->
-        <!-- Tabler Core -->
+        <!-- Core JS -->
         <script src="{{ asset('dist/js/tabler.min.js') }}" defer></script>
-        <script src="{{ asset('dist/js/demo.min.js') }}" defer></script>
-        @stack('page-scripts')
+        @stack('scripts')
     </body>
 </html>
