@@ -85,33 +85,25 @@ class OrderController extends Controller
         }
     }
 
-    public function destroy($uuid)
+    public function destroy(Order $order)
     {
         try {
             DB::beginTransaction();
-
-            // Find the order by uuid
-            $order = Order::where('uuid', $uuid)->firstOrFail();
-
-            // Instead of deleting, update the status and add deleted_at timestamp
-            $order->update([
-                'deleted_at' => now(),
-                'deletion_reason' => request('reason', 'Order deleted by user')
-            ]);
-
-            DB::commit();
             
-            return redirect()->route('orders.index')
-                ->with('success', "Order #{$order->invoice_no} has been marked as deleted.");
-
+            // First update the deleted_by field
+            $order->update([
+                'deleted_by' => auth()->id()
+            ]);
+            
+            // Then perform the soft delete
+            $order->delete();
+            
+            DB::commit();
+            return redirect()->back()->with('success', 'Order archived successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Delete error:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return redirect()->route('orders.index')
-                ->with('error', 'Error deleting order: ' . $e->getMessage());
+            \Log::error('Order deletion failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to archive order: ' . $e->getMessage());
         }
     }
 
@@ -347,5 +339,20 @@ class OrderController extends Controller
             ->paginate(10);
 
         return view('orders.deleted', compact('orders'));
+    }
+
+    public function restore($id)
+    {
+        try {
+            $order = Order::withTrashed()->findOrFail($id);
+            $order->restore();
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error restoring order: ' . $e->getMessage()
+            ], 500);
+        }
     }
 } 

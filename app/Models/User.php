@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     // Add role constants
     const ROLE_PET_OWNER = 'pet_owner';
@@ -45,7 +46,7 @@ class User extends Authenticatable
     }
 
     // A user can have many pets
-    public function pets(): HasMany
+    public function pets()
     {
         return $this->hasMany(Pet::class);
     }

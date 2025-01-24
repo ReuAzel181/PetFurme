@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->date('expiry_date')->nullable()->after('quantity_alert');
+        Schema::table('appointment', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('expiry_date');
+        Schema::table('appointment', function (Blueprint $table) {
+            $table->dropSoftDeletes();
         });
     }
 }; 

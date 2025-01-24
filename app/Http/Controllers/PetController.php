@@ -13,7 +13,9 @@ class PetController extends Controller
     public function index()
     {
         // Fetch all pets with their associated users
-        $pets = Pet::with('user')->get();
+        $pets = Pet::with(['appointments' => function($query) {
+            $query->orderBy('appointment_date', 'desc');
+        }, 'user'])->get();
 
             // Use the static methods for counts
         $totalPets = Pet::getTotalCount();
@@ -35,11 +37,14 @@ class PetController extends Controller
     // Show the form for creating a new pet
     public function create()
     {
-        // Fetch all users
+        // Fetch all users for the dropdown
         $users = User::all();
-    
-        // Pass the users to the view
-        return view('pet.create', compact('users'));
+        
+        // Initialize an empty Pet model
+        $pet = new Pet();
+        
+        // Use 'pet.create' instead of 'pets.create'
+        return view('pet.create', compact('users', 'pet'));
     }
     // Store a newly created pet in storage
     public function store(Request $request)
@@ -48,6 +53,9 @@ class PetController extends Controller
         $request->validate([
             'has_account' => 'required|in:yes,no',
         ]);
+
+        // Initialize the data array
+        $data = [];
 
         // Then validate the rest based on has_account value
         if ($request->has_account === 'yes') {
@@ -63,6 +71,9 @@ class PetController extends Controller
                 'notes' => 'nullable|string',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
+            
+            $data = $validated;
+            $data['owner_name'] = null;
         } else {
             $validated = $request->validate([
                 'owner_name' => 'required|string|max:255',
@@ -76,36 +87,27 @@ class PetController extends Controller
                 'notes' => 'nullable|string',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
+            
+            $data = $validated;
+            $data['user_id'] = null;
         }
 
-        // Handle file upload
-        $photoPath = null;
+        // Handle photo upload
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('pet_photos', 'public');
+            $photo = $request->file('photo');
+            $filename = time() . '_' . $photo->getClientOriginalName();
+            
+            // Store the file in the public disk under pet_photos directory
+            $path = $photo->storeAs('pet_photos', $filename, 'public');
+            
+            // Add the path to the data array
+            $data['photo'] = $path;
         }
 
-        // Convert age to months if years is selected
-        $age = $request->age;
-        if ($request->age_unit === 'years' && $age) {
-            $age = $age * 12; // Convert years to months
-        }
+        // Create the pet record
+        Pet::create($data);
 
-        // Create the pet with corrected owner_name logic
-        Pet::create([
-            'user_id' => $request->has_account === 'yes' ? $request->user_id : null,
-            'owner_name' => $request->has_account === 'no' ? $request->owner_name : null,
-            'name' => $request->name,
-            'category' => $request->category,
-            'gender' => $request->gender,
-            'breed' => $request->breed,
-            'age' => $age,
-            'weight' => $request->weight,
-            'allergies' => $request->allergies,
-            'notes' => $request->notes,
-            'photo' => $photoPath,
-        ]);
-
-        return redirect()->route('pets.index')->with('success', 'Pet added successfully!');
+        return redirect()->route('pets.index')->with('success', 'Pet created successfully!');
     }
 
     public function update(Request $request, Pet $pet)
@@ -123,12 +125,17 @@ class PetController extends Controller
             'photo' => 'nullable|image|max:2048',
         ]);
 
-        // Handle photo upload
+        // Update the image handling
         if ($request->hasFile('photo')) {
-            if ($pet->photo) {
+            // Delete old photo if exists
+            if ($pet->photo && Storage::disk('public')->exists($pet->photo)) {
                 Storage::disk('public')->delete($pet->photo);
             }
-            $pet->photo = $request->file('photo')->store('pet_photos', 'public');
+            
+            $file = $request->file('photo');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $photoPath = $file->storeAs('pet_photos', $filename, 'public');
+            $pet->photo = $photoPath;
         }
 
         // Convert age to months if years is selected
@@ -137,7 +144,7 @@ class PetController extends Controller
             $age = $age * 12; // Convert years to months
         }
 
-        // Update the pet with corrected owner_name logic
+        // Update the pet with corrected owner_name logic and type
         $updateData = [
             'name' => $request->name,
             'category' => $request->category,
@@ -166,11 +173,44 @@ class PetController extends Controller
     public function destroy(Pet $pet)
     {
         if ($pet->photo) {
-            Storage::disk('public')->delete($pet->photo); // Delete the photo
+            Storage::disk('public')->delete($pet->photo);
         }
 
+        $pet->deleted_by = auth()->id();
+        $pet->save();
+        
         $pet->delete();
 
         return redirect()->route('pets.index')->with('success', 'Pet deleted successfully!');
+    }
+
+    public function restore($id)
+    {
+        try {
+            $pet = Pet::withTrashed()->findOrFail($id);
+            $pet->restore();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pet restored successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to restore pet'
+            ], 500);
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        try {
+            $pet = Pet::withTrashed()->findOrFail($id);
+            $pet->forceDelete();
+            
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }

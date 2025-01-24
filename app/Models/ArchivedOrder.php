@@ -25,7 +25,8 @@ class ArchivedOrder extends Model
         'payment_note',
         'archive_reason',
         'archive_note',
-        'archived_at'
+        'archived_at',
+        'deleted_by'
     ];
     
     protected $casts = [
@@ -48,5 +49,10 @@ class ArchivedOrder extends Model
     public function scopeByReason($query, $reason)
     {
         return $query->where('archive_reason', $reason);
+    }
+
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 } 

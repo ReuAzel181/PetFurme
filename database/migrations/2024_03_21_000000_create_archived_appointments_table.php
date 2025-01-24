@@ -8,11 +8,14 @@ return new class extends Migration
 {
     public function up()
     {
+        // Drop the table if it exists
+        Schema::dropIfExists('archived_appointments');
+
         Schema::create('archived_appointments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('original_id');
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('pet_id')->nullable()->constrained('pets')->onDelete('set null');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('pet_id')->nullable();
             $table->string('owner_name')->nullable();
             $table->string('pet_name')->nullable();
             $table->date('appointment_date');

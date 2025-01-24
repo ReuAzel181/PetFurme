@@ -9,6 +9,7 @@
     // Bwiset eto lang pala
     use App\Http\Controllers\MessageController;
     use App\Http\Controllers\Dashboards\DashboardController;
+    use App\Http\Controllers\AppointmentController;
 
     // For the login and logout routes
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('api.login');
@@ -34,3 +35,5 @@
     })->name('api.user.pets');
 
     Route::get('/statistics', [DashboardController::class, 'getStatistics'])->name('api.statistics');
+
+    Route::get('/appointments/dates', [AppointmentController::class, 'getDates']);

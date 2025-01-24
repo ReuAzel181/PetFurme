@@ -68,15 +68,11 @@
 
                     <!-- Category -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Category <span class="text-danger">*</span></label>
+                        <label class="form-label">Pet Type <span class="text-danger">*</span></label>
                         <select name="category" class="form-select" required>
-                            <option value="">Select Category</option>
-                            <option value="Dog">Dog</option>
-                            <option value="Cat">Cat</option>
-                            <option value="Bird">Bird</option>
-                            <option value="Fish">Fish</option>
-                            <option value="Reptile">Reptile</option>
-                            <option value="Amphibian">Amphibian</option>
+                            <option value="">Select Pet Type</option>
+                            <option value="Dog">Canine</option>
+                            <option value="Cat">Feline</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
@@ -125,7 +121,10 @@
                     <!-- Photo -->
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Photo</label>
-                        <input type="file" name="photo" class="form-control" accept="image/*">
+                        <input type="file" name="photo" id="photo" class="form-control" accept="image/*" onchange="previewImage(this)">
+                        <div class="mt-2">
+                            <img id="preview" src="#" alt="Preview" style="display: none; max-width: 200px;" class="img-fluid">
+                        </div>
                     </div>
 
                     <!-- Allergies -->
@@ -164,6 +163,12 @@
                     </a>
                 </div>
             </form>
+
+            @if($pet->photo)
+                <img src="{{ asset('storage/' . $pet->photo) }}" alt="{{ $pet->name }}" class="img-fluid">
+            @else
+                <img src="{{ asset('images/default-pet.jpg') }}" alt="Default pet image" class="img-fluid">
+            @endif
         </div>
     </div>
 </div>
@@ -174,6 +179,18 @@
         document.getElementById('existingUserSection').style.display = hasAccount === 'yes' ? 'block' : 'none';
         document.getElementById('newUserSection').style.display = hasAccount === 'no' ? 'block' : 'none';
     });
+
+    function previewImage(input) {
+        var preview = document.getElementById('preview');
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 </script>
 
 @endsection

@@ -32,7 +32,14 @@ class Order extends Model
         'change_amount',
         'paid_at',
         'deleted_at',
-        'deletion_reason'
+        'deletion_reason',
+        'deleted_by'
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
     protected $casts = [
@@ -44,7 +51,8 @@ class Order extends Model
         'amount_received' => 'decimal:2',
         'change_amount' => 'decimal:2',
         'completed_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
+        'uuid' => 'string',
     ];
 
     protected $with = ['details', 'details.product'];
@@ -136,5 +144,13 @@ class Order extends Model
             'cancelled' => 'danger',
             default => 'secondary'
         };
+    }
+
+    /**
+     * Get the user who deleted the order
+     */
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 }

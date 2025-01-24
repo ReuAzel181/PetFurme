@@ -18,7 +18,8 @@ class AppointmentController extends Controller
                 DB::raw('CASE 
                     WHEN users.id IS NOT NULL THEN users.name
                     ELSE appointment.owner_name
-                END as display_name')
+                END as display_name'),
+                DB::raw('DATE(appointment_date) as appointment_date_display')
             )
             ->leftJoin('users', 'appointment.user_id', '=', 'users.id')
             ->get();
@@ -38,7 +39,8 @@ class AppointmentController extends Controller
                 DB::raw('CASE 
                     WHEN users.id IS NOT NULL THEN users.name
                     ELSE archived_appointments.owner_name
-                END as display_name')
+                END as display_name'),
+                DB::raw('DATE(appointment_date) as appointment_date_display')
             )
             ->orderBy('archived_at', 'desc')
             ->get();
@@ -51,40 +53,99 @@ class AppointmentController extends Controller
 
     public function create()
     {
+        // Get all users with role 'pet_owner', including those without pets yet
         $users = User::where('role', 'pet_owner')
-            ->with(['pets' => function($query) {
-                $query->select('id', 'user_id', 'name', 'age', 'category');
-            }])
-            ->get(['id', 'name', 'email']);
-
-        return view('appointment.create', compact('users'));
+            ->orderBy('name')
+            ->get();
+        
+        $pets = Pet::with('user')  // Eager load user relationship
+            ->orderBy('name')
+            ->get();
+        
+        return view('appointment.create', compact('users', 'pets'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'user_id' => 'nullable|exists:users,id',
-            'owner_name' => 'required_without:user_id|string|max:255',
-            'pet_id' => 'nullable|exists:pets,id',
-            'pet_name' => 'required_without:pet_id|string|max:255',
+        $rules = [
             'appointment_date' => 'required|date',
             'appointment_time' => 'required',
-            'reason_for_visit' => 'required|string', // JSON-encoded string
-        ]);
+            'reason_for_visit' => 'required|string',
+            'notes' => 'nullable|string',
+        ];
 
-        // Create the appointment
-        Appointment::create([
-            'user_id' => $request->user_id,
-            'owner_name' => $request->user_id ? null : $request->owner_name,
-            'pet_id' => $request->pet_id,
-            'pet_name' => $request->pet_name,
-            'appointment_date' => $request->appointment_date,
-            'appointment_time' => $request->appointment_time,
-            'reason_for_visit' => $request->reason_for_visit, // Already JSON encoded from frontend
-        ]);
+        // Add conditional validation rules based on whether it's a walk-in or registered user
+        if ($request->user_id === 'no_account') {
+            $rules = array_merge($rules, [
+                'owner_name' => 'required|string',
+                'walkin_pet_name' => 'required|string',
+                'walkin_pet_type' => 'required|string',
+                'walkin_pet_age' => 'required|numeric|min:0',
+                'walkin_age_unit' => 'required|in:years,months',
+            ]);
+        } else {
+            $rules = array_merge($rules, [
+                'user_id' => 'required|exists:users,id',
+                'pet_id' => 'required|exists:pets,id',
+            ]);
+        }
 
-        return redirect()->route('appointment.index')
-            ->with('success', 'Appointment created successfully.');
+        $validated = $request->validate($rules);
+
+        try {
+            DB::beginTransaction();
+
+            $appointment = new Appointment();
+            
+            if ($request->user_id === 'no_account') {
+                // Handle walk-in appointment
+                $appointment->owner_name = $validated['owner_name'];
+                $appointment->pet_name = $validated['walkin_pet_name'];
+                $appointment->pet_type = $validated['walkin_pet_type'];
+                
+                // Convert age to months if years is selected
+                $age = $validated['walkin_pet_age'];
+                if ($validated['walkin_age_unit'] === 'years') {
+                    $age = $age * 12;
+                }
+                $appointment->pet_age = $age;
+                
+                $appointment->user_id = null;
+                $appointment->pet_id = null;
+            } else {
+                // Handle registered user appointment
+                $appointment->user_id = $validated['user_id'];
+                $appointment->pet_id = $validated['pet_id'];
+                // Get pet details from the database
+                $pet = Pet::findOrFail($validated['pet_id']);
+                $appointment->pet_name = $pet->name;
+                $appointment->pet_type = $pet->category;
+                $appointment->pet_age = $pet->age; // Assuming pet age is already in months in the database
+            }
+
+            $appointment->appointment_date = $validated['appointment_date'];
+            $appointment->appointment_time = $validated['appointment_time'];
+            $appointment->reason_for_visit = $validated['reason_for_visit'];
+            $appointment->notes = $validated['notes'] ?? null;
+            $appointment->deleted_by = null;
+
+            $appointment->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment scheduled successfully!',
+                'redirect' => route('appointment.index')
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating appointment: ' . $e->getMessage()
+            ], 422);
+        }
     }
 
     public function edit($id)
@@ -134,55 +195,34 @@ class AppointmentController extends Controller
 
     public function restore($id)
     {
-        $archived = DB::table('archived_appointments')->where('id', $id)->first();
-        
-        if (!$archived) {
-            return redirect()->back()->with('error', 'Archived appointment not found.');
+        try {
+            $appointment = Appointment::withTrashed()->findOrFail($id);
+            $appointment->restore();
+
+            return redirect()->back()->with('success', 'Appointment restored successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error restoring appointment: ' . $e->getMessage());
         }
-
-        // Restore to appointments table
-        Appointment::create([
-            'user_id' => $archived->user_id,
-            'pet_id' => $archived->pet_id,
-            'owner_name' => $archived->owner_name,
-            'pet_name' => $archived->pet_name,
-            'appointment_date' => $archived->appointment_date,
-            'appointment_time' => $archived->appointment_time,
-            'reason_for_visit' => $archived->reason_for_visit
-        ]);
-
-        // Remove from archive
-        DB::table('archived_appointments')->where('id', $id)->delete();
-
-        return redirect()->route('appointment.index')
-            ->with('success', 'Appointment restored successfully.');
     }
 
-    public function destroy($id)
+    public function destroy(Appointment $appointment)
     {
-        $appointment = Appointment::findOrFail($id);
-        
-        // Insert into archived_appointments as cancelled
-        DB::table('archived_appointments')->insert([
-            'original_id' => $appointment->id,
-            'user_id' => $appointment->user_id,
-            'pet_id' => $appointment->pet_id,
-            'owner_name' => $appointment->owner_name,
-            'pet_name' => $appointment->pet_name,
-            'appointment_date' => $appointment->appointment_date,
-            'appointment_time' => $appointment->appointment_time,
-            'reason_for_visit' => $appointment->reason_for_visit,
-            'status' => 'cancelled',
-            'archived_at' => now(),
-            'created_at' => $appointment->created_at,
-            'updated_at' => now()
-        ]);
-
-        // Delete from original table
-        $appointment->delete();
-
-        return redirect()->route('appointment.index')
-            ->with('success', 'Appointment cancelled and archived.');
+        try {
+            DB::beginTransaction();
+            
+            // Set deleted_by before soft deleting
+            $appointment->update([
+                'deleted_by' => auth()->id()
+            ]);
+            
+            $appointment->delete();
+            
+            DB::commit();
+            return redirect()->back()->with('success', 'Appointment archived successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to archive appointment.');
+        }
     }
 
     public function markAsCompleted(Request $request, $id)
@@ -231,5 +271,18 @@ class AppointmentController extends Controller
         return view('appointment.completed', [
             'appointments' => $completedAppointments
         ]);
+    }
+
+    public function getDates()
+    {
+        $dates = Appointment::select('appointment_date')
+            ->where('appointment_date', '>=', now()->format('Y-m-d'))
+            ->distinct()
+            ->pluck('appointment_date')
+            ->map(function($date) {
+                return $date->format('Y-m-d');
+            });
+
+        return response()->json(['dates' => $dates]);
     }
 }

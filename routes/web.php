@@ -36,6 +36,9 @@ use App\Services\MessageService;
 use Supabase\CreateClient;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\AnalyticsController;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ArchivesController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -138,7 +141,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
  Route::post('/appointment', [AppointmentController::class, 'store'])->name('appointment.store');
  Route::get('/appointment/{id}/edit', [AppointmentController::class, 'edit'])->name('appointment.edit');
  Route::put('/appointment/{id}', [AppointmentController::class, 'update'])->name('appointment.update');
- Route::delete('/appointment/{id}', [AppointmentController::class, 'destroy'])->name('appointment.destroy');
+ Route::delete('/appointment/{appointment}', [AppointmentController::class, 'destroy'])->name('appointment.destroy');
 
 // Route Pet and Sales
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -239,8 +242,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/cart/totals', [CartController::class, 'getCartTotals'])->name('cart.totals');
 
     // Orders routes - make sure archived route is before resource route
-    Route::get('/orders/archived', [OrderController::class, 'archived'])->name('orders.archived');
-    Route::delete('/orders/{uuid}/delete', [OrderController::class, 'destroy'])->name('orders.destroy');
+    // Route::get('/orders/archived', [OrderController::class, 'archived'])->name('orders.archived');
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])
+        ->name('orders.destroy')
+        ->whereUuid('order');
     Route::resource('orders', OrderController::class)->except(['destroy']);
 
     // Add these routes for appointments
@@ -371,6 +376,7 @@ Route::get('/orders/deleted', [OrderController::class, 'deleted'])->name('orders
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
+    Route::get('/analytics/archives', [ArchivesController::class, 'index'])->name('analytics.archives');
     Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     
@@ -382,3 +388,34 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/backup', [SettingsController::class, 'backup'])->name('backup');
     });
 });
+
+Route::post('/pets/{pet}/restore', [PetController::class, 'restore'])->name('pets.restore');
+Route::delete('/pets/{id}/force-delete', [PetController::class, 'forceDelete'])->name('pets.forceDelete');
+
+Route::get('/storage-test', function() {
+    $path = 'pet_photos/test.txt';
+    
+    // Try to write a test file
+    Storage::disk('public')->put($path, 'test');
+    
+    return [
+        'file_written' => Storage::disk('public')->exists($path),
+        'storage_path' => Storage::disk('public')->path($path),
+        'public_url' => asset('storage/' . $path),
+        'storage_link_exists' => file_exists(public_path('storage')),
+    ];
+});
+
+Route::post('/orders/{id}/restore', [OrderController::class, 'restore'])
+    ->name('orders.restore');
+
+Route::post('/appointments/{appointment}/restore', [AppointmentController::class, 'restore'])
+    ->name('appointment.restore');
+
+// Add these routes
+Route::get('/appointments/{id}/restore', [ArchivesController::class, 'restoreAppointment'])->name('appointments.restore');
+Route::get('/appointments/{id}/view', [ArchivesController::class, 'viewAppointment'])->name('appointments.view');
+
+// Appointment routes
+Route::resource('appointments', AppointmentController::class);
+Route::get('appointments/create/{pet_id?}', [AppointmentController::class, 'create'])->name('appointments.create');

@@ -8,18 +8,15 @@ return new class extends Migration
 {
     public function up()
     {
-        // Temporarily disable foreign key checks
-        Schema::disableForeignKeyConstraints();
-
-        // Drop and recreate the pets table
         Schema::dropIfExists('pets');
-
+        
         Schema::create('pets', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('owner_name')->nullable();
             $table->string('name');
             $table->string('category');
+            $table->string('type')->default('client');
             $table->string('gender')->nullable();
             $table->string('breed')->nullable();
             $table->integer('age')->nullable();
@@ -35,9 +32,6 @@ return new class extends Migration
                   ->on('users')
                   ->onDelete('cascade');
         });
-
-        // Re-enable foreign key checks
-        Schema::enableForeignKeyConstraints();
     }
 
     public function down()

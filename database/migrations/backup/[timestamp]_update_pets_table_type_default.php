@@ -8,21 +8,21 @@ return new class extends Migration
 {
     public function up()
     {
-        // First, make type nullable
         Schema::table('pets', function (Blueprint $table) {
-            $table->string('type')->nullable()->change();
-        });
-
-        // Then drop it
-        Schema::table('pets', function (Blueprint $table) {
-            $table->dropColumn('type');
+            if (!Schema::hasColumn('pets', 'type')) {
+                $table->string('type')->default('client');
+            } else {
+                $table->string('type')->default('client')->change();
+            }
         });
     }
 
     public function down()
     {
         Schema::table('pets', function (Blueprint $table) {
-            $table->string('type')->nullable();
+            if (Schema::hasColumn('pets', 'type')) {
+                $table->string('type')->default(null)->change();
+            }
         });
     }
 }; 

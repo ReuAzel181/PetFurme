@@ -9,13 +9,13 @@ return new class extends Migration
 {
     public function up()
     {
-        // First, modify the enum values
-        DB::statement("ALTER TABLE archived_orders MODIFY COLUMN archive_reason ENUM('completed', 'cancelled') DEFAULT 'completed'");
+        // First, modify the enum values to include 'deleted'
+        DB::statement("ALTER TABLE archived_orders MODIFY COLUMN archive_reason ENUM('completed', 'cancelled', 'deleted') DEFAULT 'completed'");
     }
 
     public function down()
     {
         // Revert the changes if needed
-        DB::statement("ALTER TABLE archived_orders MODIFY COLUMN archive_reason ENUM('deleted', 'completed') DEFAULT 'deleted'");
+        DB::statement("ALTER TABLE archived_orders MODIFY COLUMN archive_reason ENUM('completed', 'cancelled') DEFAULT 'completed'");
     }
 }; 
