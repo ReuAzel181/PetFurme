@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pet;
 use App\Models\Order;
 use App\Models\Appointment;
+use App\Models\ArchivedOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,21 +14,13 @@ class ArchivesController extends Controller
     public function index()
     {
         $archivedPets = Pet::onlyTrashed()
+            ->with(['user', 'deletedBy'])
             ->orderBy('deleted_at', 'desc')
             ->paginate(10);
 
-        $archivedOrders = Order::onlyTrashed()
-            ->with(['user' => function($query) {
-                $query->withTrashed();
-            }, 'deletedBy' => function($query) {
-                $query->withTrashed();
-            }])
-            ->orderBy('deleted_at', 'desc')
-            ->paginate(10)
-            ->through(function ($order) {
-                $order->deleted_at = $order->deleted_at ? \Carbon\Carbon::parse($order->deleted_at) : null;
-                return $order;
-            });
+        $archivedOrders = ArchivedOrder::with(['archivedDetails', 'deletedBy'])
+            ->orderBy('archived_at', 'desc')
+            ->paginate(10);
 
         $archivedAppointments = Appointment::onlyTrashed()
             ->with(['user' => function($query) {

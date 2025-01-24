@@ -46,13 +46,13 @@ class ArchivedOrder extends Model
         return $this->hasMany(ArchivedOrderDetail::class, 'archived_order_id');
     }
 
-    public function scopeByReason($query, $reason)
-    {
-        return $query->where('archive_reason', $reason);
-    }
-
     public function deletedBy()
     {
         return $this->belongsTo(User::class, 'deleted_by');
+    }
+
+    public function scopeByReason($query, $reason)
+    {
+        return $query->where('archive_reason', $reason);
     }
 } 

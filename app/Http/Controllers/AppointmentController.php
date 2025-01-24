@@ -126,7 +126,7 @@ class AppointmentController extends Controller
             $appointment->appointment_date = $validated['appointment_date'];
             $appointment->appointment_time = $validated['appointment_time'];
             $appointment->reason_for_visit = $validated['reason_for_visit'];
-            $appointment->notes = $validated['notes'] ?? null;
+            $appointment->notes = $validated['notes'] ?? '';
             $appointment->deleted_by = null;
 
             $appointment->save();

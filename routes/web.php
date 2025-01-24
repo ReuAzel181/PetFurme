@@ -38,6 +38,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ArchivesController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -418,3 +419,8 @@ Route::get('/appointments/{id}/view', [ArchivesController::class, 'viewAppointme
 // Appointment routes
 Route::resource('appointments', AppointmentController::class);
 Route::get('appointments/create/{pet_id?}', [AppointmentController::class, 'create'])->name('appointments.create');
+
+// Add these routes if they don't exist
+Route::get('/analytics/archives', [ArchivesController::class, 'index'])->name('analytics.archives');
+Route::get('/appointments/{id}/restore', [ArchivesController::class, 'restoreAppointment'])->name('appointments.restore');
+Route::get('/appointments/{id}/view', [ArchivesController::class, 'viewAppointment'])->name('appointments.view');

@@ -185,161 +185,205 @@
 
                         <!-- Pet Details Div (Hidden by default) -->
                         <div id="petDetails{{ $pet->id }}" class="pet-details-popup" style="display: none;">
-                            <div class="card border-0 shadow">
-                                <!-- Add a colorful header banner -->
-                                <div class="card-banner bg-primary text-white p-5 position-relative overflow-hidden">
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <span class="avatar avatar-xl avatar-rounded border-white border-4" style="background-image: url({{ $pet->photo ? asset('storage/' . $pet->photo) : asset('images/default-pet.png') }})"></span>
-                                        </div>
-                                        <div class="col">
+                            <div class="card border-0">
+                                <!-- Header Section with gradient background -->
+                                <div class="pet-details-header position-relative p-4">
+                                    <div class="d-flex align-items-center position-relative z-1">
+                                        <span class="avatar avatar-xl avatar-rounded border-white border-3 me-3" 
+                                              style="background-image: url({{ $pet->photo ? asset('storage/' . $pet->photo) : asset('images/default-pet.png') }})">
+                                        </span>
+                                        <div class="text-white">
                                             <h2 class="mb-0">{{ $pet->name }}</h2>
-                                            <div class="mt-2">
-                                                <span class="badge bg-white text-primary">{{ $pet->category }}</span>
-                                                <span class="badge bg-white text-primary">{{ $pet->breed }}</span>
-                                                <span class="badge bg-white text-{{ $pet->gender === 'Male' ? 'azure' : 'pink' }}">{{ $pet->gender }}</span>
+                                            <div class="d-flex align-items-center mt-2">
+                                                <span class="badge bg-white bg-opacity-20 me-2">{{ $pet->category }}</span>
+                                                <span class="badge bg-white bg-opacity-20">{{ $pet->breed }}</span>
                                             </div>
                                         </div>
+                                        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" onclick="hideAllPetDetails()"></button>
                                     </div>
-                                    <!-- Add decorative elements -->
-                                    <div class="position-absolute top-0 end-0 p-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-paw opacity-25" width="100" height="100" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <!-- Decorative element -->
+                                    <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-pet" width="100" height="100" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none">
                                             <path d="M14.7 13.5c-1.1 1.4-2.3 2.5-3.7 2.5-1.4 0-2.6-1.1-3.7-2.5-2.2-2.8-3.3-6.5-3.3-8.5 0-1.1.9-2 2-2 .8 0 1.5.4 1.8 1.1l.2.4c.3.7 1 1.2 1.8 1.2.8 0 1.5-.5 1.8-1.2l.2-.4c.3-.7 1-1.1 1.8-1.1 1.1 0 2 .9 2 2 0 2-1.1 5.7-3.3 8.5z"/>
                                         </svg>
                                     </div>
-                                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" onclick="hideAllPetDetails()"></button>
                                 </div>
 
-                                <div class="card-body p-4">
-                                    <div class="row g-3">
-                                        <!-- Basic Information -->
+                                <!-- Content Section -->
+                                <div class="p-4">
+                                    <div class="row g-4">
+                                        <!-- Left Column - Pet Details -->
                                         <div class="col-md-6">
-                                            <div class="card card-sm shadow-sm border-0 h-100 bg-azure-lt">
-                                                <div class="card-body">
-                                                    <h3 class="card-title text-azure d-flex align-items-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-circle me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <div class="info-card bg-azure-lt">
+                                                <div class="info-card-header">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-circle me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                                                             <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
                                                             <path d="M12 8l.01 0"></path>
                                                             <path d="M11 12l1 0l0 4l1 0"></path>
                                                         </svg>
-                                                        Basic Information
-                                                    </h3>
-                                                    <div class="mb-2">
-                                                        <span class="text-muted">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                <path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/>
-                                                                <path d="M16 3v4"/>
-                                                                <path d="M8 3v4"/>
-                                                                <path d="M4 11h16"/>
-                                                                <path d="M12 12v3l2 2"/>
-                                                            </svg>
-                                                            Age:
-                                                        </span>
-                                                        <strong>{{ floor($pet->age/12) }} years {{ $pet->age % 12 }} months</strong>
+                                                    Pet Details
                                                     </div>
-                                                    <div class="mb-2">
-                                                        <span class="text-muted">Weight: </span>
-                                                        <strong>{{ $pet->weight }} kg</strong>
+                                                <div class="info-card-body">
+                                                    <div class="info-item">
+                                                        <span class="info-label">Age</span>
+                                                        <span class="info-value">{{ floor($pet->age/12) }}y {{ $pet->age % 12 }}m</span>
                                                     </div>
-                                                    <div class="mb-2">
-                                                        <span class="text-muted">Allergies: </span>
-                                                        <strong>{{ $pet->allergies ?? 'None' }}</strong>
+                                                    <div class="info-item">
+                                                        <span class="info-label">Weight</span>
+                                                        <span class="info-value">{{ $pet->weight }} kg</span>
                                                     </div>
-                                                    @if($pet->notes)
-                                                    <div class="mb-2">
-                                                        <span class="text-muted">Special Notes: </span>
-                                                        <strong>{{ $pet->notes }}</strong>
+                                                    @if($pet->allergies)
+                                                    <div class="info-item">
+                                                        <span class="info-label">Allergies</span>
+                                                        <span class="info-value">{{ $pet->allergies }}</span>
                                                     </div>
                                                     @endif
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Owner Information -->
+                                        <!-- Right Column - Owner Information -->
                                         <div class="col-md-6">
-                                            <div class="card card-sm shadow-sm border-0 h-100 bg-purple-lt">
-                                                <div class="card-body">
-                                                    <h3 class="card-title text-purple d-flex align-items-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <div class="info-card bg-purple-lt">
+                                                <div class="info-card-header">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                                                         <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
                                                         <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
                                                         <path d="M6.168 18.849a4 4 0 0 1 3.832-2.849h4a4 4 0 0 1 3.834 2.855"/>
                                                     </svg>
                                                         Owner Information
-                                                    </h3>
-                                                    <div class="mb-2">
-                                                        <span class="text-muted">Name: </span>
-                                                        <strong>{{ $pet->user ? $pet->user->name : $pet->owner_name }}</strong>
+                                                </div>
+                                                <div class="info-card-body">
+                                                    <div class="info-item">
+                                                        <span class="info-label">Name</span>
+                                                        <span class="info-value">{{ $pet->user ? $pet->user->name : $pet->owner_name }}</span>
                                                     </div>
                                                     @if($pet->user)
-                                                        <div class="mb-2">
-                                                            <span class="text-muted">Email: </span>
-                                                            <strong>{{ $pet->user->email }}</strong>
+                                                    <div class="info-item">
+                                                        <span class="info-label">Email</span>
+                                                        <span class="info-value">{{ $pet->user->email }}</span>
                                                         </div>
-                                                        <div class="mb-2">
-                                                            <span class="text-muted">Phone: </span>
-                                                            <strong>{{ $pet->user->phone ?? 'Not provided' }}</strong>
+                                                    @if($pet->user->phone)
+                                                    <div class="info-item">
+                                                        <span class="info-label">Phone</span>
+                                                        <span class="info-value">{{ $pet->user->phone }}</span>
                                                         </div>
-                                                        <div class="mb-2">
-                                                            <span class="text-muted">Address: </span>
-                                                            <strong>{{ $pet->user->address ?? 'Not provided' }}</strong>
-                                                        </div>
+                                                    @endif
                                                     @endif
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Appointment History with new styling -->
+                                        <!-- Appointments Section -->
                                         <div class="col-12">
-                                            <div class="card shadow-sm border-0">
-                                                <div class="card-header bg-green-lt border-0">
-                                                    <h3 class="card-title text-green d-flex align-items-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-stats me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <div class="info-card">
+                                                <div class="info-card-header d-flex justify-content-between align-items-center">
+                                                    <div class="d-flex align-items-center">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                                                             <path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/>
                                                             <path d="M16 3v4"/>
                                                             <path d="M8 3v4"/>
                                                             <path d="M4 11h16"/>
-                                                            <path d="M8 14v3"/>
-                                                            <path d="M12 14v3"/>
-                                                            <path d="M16 14v3"/>
                                                         </svg>
-                                                        Appointment History
-                                                    </h3>
-                                                    <a href="{{ route('appointments.create', ['pet_id' => $pet->id]) }}" class="btn btn-primary btn-sm">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                            <path d="M12 5v14M5 12h14"/>
-                                                        </svg>
-                                                        Schedule Appointment
+                                                        Appointments
+                                                    </div>
+                                                    <a href="{{ route('appointments.create', ['pet_id' => $pet->id]) }}" class="btn btn-primary">
+                                                        Schedule Now
                                                     </a>
                                                 </div>
-                                                <div class="card-body">
+                                                <div class="info-card-body">
                                                     @if($pet->appointments && $pet->appointments->count() > 0)
-                                                        <div class="timeline">
-                                                            @foreach($pet->appointments->sortByDesc('appointment_date') as $appointment)
-                                                                <div class="timeline-event">
-                                                                    <div class="timeline-event-icon">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-stethoscope" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                            <path d="M6 4h-1a2 2 0 0 0-2 2v3.5h0a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0-2-2h-1"/>
-                                                                            <path d="M8 15a6 6 0 1 0 12 0v-3"/>
-                                                                            <path d="M11 3v2"/>
-                                                                            <path d="M6 3v2"/>
-                                                                            <path d="M20 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0"/>
-                                                                        </svg>
-                                                                    </div>
-                                                                    <div class="timeline-event-card">
-                                                                        <div class="text-muted small">{{ $appointment->appointment_date->format('M d, Y') }}</div>
-                                                                        <div class="font-weight-bold">{{ $appointment->service_type }}</div>
-                                                                        @if($appointment->notes)
-                                                                            <div class="text-muted mt-1">{{ $appointment->notes }}</div>
-                                                                        @endif
+                                                        <div class="appointment-timeline">
+                                                            @foreach($pet->appointments->sortByDesc('appointment_date')->take(3) as $appointment)
+                                                            <div class="appointment-item">
+                                                                <div class="appointment-date">
+                                                                    <div class="date-badge">
+                                                                        <div class="month">{{ $appointment->appointment_date->format('M') }}</div>
+                                                                        <div class="day">{{ $appointment->appointment_date->format('d') }}</div>
+                                                                        <div class="year text-muted">{{ $appointment->appointment_date->format('Y') }}</div>
                                                                     </div>
                                                                 </div>
+                                                                <div class="appointment-content">
+                                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                                        @php
+                                                                            $serviceTypeColor = match($appointment->service_type) {
+                                                                                'Checkup' => 'blue',
+                                                                                'Vaccination' => 'green',
+                                                                                'Surgery' => 'red',
+                                                                                'Grooming' => 'purple',
+                                                                                default => 'azure'
+                                                                            };
+                                                                        @endphp
+                                                                        <span class="service-type-icon bg-{{ $serviceTypeColor }}-lt">
+                                                                            @switch($appointment->service_type)
+                                                                                @case('Checkup')
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-stethoscope" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                                        <path d="M6 4h-1a2 2 0 0 0 -2 2v3.5h0a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1" />
+                                                                                        <path d="M8 15a6 6 0 1 0 12 0v-3" />
+                                                                                        <path d="M11 3v2" />
+                                                                                        <path d="M6 3v2" />
+                                                                                        <path d="M20 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                                                                    </svg>
+                                                                                    @break
+                                                                                @case('Vaccination')
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-vaccine" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                                        <path d="M17 3l4 4" />
+                                                                                        <path d="M19 5l-4.5 4.5" />
+                                                                                        <path d="M11.5 6.5l6 6" />
+                                                                                        <path d="M16.5 11.5l-6.5 6.5h-4v-4l6.5 -6.5" />
+                                                                                        <path d="M7.5 12.5l1.5 1.5" />
+                                                                                        <path d="M10.5 9.5l1.5 1.5" />
+                                                                                        <path d="M3 21l3 -3" />
+                                                                                    </svg>
+                                                                                    @break
+                                                                                @case('Surgery')
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-emergency-bed" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                                        <path d="M16 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                                                                        <path d="M8 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                                                                        <path d="M4 8l2.1 2.8a3 3 0 0 0 2.4 1.2h11.5" />
+                                                                                        <path d="M10 6h4" />
+                                                                                        <path d="M12 4v4" />
+                                                                                    </svg>
+                                                                                    @break
+                                                                                @case('Grooming')
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cut" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                                        <path d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                                                                        <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                                                                        <path d="M9.15 14.85l8.85 -8.85" />
+                                                                                        <path d="M6 4l8.85 8.85" />
+                                                                                    </svg>
+                                                                                    @break
+                                                                                @default
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                                        <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z" />
+                                                                                    </svg>
+                                                                            @endswitch
+                                                                        </span>
+                                                                        <span class="h4 mb-0">{{ $appointment->service_type }}</span>
+                                                                    </div>
+                                                                    @if($appointment->reason_for_visit)
+                                                                    <div class="text-muted mb-2 reason-text">
+                                                                        <strong>Reason:</strong> 
+                                                                        @if(is_array($appointment->reason_for_visit))
+                                                                            {{ implode(', ', $appointment->reason_for_visit) }}
+                                                                        @else
+                                                                            {{ $appointment->reason_for_visit }}
+                                                                        @endif
+                                                                    </div>
+                                                                    @endif
+                                                                    @if($appointment->notes)
+                                                                    <div class="text-muted small">
+                                                                        <strong>Notes:</strong> {{ $appointment->notes }}
+                                                                    </div>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
                                                             @endforeach
                                                         </div>
                                                     @else
-                                                        <div class="empty">
-                                                            <div class="empty-icon text-muted">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-off" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <div class="empty-state">
+                                                            <div class="empty-state-icon">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-off" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                                                                     <path d="M19.823 19.824a2 2 0 0 1-1.823 1.176h-12a2 2 0 0 1-2-2v-12a2 2 0 0 1 1.175-1.823m3.825-.177h9a2 2 0 0 1 2 2v9"/>
                                                                     <path d="M16 3v4"/>
                                                                     <path d="M8 3v1"/>
@@ -347,10 +391,7 @@
                                                                     <path d="M3 3l18 18"/>
                                                                 </svg>
                                                             </div>
-                                                            <p class="empty-title">No appointments yet</p>
-                                                            <p class="empty-subtitle text-muted">
-                                                                Click the button above to schedule an appointment
-                                                            </p>
+                                                            <p>No appointments scheduled yet</p>
                                                         </div>
                                                     @endif
                                                 </div>
@@ -382,68 +423,26 @@
     transform: translate(-50%, -50%);
     z-index: 1000;
     width: 90%;
-    max-width: 1000px;
+    max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
     background: white;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    border-radius: 0.5rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
-.timeline {
-    position: relative;
-    padding: 1rem 0;
+.list-group-flush .list-group-item {
+    border-color: #f0f0f0;
 }
 
-.timeline-event {
-    position: relative;
-    padding-left: 2.5rem;
-    padding-bottom: 1.5rem;
-    border-left: 2px solid #e9ecef;
-    margin-left: 1rem;
+.avatar-lg {
+    width: 64px;
+    height: 64px;
 }
 
-.timeline-event:last-child {
-    padding-bottom: 0;
-}
-
-.timeline-event-icon {
-    position: absolute;
-    left: -1.25rem;
-    top: 0;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background: #206bc4;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-}
-
-.timeline-event-card {
-    background: #f8f9fa;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    margin-left: 1rem;
-}
-
-.empty-icon {
-    width: 5rem;
-    height: 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f8f9fa;
-    border-radius: 50%;
-    margin: 0 auto 1rem;
-}
-
-.card-title {
-    display: flex;
-    align-items: center;
-    color: #1e293b;
+.badge {
+    font-weight: 500;
+    padding: 0.5em 1em;
 }
 
 .status-dot {
@@ -520,6 +519,203 @@
 
 .card-sm:hover {
     transform: translateY(-2px);
+}
+
+.pet-details-header {
+    background: linear-gradient(135deg, #206bc4, #4299e1);
+    color: white;
+    overflow: hidden;
+}
+
+.info-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    height: 100%;
+}
+
+.info-card-header {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.info-card-body {
+    padding: 1rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.info-value {
+    font-weight: 500;
+}
+
+.appointment-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.appointment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.date-badge {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 0.5rem;
+    text-align: center;
+    min-width: 60px;
+}
+
+.date-badge .month {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #6c757d;
+}
+
+.date-badge .day {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #206bc4;
+}
+
+.appointment-content {
+    flex: 1;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    margin-bottom: 1rem;
+    color: #adb5bd;
+}
+
+.avatar-xl {
+    width: 80px;
+    height: 80px;
+}
+
+.z-1 {
+    z-index: 1;
+}
+
+.icon-pet {
+    stroke: white;
+}
+
+.opacity-10 {
+    opacity: 0.1;
+}
+
+.service-type-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.service-type-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.appointment-item {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.appointment-item:hover {
+    transform: translateX(4px);
+}
+
+.date-badge {
+    background: linear-gradient(to bottom, rgba(32, 107, 196, 0.1), rgba(32, 107, 196, 0.05));
+    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: center;
+    min-width: 70px;
+    border: 1px solid rgba(32, 107, 196, 0.1);
+}
+
+.date-badge .month {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #206bc4;
+    font-weight: 600;
+}
+
+.date-badge .day {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #206bc4;
+    line-height: 1.2;
+}
+
+.date-badge .year {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.appointment-content {
+    flex: 1;
+    background: transparent;
+    padding: 0;
+}
+
+.h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.reason-text {
+    font-size: 1.1rem !important;  /* Reduced from 1.25rem */
+    line-height: 1.4;
+    color: #1e293b !important;
+}
+
+.info-card-header .btn-primary {
+    font-size: 1rem;  /* Reduced from 1.125rem */
+    padding: 0.5rem 1rem;  /* Reduced padding slightly */
+    font-weight: 500;
 }
 </style>
 
