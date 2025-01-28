@@ -110,4 +110,23 @@ class User extends Authenticatable
     {
         return in_array($this->role, ['admin', 'staff']);
     }
+
+    public function routeNotificationForNexmo($notification)
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Route notifications for the Twilio channel.
+     *
+     * @param  \Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForTwilio($notification)
+    {
+        // Format the phone number to E.164 format
+        // Remove any non-numeric characters and add the country code
+        $phone = preg_replace('/[^0-9]/', '', $this->phone);
+        return '+63' . ltrim($phone, '0'); // Assuming Philippines (+63)
+    }
 }

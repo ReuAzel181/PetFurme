@@ -540,4 +540,52 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/mark-all-read', [NotificationsController::class, 'markAllRead'])
         ->name('notifications.markAllRead');
+
+    // Remove the auth middleware temporarily for testing
+    Route::get('/test-sms', function() {
+        try {
+            $twilio = new \Twilio\Rest\Client(
+                env('TWILIO_ACCOUNT_SID'),  // Use env() directly for testing
+                env('TWILIO_AUTH_TOKEN')
+            );
+
+            dd([
+                'step' => 'Twilio client created',
+                'config' => [
+                    'account_sid' => env('TWILIO_ACCOUNT_SID'),
+                    'auth_token' => substr(env('TWILIO_AUTH_TOKEN'), 0, 5) . '...',  // Show first 5 chars only
+                    'from_number' => env('TWILIO_PHONE_NUMBER'),
+                    'to_number' => '+639214017593'
+                ]
+            ]);
+
+            $message = $twilio->messages->create(
+                "+639214017593",  // Your number
+                [
+                    'from' => env('TWILIO_PHONE_NUMBER'),
+                    'body' => "Hello! This is a test message from PawfectCare."
+                ]
+            );
+
+            return [
+                'success' => true,
+                'message' => 'SMS sent successfully!',
+                'message_sid' => $message->sid
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'config' => [
+                    'account_sid' => env('TWILIO_ACCOUNT_SID'),
+                    'from_number' => env('TWILIO_PHONE_NUMBER')
+                ]
+            ];
+        }
+    });
+});
+
+Route::get('/test', function() {
+    return 'Route is working!';
 });

@@ -198,7 +198,21 @@
                 <div class="bg-purple-100 rounded-full p-3 mr-4">
                     <i class="fas fa-comments text-purple-600 text-lg"></i>
                 </div>
-                <span class="text-gray-700 font-medium">Chat with Vet</span>
+                <div class="flex-1">
+                    <span class="text-gray-700 font-medium">Chat with Vet</span>
+                    @if($unreadMessages > 0)
+                        <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                            {{ $unreadMessages }}
+                        </span>
+                    @endif
+                    <p class="text-sm text-gray-500 mt-1">
+                        @if($latestMessage)
+                            {{ Str::limit($latestMessage->content, 30) }}
+                        @else
+                            Start a conversation with our vets
+                        @endif
+                    </p>
+                </div>
                 <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
             </a>
             
