@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Message;
 
 class DashboardController extends Controller
 {
@@ -39,6 +40,23 @@ class DashboardController extends Controller
             return $product;
         });
 
-        return view('pet-owner.dashboard', compact('pets', 'appointments', 'products'));
+        // Get unread messages count
+        $unreadMessages = Message::where('receiver_id', $user->id)
+            ->whereNull('sent_at')  // assuming sent_at null means unread
+            ->count();
+
+        // Get latest message
+        $latestMessage = Message::where('receiver_id', $user->id)
+            ->orWhere('sender_id', $user->id)
+            ->latest()
+            ->first();
+
+        return view('pet-owner.dashboard', compact(
+            'unreadMessages',
+            'latestMessage',
+            'pets',
+            'appointments',
+            'products'
+        ));
     }
 } 

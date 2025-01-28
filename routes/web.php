@@ -467,6 +467,14 @@ Route::middleware(['auth', 'role:pet_owner'])->prefix('pet-owner')->name('pet-ow
     
     // Appointment routes
     Route::resource('appointments', PetOwner\AppointmentController::class);
+
+    // Messages Routes - Updated for unified messaging
+    Route::get('/messages', [App\Http\Controllers\PetOwner\MessagesController::class, 'index'])
+        ->name('messages.index');
+    Route::get('/messages/chat', [App\Http\Controllers\PetOwner\MessagesController::class, 'show'])
+        ->name('messages.show');
+    Route::post('/messages', [App\Http\Controllers\PetOwner\MessagesController::class, 'store'])
+        ->name('messages.store');  // Removed {admin_id} parameter
 });
 
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
@@ -589,3 +597,15 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/test', function() {
     return 'Route is working!';
 });
+
+// Admin & Sub-admin message routes
+Route::middleware(['auth', 'can:access-admin'])->group(function () {
+    Route::get('/admin/messages', [App\Http\Controllers\Admin\MessagesController::class, 'index'])
+        ->name('admin.messages.index');
+    Route::get('/admin/messages/{conversation}', [App\Http\Controllers\Admin\MessagesController::class, 'show'])
+        ->name('admin.messages.show');
+    Route::post('/admin/messages/{conversation}', [App\Http\Controllers\Admin\MessagesController::class, 'store'])
+        ->name('admin.messages.store');
+});
+
+Route::view('privacy-policy', 'privacy-policy')->name('privacy-policy');

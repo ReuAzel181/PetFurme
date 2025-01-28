@@ -31,6 +31,10 @@
         <meta property="og:title" content="Tabler: Premium and Open Source dashboard template with responsive and high quality UI.">
         <meta property="og:url" content="https://tabler.io/demo/static/og.png">
         <meta property="og:description" content="Tabler comes with tons of well-designed components and features. Start your adventure with Tabler and make your dashboard great again. For free!">
+        <!-- Preload critical assets -->
+        <link rel="preload" href="{{ asset('dist/css/tabler.min.css') }}" as="style">
+        <link rel="preload" href="{{ asset('dist/js/tabler.min.js') }}" as="script">
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
         <!-- CSS files -->
         <link href="{{ asset('dist/css/tabler.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('dist/css/tabler-flags.min.css') }}" rel="stylesheet"/>
@@ -46,14 +50,28 @@
         </style>
         @stack('styles')
     </head>
-    <body>
+    <body class="auth-page">
         <div class="page">
             @include('components.alert')
             @yield('content')
         </div>
 
-        <!-- Core JS -->
+        <!-- Tabler Core -->
         <script src="{{ asset('dist/js/tabler.min.js') }}" defer></script>
+        
+        <!-- Add cookie consent component -->
+        <x-cookie-consent/>
+        
+        <!-- Debug script -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Auth page loaded');
+            console.log('Cookie consent element:', document.getElementById('cookie-consent'));
+            console.log('LocalStorage:', localStorage.getItem('cookieConsent'));
+            console.log('Cookies:', document.cookie);
+        });
+        </script>
+        
         @stack('scripts')
     </body>
 </html>

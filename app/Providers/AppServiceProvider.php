@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Breadcrumbs\Breadcrumbs;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +28,8 @@ class AppServiceProvider extends ServiceProvider
         Request::macro('breadcrumbs', function (){
             return new Breadcrumbs($this);
         });
+
+        // Register cookie-consent component
+        Blade::component('cookie-consent', \App\View\Components\CookieConsent::class);
     }
 }

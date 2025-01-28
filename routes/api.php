@@ -37,3 +37,9 @@
     Route::get('/statistics', [DashboardController::class, 'getStatistics'])->name('api.statistics');
 
     Route::get('/appointments/dates', [AppointmentController::class, 'getDates']);
+
+    Route::get('/check-cookie-consent', function () {
+        return response()->json([
+            'consent' => request()->cookie('cookie_consent', 'declined')
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+    })->middleware('web');

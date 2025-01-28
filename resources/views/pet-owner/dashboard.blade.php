@@ -193,7 +193,7 @@
                 <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
             </a>
             
-            <a href="{{ route('messages.index') }}" 
+            <a href="{{ route('pet-owner.messages.index') }}" 
                class="flex items-center bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
                 <div class="bg-purple-100 rounded-full p-3 mr-4">
                     <i class="fas fa-comments text-purple-600 text-lg"></i>
@@ -207,7 +207,7 @@
                     @endif
                     <p class="text-sm text-gray-500 mt-1">
                         @if($latestMessage)
-                            {{ Str::limit($latestMessage->content, 30) }}
+                            {{ Str::limit($latestMessage->message, 30) }}
                         @else
                             Start a conversation with our vets
                         @endif

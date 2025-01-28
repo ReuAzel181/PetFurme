@@ -21,6 +21,8 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\CacheControl::class,
+        \App\Http\Middleware\ResponseCache::class,
     ];
     
     /*For Message*/
@@ -30,6 +32,7 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckRole::class,
         'pet.owner' => \App\Http\Middleware\PetOwnerMiddleware::class,
         'staff' => \App\Http\Middleware\CheckStaffRole::class,
+        'can:access-admin' => \App\Http\Middleware\AdminAccessMiddleware::class,
     ];
     
 
@@ -46,6 +49,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\ResponseCache::class,
         ],
 
         'api' => [

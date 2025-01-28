@@ -6,11 +6,25 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }} - Pet Care</title>
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Preload critical assets -->
+    <link rel="preload" href="{{ asset('fonts/Inter-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    
+    <!-- Self-hosted Inter font -->
+    <style>
+        @font-face {
+            font-family: 'Inter';
+            font-weight: 100 900;
+            font-display: swap;
+            src: url('{{ asset('fonts/Inter-Variable.woff2') }}') format('woff2');
+        }
+    </style>
     
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
+          integrity="sha512-..." 
+          crossorigin="anonymous" 
+          referrerpolicy="no-referrer" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -46,6 +60,19 @@
             display: none;
         }
     </style>
+
+    <!-- Modified service worker registration -->
+    <script>
+        if ('serviceWorker' in navigator && localStorage.getItem('cookieConsent') === 'accepted') {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful');
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </head>
 <body class="bg-gray-50">
     <!-- Top Navigation -->
@@ -149,10 +176,10 @@
                 <span class="text-xs">Schedule</span>
             </a>
             
-            <a href="{{ route('messages.index') }}"
-               class="flex flex-col items-center justify-center space-y-1 {{ request()->routeIs('messages.*') ? 'text-blue-600' : 'text-gray-600' }}">
+            <a href="{{ route('pet-owner.messages.index') }}"
+               class="flex flex-col items-center justify-center space-y-1 {{ request()->routeIs('pet-owner.messages.*') ? 'text-blue-600' : 'text-gray-600' }}">
                 <i class="fas fa-comments text-xl"></i>
-                <span class="text-xs">Chat</span>
+                <span class="text-xs">Messages</span>
             </a>
         </div>
     </nav>
@@ -181,5 +208,14 @@
     <!-- Alpine.js for dropdown -->
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @stack('scripts')
+
+    {{-- Add cookie consent component --}}
+    <x-cookie-consent/>
+
+    <script>
+        // Add this to debug
+        console.log('Cookie consent status:', localStorage.getItem('cookieConsent'));
+        console.log('Cookie consent cookie:', document.cookie.match(/cookie_consent=([^;]+)/));
+    </script>
 </body>
 </html> 

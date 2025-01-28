@@ -129,4 +129,13 @@ class User extends Authenticatable
         $phone = preg_replace('/[^0-9]/', '', $this->phone);
         return '+63' . ltrim($phone, '0'); // Assuming Philippines (+63)
     }
+
+    protected $appends = ['photo_url'];
+
+    public function getPhotoUrlAttribute()
+    {
+        return $this->photo ? 
+            asset('storage/' . $this->photo) : 
+            asset('storage/defaults/no-avatar.jpg');
+    }
 }
