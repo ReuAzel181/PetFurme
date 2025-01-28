@@ -663,7 +663,7 @@
         background: #206bc4;
         color: white;
         border: none;
-        border-radius: 50%;
+        border-radius: 10%;
         width: 40px;
         height: 40px;
         display: flex;
@@ -847,6 +847,38 @@
     /* Ensure dropdowns appear above calendar */
     .fc-view-harness {
         z-index: 1;
+    }
+
+    .avatar {
+        --tblr-avatar-size: 40px;
+        --tblr-avatar-bg: #929dab;
+        position: relative;
+        width: var(--tblr-avatar-size);
+        height: var(--tblr-avatar-size);
+        font-size: calc(var(--tblr-avatar-size) * 0.4);
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        background: var(--tblr-avatar-bg) no-repeat center/cover;
+        border-radius: 50%;
+        vertical-align: middle;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .avatar.avatar-sm {
+        --tblr-avatar-size: 40px;
+        font-size: 1rem;
+    }
+
+    /* Ensure images inside avatars maintain the circular shape */
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
     }
 </style>
 

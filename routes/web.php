@@ -45,6 +45,9 @@ use App\Http\Controllers\PetOwner;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\UserManagementController;
+
+use App\Http\Controllers\NotificationsController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -522,4 +525,19 @@ Route::get('/check-storage', function() {
         'public_path' => public_path('storage'),
         'directories' => $results
     ];
+});
+
+Route::post('/appointments/{appointment}/confirm', [AppointmentController::class, 'confirm'])
+    ->name('appointment.confirm')
+    ->middleware(['auth', 'staff']);
+
+Route::get('user-management/export/{format}', [UserManagementController::class, 'export'])->name('user-management.export');
+
+Route::post('user-management/export-selected', [UserManagementController::class, 'exportSelected'])
+    ->name('user-management.export-selected');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-all-read', [NotificationsController::class, 'markAllRead'])
+        ->name('notifications.markAllRead');
 });

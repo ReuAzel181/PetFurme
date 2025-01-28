@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.tabler')
 
 @section('title', 'Create POS')
 

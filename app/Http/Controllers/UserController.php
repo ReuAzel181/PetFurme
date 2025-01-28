@@ -13,13 +13,24 @@ class UserController extends Controller
     // Display all users or filter by role
     public function index(Request $request)
     {
+        $users = User::withCount(['pets', 'appointments', 'orders'])
+            ->with([
+                'pets', 
+                'appointments.pet',
+                'orders.details.product',
+                'orders' => function($query) {
+                    $query->latest();
+                }
+            ])
+            ->when($request->query('role'), function($query, $role) {
+                if ($role !== 'all') {
+                    $query->where('role', $role);
+                }
+            })
+            ->get();
+    
         // Get the role from the query parameter or default to 'all'
         $role = $request->query('role', 'all');
-    
-        // Fetch users based on the role
-        $users = $role === 'all' 
-            ? User::all() 
-            : User::where('role', $role)->get();
     
         // Pass roles for filtering buttons
         $roles = [

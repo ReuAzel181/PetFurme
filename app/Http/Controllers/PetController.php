@@ -49,64 +49,53 @@ class PetController extends Controller
     // Store a newly created pet in storage
     public function store(Request $request)
     {
-        // First validate the has_account field
-        $request->validate([
-            'has_account' => 'required|in:yes,no',
-        ]);
-
-        // Initialize the data array
-        $data = [];
-
-        // Then validate the rest based on has_account value
-        if ($request->has_account === 'yes') {
+        try {
             $validated = $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'name' => 'required|string|max:255',
                 'category' => 'required|string',
-                'breed' => 'nullable|string|max:255',
-                'age' => 'nullable|numeric',
-                'gender' => 'nullable|string|in:Male,Female,Other',
-                'weight' => 'nullable|numeric',
+                'breed' => 'required|string|max:255',
+                'gender' => 'required|in:Male,Female',
+                'age' => 'required|numeric|min:0',
+                'weight' => 'required|numeric|min:0',
                 'allergies' => 'nullable|string',
                 'notes' => 'nullable|string',
-                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'photo' => 'nullable|image|max:2048'
             ]);
-            
-            $data = $validated;
-            $data['owner_name'] = null;
-        } else {
-            $validated = $request->validate([
-                'owner_name' => 'required|string|max:255',
-                'name' => 'required|string|max:255',
-                'category' => 'required|string',
-                'breed' => 'nullable|string|max:255',
-                'age' => 'nullable|numeric',
-                'gender' => 'nullable|string|in:Male,Female,Other',
-                'weight' => 'nullable|numeric',
-                'allergies' => 'nullable|string',
-                'notes' => 'nullable|string',
-                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
-            
-            $data = $validated;
-            $data['user_id'] = null;
-        }
 
-        // Handle photo upload
-        if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($pet->photo) {
-                Storage::disk('public')->delete($pet->photo);
+            // Handle photo upload
+            if ($request->hasFile('photo')) {
+                $photoPath = $request->file('photo')->store('pet_photos', 'public');
+                $validated['photo'] = $photoPath;
             }
-            
-            // Store new photo
-            $data['photo'] = $request->file('photo')->store('pet_photos', 'public');
+
+            // Create the pet record with explicit data
+            $pet = Pet::create([
+                'user_id' => $validated['user_id'],
+                'name' => $validated['name'],
+                'category' => $validated['category'],
+                'breed' => $validated['breed'],
+                'gender' => $validated['gender'],
+                'age' => $validated['age'],
+                'weight' => $validated['weight'],
+                'allergies' => $validated['allergies'] ?? null,
+                'notes' => $validated['notes'] ?? null,
+                'photo' => $validated['photo'] ?? null,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pet registered successfully',
+                'redirect' => route('pets.index')
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Pet creation error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating pet: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Create the pet record
-        Pet::create($data);
-
-        return redirect()->route('pets.index')->with('success', 'Pet created successfully!');
     }
 
     public function update(Request $request, Pet $pet)

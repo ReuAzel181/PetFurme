@@ -7,10 +7,10 @@
                 <div class="row g-2 align-items-center">
                     <div class="col">
                         <div class="page-pretitle text-muted text-uppercase">
-                            PHARMACY & SUPPLIES
+                            OVERVIEW
                         </div>
                         <h2 class="page-title">
-                            Clinic Inventory
+                            Clinic Supplies
                         </h2>
                     </div>
                     <div class="col-auto ms-auto">

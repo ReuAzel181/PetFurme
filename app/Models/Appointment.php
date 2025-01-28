@@ -13,6 +13,9 @@ class Appointment extends Model
     protected $table = 'appointment';
 
     protected $fillable = [
+        'title',
+        'description',
+        'scheduled_at',
         'user_id',
         'pet_id',
         'owner_name',
@@ -24,20 +27,26 @@ class Appointment extends Model
         'reason_for_visit',
         'deleted_by',
         'notes',
-        'status'
+        'status',
+        'created_by_type',
+        'created_by_id',
+        'confirmed_by',
+        'confirmed_at'
     ];
 
     protected $dates = [
         'created_at',
         'updated_at',
         'deleted_at',
-        'appointment_date'
+        'appointment_date',
+        'confirmed_at'
     ];
 
     protected $casts = [
         'reason_for_visit' => 'array',
         'appointment_date' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
+        'scheduled_at' => 'datetime'
     ];
 
     protected $attributes = [
@@ -100,5 +109,27 @@ class Appointment extends Model
     public function getAppointmentDateDisplayAttribute()
     {
         return $this->appointment_date->format('Y-m-d');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    // Add an accessor for creator type
+    public function getCreatorTypeAttribute()
+    {
+        return $this->created_by_type;
+    }
+
+    // Helper method to determine if appointment needs confirmation
+    public function needsConfirmation()
+    {
+        return $this->status === 'pending' && $this->created_by_type === 'user';
+    }
+
+    public function confirmer()
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
     }
 }

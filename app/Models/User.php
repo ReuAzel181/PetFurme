@@ -55,7 +55,7 @@ class User extends Authenticatable
     }
 
     // A user can have many appointments
-    public function appointments(): HasMany
+    public function appointments()
     {
         return $this->hasMany(Appointment::class);
     }
@@ -79,7 +79,7 @@ class User extends Authenticatable
 
     public function orders()
     {
-        return $this->hasMany(Order::class, 'customer_id', 'id');
+        return $this->hasMany(Order::class);
     }
 
     /**
@@ -99,5 +99,15 @@ class User extends Authenticatable
     public function settings()
     {
         return $this->hasOne(UserSettings::class);
+    }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+
+    public function isStaff()
+    {
+        return in_array($this->role, ['admin', 'staff']);
     }
 }

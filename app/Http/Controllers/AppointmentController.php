@@ -12,7 +12,7 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = Appointment::with(['pet', 'user'])
+        $appointments = Appointment::with(['pet', 'user', 'creator', 'confirmer'])
             ->select(
                 'appointment.*',
                 DB::raw('CASE 
@@ -95,7 +95,20 @@ class AppointmentController extends Controller
         try {
             DB::beginTransaction();
 
-            $appointment = new Appointment();
+            $appointment = new Appointment($validated);
+            
+            // If logged in user is staff
+            if (auth()->user()->isStaff()) {
+                $appointment->status = 'confirmed';
+                $appointment->created_by_type = 'staff';
+                $appointment->created_by_id = auth()->id();
+            } 
+            // If regular user
+            else {
+                $appointment->status = 'pending';
+                $appointment->created_by_type = 'user';
+                $appointment->created_by_id = auth()->id();
+            }
             
             if ($request->user_id === 'no_account') {
                 // Handle walk-in appointment
@@ -128,6 +141,9 @@ class AppointmentController extends Controller
             $appointment->reason_for_visit = $validated['reason_for_visit'];
             $appointment->notes = $validated['notes'] ?? '';
             $appointment->deleted_by = null;
+
+            // Combine date and time into scheduled_at
+            $appointment->scheduled_at = $validated['appointment_date'] . ' ' . $validated['appointment_time'];
 
             $appointment->save();
 
@@ -284,5 +300,23 @@ class AppointmentController extends Controller
             });
 
         return response()->json(['dates' => $dates]);
+    }
+
+    public function confirm(Appointment $appointment)
+    {
+        $this->authorize('confirm-appointments');
+        
+        $appointment->update([
+            'status' => 'confirmed',
+            'confirmed_by' => auth()->id(),
+            'confirmed_at' => now()
+        ]);
+        
+        return back()->with('success', 'Appointment confirmed successfully');
+    }
+
+    public function show(Appointment $appointment)
+    {
+        return view('appointments.show', compact('appointment'));
     }
 }

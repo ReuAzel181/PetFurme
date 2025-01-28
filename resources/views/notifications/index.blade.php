@@ -131,6 +131,75 @@
                         @endif
                     </div>
                 </div>
+
+                <!-- Appointment Alerts Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            {{ __('Upcoming Appointments') }}
+                        </h3>
+                        <span class="badge bg-blue ms-2">{{ $upcomingAppointments->count() }}</span>
+                    </div>
+                    <div class="card-body">
+                        @if($upcomingAppointments->isEmpty())
+                            <div class="empty">
+                                <div class="empty-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
+                                        <path d="M16 3l0 4" />
+                                        <path d="M8 3l0 4" />
+                                        <path d="M4 11l16 0" />
+                                    </svg>
+                                </div>
+                                <p class="empty-title">{{ __('No Upcoming Appointments') }}</p>
+                                <p class="empty-subtitle text-muted">{{ __('No appointments scheduled for the next week.') }}</p>
+                            </div>
+                        @else
+                            <div class="list-group">
+                                @foreach($upcomingAppointments as $appointment)
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h3 class="mb-1">{{ $appointment->title }}</h3>
+                                            <p class="mb-1">
+                                                {{ __('Date: ') }} {{ $appointment->scheduled_at->format('M d, Y H:i') }}
+                                                <br>
+                                                <small class="text-muted">
+                                                    {{ $appointment->scheduled_at->diffForHumans() }}
+                                                </small>
+                                            </p>
+                                            @if($appointment->description)
+                                                <p class="text-muted mb-0">{{ $appointment->description }}</p>
+                                            @endif
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge 
+                                                @if($appointment->scheduled_at->isToday()) 
+                                                    bg-red
+                                                @elseif($appointment->scheduled_at->isTomorrow()) 
+                                                    bg-orange
+                                                @else 
+                                                    bg-blue
+                                                @endif 
+                                                rounded-pill">
+                                                @if($appointment->scheduled_at->isToday())
+                                                    {{ __('Today') }}
+                                                @elseif($appointment->scheduled_at->isTomorrow())
+                                                    {{ __('Tomorrow') }}
+                                                @else
+                                                    {{ __('Upcoming') }}
+                                                @endif
+                                            </span>
+                                            <a href="{{ route('appointments.show', $appointment) }}" class="btn btn-sm btn-outline-primary">
+                                                {{ __('View Details') }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </div>

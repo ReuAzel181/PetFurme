@@ -85,6 +85,8 @@
                                             <option value="">Select Pet Type</option>
                                             <option value="Canine">Canine</option>
                                             <option value="Feline">Feline</option>
+                                            <option value="Avian">Avian</option>
+                                            <option value="Lapine">Lapine</option>
                                             <option value="Other">Other</option>
                                         </select>
                                         @error('walkin_pet_type')
@@ -399,7 +401,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.getElementById('pet_name').value = selectedOption.text || '';
         document.getElementById('pet_type').value = selectedOption.dataset.type === 'Canine' ? 'Dog' : 
-            (selectedOption.dataset.type === 'Feline' ? 'Cat' : selectedOption.dataset.type) || '';
+            (selectedOption.dataset.type === 'Feline' ? 'Cat' : 
+            (selectedOption.dataset.type === 'Avian' ? 'Bird' :
+            (selectedOption.dataset.type === 'Lapine' ? 'Rabbit' : 
+            selectedOption.dataset.type))) || '';
         document.getElementById('pet_age').value = selectedOption.dataset.age || '';
     });
 

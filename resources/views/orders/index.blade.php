@@ -85,9 +85,13 @@
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <span class="avatar avatar-xs me-2 rounded-circle">
-                                                {{ strtoupper(substr($order->user->name, 0, 1)) }}
-                                            </span>
+                                            @if($order->user->photo)
+                                                <span class="avatar avatar-xs me-2" style="background-image: url('{{ asset('storage/' . $order->user->photo) }}')"></span>
+                                            @else
+                                                <span class="avatar avatar-xs me-2">
+                                                    {{ strtoupper(substr($order->user->name, 0, 1)) }}
+                                                </span>
+                                            @endif
                                             {{ $order->user->name }}
                                         </div>
                                     </td>
@@ -341,7 +345,7 @@
 }
 
 .avatar {
-    --tblr-avatar-size: 1.75rem;
+    --tblr-avatar-size: 40px;
     --tblr-avatar-bg: #929dab;
     position: relative;
     width: var(--tblr-avatar-size);
@@ -352,12 +356,17 @@
     align-items: center;
     justify-content: center;
     color: #fff;
-    background: var(--tblr-avatar-bg);
+    background: var(--tblr-avatar-bg) no-repeat center/cover;
     border-radius: 50%;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
 }
 
-.avatar.avatar-md {
-    --tblr-avatar-size: 3rem;
+.avatar.avatar-xs,
+.avatar.avatar-sm {
+    --tblr-avatar-size: 40px;
+    font-size: 1rem;
 }
 
 .list-group-item {

@@ -29,6 +29,7 @@ class Kernel extends HttpKernel
         'checkConversationAccess' => \App\Http\Middleware\CheckConversationAccess::class,
         'role' => \App\Http\Middleware\CheckRole::class,
         'pet.owner' => \App\Http\Middleware\PetOwnerMiddleware::class,
+        'staff' => \App\Http\Middleware\CheckStaffRole::class,
     ];
     
 

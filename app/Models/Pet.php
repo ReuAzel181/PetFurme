@@ -11,18 +11,21 @@ class Pet extends Model
 
     protected $fillable = [
         'user_id',
-        'owner_name',
         'name',
         'category',
         'type',
-        'gender',
         'breed',
+        'gender',
         'age',
         'weight',
-        'size',
         'allergies',
         'notes',
-        'photo',
+        'photo'
+    ];
+
+    protected $casts = [
+        'age' => 'integer',
+        'weight' => 'float'
     ];
 
     public function user()
@@ -48,5 +51,14 @@ class Pet extends Model
     public static function getTodayCount()
     {
         return self::whereDate('created_at', today())->count();
+    }
+
+    // Add accessor for photo URL
+    public function getPhotoUrlAttribute()
+    {
+        if ($this->photo) {
+            return asset('storage/' . $this->photo);
+        }
+        return asset('images/default-pet.png');
     }
 }

@@ -18,6 +18,7 @@
     <link href="{{ asset('dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('dist/css/demo.min.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     
     <style>
         @import url('https://rsms.me/inter/inter.css');
@@ -42,92 +43,128 @@
             box-shadow: none;
         }
 
-        /* Header navbar styles */
-        .navbar {
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 70px;
-            z-index: 1040;
-            background-color: var(--tblr-bg-surface);
-            border-bottom: 1px solid var(--tblr-border-color);
-        }
-
-        /* Sidebar styles */
+        /* Navbar menu styles */
         #navbar-menu {
             position: fixed;
-            top: 0;
+            top: 70px;
             left: 0;
             bottom: 0;
-            width: 280px; /* Reduced from 400px for better layout */
+            width: 280px;
             background-color: #3A4652;
             transition: transform 0.3s ease;
-            z-index: 1030;
-            padding-top: 70px; /* Height of header */
+            z-index: 1000;
+            padding: 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
         }
 
         #navbar-menu .navbar {
-            position: relative !important;
             height: 100%;
-            padding: 1rem;
-            background: none;
-            border: none;
+            padding: 0;
         }
 
         #navbar-menu .container-xl {
             height: 100%;
-            background-color: transparent;
+            background-color: #3A4652;
             padding: 0;
         }
 
-        /* Main content wrapper */
-        #main-content {
-            position: relative;
-            margin-left: 280px; /* Match sidebar width */
-            margin-top: 70px; /* Match header height */
-            min-height: calc(100vh - 70px);
-            transition: margin 0.3s ease;
-            width: auto;
-            overflow: initial;
-        }
-
-        #main-content.expanded {
-            margin-left: 0;
-        }
-
-        /* Container fluid adjustment */
-        .container-fluid {
-            padding: 1.5rem;
-            height: auto;
-            min-height: calc(100vh - 70px);
-        }
-
-        /* Sidebar collapse styles */
         .sidebar-collapsed {
             transform: translateX(-100%);
         }
 
-        /* Remove scrollbar styles */
-        #main-content::-webkit-scrollbar {
-            display: none;
+        /* Main content styles */
+        #main-content {
+            transition: margin 0.3s ease;
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            position: fixed;
+            top: 70px;
         }
 
-        /* Responsive adjustments */
+        #main-content.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Smooth scrolling */
+        #main-content {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar */
+        #main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #main-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #main-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        #main-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Ensure content fills available space */
+        .container-fluid {
+            min-height: 100%;
+            padding: 20px;
+        }
+
+        /* Remove conflicting styles */
+        .page-wrapper {
+            height: auto;
+            overflow: visible;
+        }
+
+        /* Page wrapper styles */
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Container fluid styles */
+        .container-fluid {
+            height: 100%;
+            padding: 20px;
+        }
+
         @media (max-width: 992px) {
             #navbar-menu {
-                width: 240px;
+                width: 260px;
             }
             
             #main-content {
-                margin-left: 240px;
+                margin-left: 260px;
+                width: calc(100% - 260px);
+            }
+            
+            .navbar-nav .nav-item {
+                margin: 2px 10px;
+            }
+            
+            .nav-link-title {
+                font-size: 0.85rem;
             }
         }
 
         @media (max-width: 768px) {
             #navbar-menu {
                 width: 100%;
-                max-width: 280px;
+                transform: translateX(-100%);
             }
             
             #main-content {
@@ -135,43 +172,50 @@
                 width: 100%;
             }
             
-            .sidebar-collapsed {
+            #navbar-menu.sidebar-collapsed {
                 transform: translateX(-100%);
             }
         }
 
-        /* Page wrapper adjustment */
-        .page {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-top: 0;
-            margin-top: 0;
+        /* Base navbar menu styles */
+        #navbar-menu {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            bottom: 0;
+            width: 280px;
+            background-color: #3A4652;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            padding: 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
         }
 
-        .page-wrapper {
+        /* Navigation container */
+        .navbar-nav {
+            width: 100%;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 70px); /* Full viewport height minus header */
+        }
+
+        /* Navigation items container */
+        .nav-items-container {
+            display: flex;
+            flex-direction: column;
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: auto;
-            overflow: visible;
+            min-height: min-content; /* Ensures minimum height based on content */
         }
 
-        /* Remove any fixed positioning from these elements */
-        .page-header {
-            position: relative;
-        }
-
-        .page-body {
-            position: relative;
-        }
-
-        /* Active menu item styles */
+        /* Navigation items */
         .navbar-nav .nav-item {
-            margin: 4px 8px;
-            border-radius: 8px;
+            margin: 1px 0;
+            width: 100%;
+            flex-shrink: 0; /* Prevents items from shrinking */
         }
 
+        /* Nav link styling */
         .navbar-nav .nav-link {
             display: flex;
             align-items: center;
@@ -179,67 +223,134 @@
             padding: 10px 16px;
             border-radius: 8px;
             transition: all 0.2s ease;
+            width: 100%;
+            min-height: 48px; /* Minimum height instead of fixed */
+            height: auto; /* Allow height to adjust */
         }
 
-        /* Improve icon alignment and spacing */
-        .nav-link-icon {
+        /* Section styling */
+        .nav-section {
+            margin: 16px 0 4px 0;
+            padding: 0 12px;
+            flex-shrink: 0;
+        }
+
+        /* Content wrapper for icon and title */
+        .nav-link-content {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            transition: margin-left 0.2s ease;
+            flex: 1;
+        }
+
+        /* Icon container */
+        .nav-link-icon.d-md-none.d-lg-inline-block {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            min-width: 32px;
+            height: 32px;
             margin-right: 12px;
-            font-size: 1.1em;
+            flex-shrink: 0;
         }
 
-        /* Make active nav link more noticeable */
-        .navbar-nav .nav-item.active {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
+        /* Active state */
         .navbar-nav .nav-item.active .nav-link {
             color: #ffffff;
             background-color: #4a5d6b;
             font-weight: 500;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            margin: 0 -8px;
+            width: calc(100% + 16px);
         }
 
-        /* Improve section headers */
-        .nav-section {
-            margin: 24px 8px 8px 8px;
+        .navbar-nav .nav-item.active .nav-link .nav-link-content {
+            margin-left: 16px; /* Move content more to the right when active */
         }
 
-        .nav-section-header {
-            padding: 0 16px;
-            margin-bottom: 8px;
+        /* Hover effect */
+        .navbar-nav .nav-link:hover .nav-link-content {
+            margin-left: 12px; /* Move content slightly right on hover */
         }
 
-        .nav-section-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 0.5px;
+        /* Icon styling */
+        .nav-link-icon i {
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Title styling */
+        .nav-link-title {
+            font-size: 0.95rem;
+            font-weight: 400;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+            flex: 1;
+        }
+
+        /* Active state */
+        .navbar-nav .nav-item.active .nav-link .nav-link-icon {
+            margin-right: 12px;
+        }
+
+        .navbar-nav .nav-item.active .nav-link .nav-link-title {
+            order: 1;
         }
 
         /* Hover effects */
         .navbar-nav .nav-link:hover {
             color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.08);
-            transform: translateX(4px);
+            background-color: rgba(255, 255, 255, 0.1);
+
+        }
+
+        /* Remove any padding from containers */
+        .navbar-collapse.show,
+        .navbar.navbar-light,
+        #navbar-menu .navbar,
+        #navbar-menu .container-xl {
+            padding: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .nav-link-icon.d-md-none.d-lg-inline-block {
+                width: 28px;
+                min-width: 28px;
+                height: 28px;
+                margin-right: 14px;
+            }
+        }
+
+        /* Update sidebar styles */
+        #navbar-menu {
+            padding-top: 8px;
+        }
+
+        #navbar-menu .navbar {
+            padding: 0;
         }
 
         /* Dark mode adjustments */
         [data-bs-theme="dark"] .navbar-nav .nav-item.active {
-            background-color: rgba(255, 255, 255, 0.15);
+            background-color: rgba(255, 255, 255, 0.12);
         }
 
         [data-bs-theme="dark"] .navbar-nav .nav-item.active .nav-link {
             background-color: #4a5d6b;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
         [data-bs-theme="dark"] .nav-section-title {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.6);
         }
 
         /* Remove existing conflicting styles */
@@ -254,16 +365,22 @@
 
         /* Update main content spacing */
         .page-header {
-            margin-bottom: 0.5rem; /* Reduce space after header */
-            padding: 0.5rem 0; /* Reduce header padding */
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
         }
 
         .page-body {
             margin-top: 10px;
-            padding-top: 0.5rem; /* Reduce top padding */
+            padding-top: 0.5rem;
         }
 
         /* Header styles */
+        .navbar {
+            justify-content: space-around;
+            position: relative !important;
+            height: 70px;
+        }
+
         .navbar-inner {
             display: flex;
             align-items: center;
@@ -1031,7 +1148,7 @@
 
         /* Update page header spacing */
         .page-wrapper .page-header {
-            margin-top: 0 !important; /* Force margin-top to 0 */
+            margin-top: 0 !important;
             padding: 0.5rem 0;
         }
 
@@ -1058,7 +1175,7 @@
 
         /* Ensure the last activity item is visible */
         .activity-item:last-child {
-            margin-bottom: 20px; /* Add space after last item */
+            margin-bottom: 20px;
         }
 
         /* Custom scrollbar for activities */
@@ -1083,7 +1200,7 @@
         /* Container wrapper to ensure proper spacing */
         .activities-wrapper {
             position: relative;
-            padding-bottom: 20px; /* Add padding at bottom */
+            padding-bottom: 20px;
             height: 100%;
         }
 
@@ -1108,6 +1225,179 @@
             font-weight: 600;
             text-transform: uppercase;
             color: #6b7280;
+        }
+
+        /* Remove padding from navbar collapse and navbar-light */
+        .navbar-collapse.show {
+            padding: 0;
+        }
+
+        .navbar.navbar-light {
+            padding: 0;
+        }
+
+        /* Adjust nav link spacing to be more compact */
+        .navbar-nav .nav-item {
+            margin: 1px 0;
+            padding: 0 8px;
+        }
+
+        .nav-link {
+            padding: 8px 12px;
+        }
+
+        /* Adjust section spacing */
+        .nav-section {
+            margin: 12px 0 4px 0;
+            padding: 0 8px;
+        }
+
+        .nav-section-header {
+            padding: 0 8px;
+            margin-bottom: 4px;
+        }
+
+        /* Make nav items more compact */
+        .nav-link-icon {
+            margin-right: 8px;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Adjust title spacing */
+        .nav-link-title {
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+
+        /* Remove any extra padding from containers */
+        #navbar-menu .container-xl,
+        .navbar-collapse .container-xl {
+            padding: 0;
+        }
+
+        /* Ensure proper vertical spacing for the entire nav */
+        .navbar-nav {
+            padding: 4px 0;
+        }
+
+        /* Remove duplicate styles */
+        #navbar-menu {
+            padding: 0;
+        }
+
+        #navbar-menu .navbar {
+            padding: 0;
+        }
+
+        /* Update loading styles */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        /* Login button states */
+        .btn-primary.loading {
+            position: relative;
+            cursor: not-allowed;
+            opacity: 0.8;
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, 
+                transparent 25%, transparent 50%, 
+                rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, 
+                transparent 75%, transparent);
+            background-size: 1rem 1rem;
+            animation: loading-stripes 1s linear infinite;
+        }
+
+        @keyframes loading-stripes {
+            0% { background-position: 1rem 0; }
+            100% { background-position: 0 0; }
+        }
+
+        .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-text, 
+        .btn-spinner {
+            transition: all 0.2s ease;
+        }
+
+        .btn-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            margin-left: 8px;
+        }
+
+        .btn.loading .btn-text {
+            opacity: 0.7;
+        }
+
+        .btn.loading .btn-spinner {
+            display: inline-block;
+        }
+
+        /* Logout animation */
+        .loading-content {
+            text-align: center;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .pet-icons {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .pet-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .pet-icon.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .loading-text {
+            color: #3A4652;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 
@@ -1252,10 +1542,12 @@
                                     <!-- Pet Owner Navigation -->
                                     <li class="nav-item {{ request()->routeIs('pet-owner.dashboard') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('pet-owner.dashboard') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-home"></i>
-                                            </span>
-                                            <span class="nav-link-title">Dashboard</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-home"></i>
+                                                </span>
+                                                <span class="nav-link-title">Dashboard</span>
+                                            </div>
                                         </a>
                                     </li>
                                     <!-- Other pet owner menu items -->
@@ -1269,37 +1561,45 @@
                                     
                                     <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('dashboard') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-home"></i>
-                                            </span>
-                                            <span class="nav-link-title">Dashboard</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-home"></i>
+                                                </span>
+                                                <span class="nav-link-title">Dashboard</span>
+                                            </div>
                                         </a>
                                     </li>
 
                                     <li class="nav-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('notifications.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-bell"></i>
-                                            </span>
-                                            <span class="nav-link-title">Notifications</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-bell"></i>
+                                                </span>
+                                                <span class="nav-link-title">Notifications</span>
+                                            </div>
                                         </a>
                                     </li>
 
                                     <li class="nav-item {{ request()->routeIs('messages.*') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('messages.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-comments"></i>
-                                            </span>
-                                            <span class="nav-link-title">Messages</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-comments"></i>
+                                                </span>
+                                                <span class="nav-link-title">Messages</span>
+                                            </div>
                                         </a>
                                     </li>
 
-                                    <li class="nav-item {{ request()->routeIs('appointments.*') ? 'active' : '' }}">
-                                        <a class="nav-link" href="{{ route('appointments.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </span>
-                                            <span class="nav-link-title">Appointments</span>
+                                    <li class="nav-item {{ request()->routeIs('appointment.*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('appointment.index') }}">
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </span>
+                                                <span class="nav-link-title">Appointments</span>
+                                            </div>
                                         </a>
                                     </li>
 
@@ -1312,37 +1612,45 @@
 
                                     <li class="nav-item {{ request()->routeIs('user-management.*') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('user-management.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-users"></i>
-                                            </span>
-                                            <span class="nav-link-title">Users</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-users"></i>
+                                                </span>
+                                                <span class="nav-link-title">Users</span>
+                                            </div>
                                         </a>
                                     </li>
 
                                     <li class="nav-item {{ request()->routeIs('pets.*') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('pets.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-paw"></i>
-                                            </span>
-                                            <span class="nav-link-title">Pets</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-paw"></i>
+                                                </span>
+                                                <span class="nav-link-title">Pets</span>
+                                            </div>
                                         </a>
                                     </li>
 
                                     <li class="nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('products.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-box"></i>
-                                            </span>
-                                            <span class="nav-link-title">Products</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-box"></i>
+                                                </span>
+                                                <span class="nav-link-title">Products</span>
+                                            </div>
                                         </a>
                                     </li>
 
                                     <li class="nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('orders.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-shopping-cart"></i>
-                                            </span>
-                                            <span class="nav-link-title">Orders</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                </span>
+                                                <span class="nav-link-title">Orders</span>
+                                            </div>
                                         </a>
                                     </li>
 
@@ -1356,38 +1664,46 @@
                                     @if(auth()->user()->role === 'admin')
                                         <li class="nav-item {{ request()->routeIs('sales.*') ? 'active' : '' }}">
                                             <a class="nav-link" href="{{ route('sales.index') }}">
-                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                    <i class="fas fa-chart-line"></i>
-                                                </span>
-                                                <span class="nav-link-title">Sales</span>
+                                                <div class="nav-link-content">
+                                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                        <i class="fas fa-chart-line"></i>
+                                                    </span>
+                                                    <span class="nav-link-title">Sales</span>
+                                                </div>
                                             </a>
                                         </li>
 
                                         <li class="nav-item {{ request()->routeIs('analytics.archives') ? 'active' : '' }}">
                                             <a class="nav-link" href="{{ route('analytics.archives') }}">
-                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                    <i class="fas fa-archive"></i>
-                                                </span>
-                                                <span class="nav-link-title">Archives</span>
+                                                <div class="nav-link-content">
+                                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                        <i class="fas fa-archive"></i>
+                                                    </span>
+                                                    <span class="nav-link-title">Archives</span>
+                                                </div>
                                             </a>
                                         </li>
 
                                         <li class="nav-item {{ request()->routeIs('pages.*') ? 'active' : '' }}">
                                             <a class="nav-link" href="{{ route('pages.index') }}">
-                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                    <i class="fas fa-file"></i>
-                                                </span>
-                                                <span class="nav-link-title">Pages</span>
+                                                <div class="nav-link-content">
+                                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                        <i class="fas fa-file"></i>
+                                                    </span>
+                                                    <span class="nav-link-title">Pages</span>
+                                                </div>
                                             </a>
                                         </li>
                                     @endif
 
                                     <li class="nav-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                                         <a class="nav-link" href="{{ route('settings.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="fas fa-cog"></i>
-                                            </span>
-                                            <span class="nav-link-title">Settings</span>
+                                            <div class="nav-link-content">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="fas fa-cog"></i>
+                                                </span>
+                                                <span class="nav-link-title">Settings</span>
+                                            </div>
                                         </a>
                                     </li>
                                 @endif
@@ -1524,10 +1840,10 @@
                             div.className = `search-suggestion-item ${item.type === 'Quick Action' ? 'quick-action' : ''}`;
                             div.setAttribute('data-url', item.url);
                             div.innerHTML = `
-                                <span class="suggestion-icon">
-                                    <i class="${item.icon || 'fas fa-search'}"></i>
-                                </span>
-                                <div class="suggestion-content">
+                                <div class="nav-link-content">
+                                    <span class="suggestion-icon">
+                                        <i class="${item.icon || 'fas fa-search'}"></i>
+                                    </span>
                                     <span class="suggestion-text">${item.text}</span>
                                     <span class="suggestion-type">${item.type}</span>
                                 </div>
@@ -1600,6 +1916,76 @@
             // Also fix after a short delay to ensure everything is rendered
             setTimeout(fixCalendarDropdowns, 100);
         });
+    });
+    </script>
+
+    <div class="spinner-wrapper">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="loading-overlay">
+        <div class="loading-content">
+            <div class="pet-icons">
+                <img src="{{ asset('assets/img/pets/dog.png') }}" class="pet-icon" alt="Dog">
+                <img src="{{ asset('assets/img/pets/cat.png') }}" class="pet-icon" alt="Cat">
+                <img src="{{ asset('assets/img/pets/bird.png') }}" class="pet-icon" alt="Bird">
+            </div>
+            <div class="loading-text">Logging out...</div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        const loadingContent = document.querySelector('.loading-content');
+        const petIcons = document.querySelectorAll('.pet-icon');
+        let currentIcon = 0;
+        let animationInterval;
+
+        function showLoginSpinner(button) {
+            button.classList.add('loading');
+            button.disabled = true;
+        }
+
+        function showLogoutContent() {
+            loadingOverlay.classList.add('active');
+            loadingContent.classList.add('active');
+            startPetAnimation();
+        }
+
+        function startPetAnimation() {
+            petIcons[currentIcon].classList.add('active');
+            animationInterval = setInterval(() => {
+                petIcons[currentIcon].classList.remove('active');
+                currentIcon = (currentIcon + 1) % petIcons.length;
+                petIcons[currentIcon].classList.add('active');
+            }, 500);
+        }
+
+        // Login form handler
+        const loginForm = document.querySelector('form[action*="login"]');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const submitButton = this.querySelector('button[type="submit"]');
+                showLoginSpinner(submitButton);
+                setTimeout(() => {
+                    this.submit();
+                }, 100);
+            });
+        }
+
+        // Logout form handler
+        const logoutForm = document.querySelector('form[action*="logout"]');
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                showLogoutContent();
+                setTimeout(() => {
+                    this.submit();
+                }, 100);
+            });
+        }
     });
     </script>
 

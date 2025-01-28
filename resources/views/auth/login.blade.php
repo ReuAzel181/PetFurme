@@ -62,14 +62,16 @@
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">Email address</label>
-                                        <div class="input-icon">
-                                            <span class="input-icon-addon">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
-                                            </span>
-                                            <input type="email" name="email" class="form-control" placeholder="your@email.com" value="{{ old('email') }}" required>
-                                        </div>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
+                                        </span>
+                                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="your@email.com" value="{{ old('email') }}" required>
+                                    </div>
                                     @error('email')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback">
+                                            The email or password you entered is incorrect. Please try again.
+                                        </div>
                                     @enderror
                                 </div>
 
@@ -84,7 +86,7 @@
                                             <span class="input-icon-addon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
                                             </span>
-                                            <input type="password" name="password" class="form-control" placeholder="Your password" required>
+                                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Your password" required>
                                             <span class="input-icon-addon">
                                                 <a href="#" class="link-secondary toggle-password">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
@@ -92,7 +94,9 @@
                                             </span>
                                         </div>
                                     @error('password')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback">
+                                            The email or password you entered is incorrect. Please try again.
+                                        </div>
                                     @enderror
                                 </div>
 
@@ -781,6 +785,26 @@
     .mb-4 {
         margin-bottom: 1.25rem !important;
     }
+
+    /* Hide the default alert */
+    .alert.alert-danger.alert-dismissible {
+        display: none !important;
+    }
+
+    /* Style for the field-specific error messages */
+    .invalid-feedback {
+        display: block;
+        color: #d63939;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        padding-left: 0.25rem;
+    }
+
+    /* Add red border to invalid inputs */
+    .form-control.is-invalid {
+        border-color: #d63939;
+        background-image: none;
+    }
 </style>
 @endpush
 
@@ -791,6 +815,34 @@
         new bootstrap.Tooltip(tooltip);
     });
     
+    // Add form submission on Enter key
+    document.getElementById('loginForm').addEventListener('keypress', function(event) {
+        // Check if Enter key is pressed and the event target is an input field
+        if (event.key === 'Enter' && event.target.tagName.toLowerCase() === 'input') {
+            event.preventDefault(); // Prevent default form submission
+            
+            // Find and click the submit button
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.click();
+            }
+        }
+    });
+
+    // Remove error messages on input
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('input', function() {
+            // Remove invalid class
+            this.classList.remove('is-invalid');
+            
+            // Find and hide the error message
+            const errorDiv = this.closest('.mb-3').querySelector('.invalid-feedback');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+        });
+    });
+
     // Password visibility toggle
     document.querySelector('.toggle-password').addEventListener('click', function(e) {
         e.preventDefault();

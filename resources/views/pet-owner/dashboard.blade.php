@@ -53,19 +53,38 @@
     <div class="mb-8">
         <!-- My Pets Card -->
         <div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 mb-4">
-            <div class="flex items-center text-indigo-600 mb-3">
-                <div class="bg-indigo-100 rounded-full p-2 mr-3">
-                    <i class="fas fa-paw text-xl"></i>
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center text-indigo-600">
+                    <div class="bg-indigo-100 rounded-full p-2 mr-3">
+                        <i class="fas fa-paw text-xl"></i>
+                    </div>
+                    <span class="font-semibold">My Pets</span>
                 </div>
-                <span class="font-semibold">My Pets</span>
             </div>
-            <div class="text-3xl font-bold text-gray-800 mb-1">{{ $pets->count() }}</div>
-            <div class="text-sm text-gray-500 mb-4">Registered Pets</div>
-            <a href="{{ route('pet-owner.pets.create') }}" 
-               class="text-indigo-600 text-sm flex items-center hover:text-indigo-700 transition-colors duration-200">
-                <i class="fas fa-plus mr-2"></i>
-                Add New Pet
-            </a>
+
+            <div class="flex space-x-4 overflow-x-auto pb-2">
+                @foreach($pets as $pet)
+                    <div class="flex-shrink-0">
+                        <div class="relative w-16 h-16">
+                            <img src="{{ $pet->photo ? asset('storage/' . $pet->photo) : asset('storage/pet_photos/no-image.jpg') }}"
+                                 alt="{{ $pet->name }}"
+                                 class="w-full h-full rounded-full object-cover border-2 border-indigo-100"
+                                 data-fallback="{{ asset('storage/pet_photos/no-image.jpg') }}"
+                                 onError="if (!this.hasError) { this.hasError = true; this.src = this.dataset.fallback; }">
+                            <p class="text-xs text-center mt-1 text-gray-600 font-medium">{{ $pet->name }}</p>
+                        </div>
+                    </div>
+                @endforeach
+
+                <!-- Add New Pet Button -->
+                <div class="flex-shrink-0">
+                    <a href="{{ route('pet-owner.pets.create') }}" 
+                       class="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition-colors duration-200">
+                        <i class="fas fa-plus text-indigo-400 text-xl"></i>
+                    </a>
+                    <p class="text-xs text-center mt-1 text-indigo-600 font-medium">Add Pet</p>
+                </div>
+            </div>
         </div>
 
         <!-- Featured Products Card -->
