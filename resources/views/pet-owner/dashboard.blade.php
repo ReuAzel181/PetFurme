@@ -1,7 +1,7 @@
 @extends('layouts.mobile-app')
 
 @section('content')
-<div class="px-4 py-4 bg-gray-50 min-h-screen overflow-hidden">
+<div class="px-4 py-4 bg-gray-50 min-h-screen overflow-auto">
     <!-- Profile Setup Alert -->
     @if(!auth()->user()->profile_completed)
     <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-2 shadow-sm mb-3 border-l-4 border-yellow-400 transform hover:scale-102 transition-transform duration-200">
@@ -173,65 +173,6 @@
                class="text-purple-600 text-sm flex items-center hover:text-purple-700 transition-colors duration-200">
                 <i class="fas fa-plus mr-2"></i>
                 Book Visit
-            </a>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="mb-6">
-        <h2 class="text-lg font-bold text-gray-800 mb-3">Quick Actions</h2>
-        <div class="space-y-2">
-            <a href="{{ route('pet-owner.appointments.create') }}" 
-               class="flex items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                <div class="bg-blue-100 rounded-full p-2 mr-3">
-                    <i class="fas fa-calendar-plus text-blue-600 text-lg"></i>
-                </div>
-                <span class="text-gray-700 font-medium">Book Appointment</span>
-                <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
-            </a>
-            
-            <a href="{{ route('pet-owner.pets.create') }}" 
-               class="flex items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                <div class="bg-green-100 rounded-full p-2 mr-3">
-                    <i class="fas fa-plus text-green-600 text-lg"></i>
-                </div>
-                <span class="text-gray-700 font-medium">Add New Pet</span>
-                <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
-            </a>
-            
-            <a href="{{ route('pet-owner.messages.index') }}" 
-               class="flex items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                <div class="bg-purple-100 rounded-full p-2 mr-3">
-                    <i class="fas fa-comments text-purple-600 text-lg"></i>
-                </div>
-                <div class="flex-1">
-                    <span class="text-gray-700 font-medium">Chat with Vet</span>
-                    @if($unreadMessages > 0)
-                        <span class="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                            {{ $unreadMessages }}
-                        </span>
-                    @endif
-                    <p class="text-sm text-gray-500 mt-1">
-                        @if($latestMessage)
-                            {{ Str::limit($latestMessage->message, 30) }}
-                        @else
-                            Start a conversation with our vets
-                        @endif
-                    </p>
-                </div>
-                <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
-            </a>
-            
-            <a href="tel:+1234567890" 
-               class="flex items-center bg-gradient-to-r from-red-50 to-red-100 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                <div class="bg-red-200 rounded-full p-2 mr-3">
-                    <i class="fas fa-phone text-red-600 text-lg"></i>
-                </div>
-                <div class="flex-1">
-                    <span class="text-red-700 font-medium">Emergency Call</span>
-                    <p class="text-red-500 text-sm mt-1">24/7 Support Available</p>
-                </div>
-                <i class="fas fa-chevron-right text-red-400 ml-auto"></i>
             </a>
         </div>
     </div>

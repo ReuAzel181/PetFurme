@@ -39,11 +39,72 @@
             background-color: #f9fafb; /* Light background for better contrast */
         }
 
+        /* Bottom navigation styling */
+        #bottomNav {
+            height: 80px; /* Increased height for better touch targets */
+            display: flex;
+            justify-content: space-around; /* Changed to space-around for better spacing */
+            align-items: center;
+            background-color: #ffffff; /* Reverted to original background color */
+            border-top: 2px solid #2563eb; /* Added a thicker border for separation */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Stronger shadow for depth */
+        }
+
+        /* Navigation items */
+        .nav-item {
+            position: relative;
+            flex-grow: 1;
+            text-align: center;
+            color: #4b5563; /* Reverted to original darker gray */
+            transition: color 0.3s, transform 0.3s, box-shadow 0.3s; /* Include box-shadow in transition */
+            margin: 0 10px; /* Added margin for spacing */
+            border-radius: 10px; /* Rounded corners for a modern look */
+            padding: 10px; /* Added padding for better touch targets */
+            height: 70px; /* Set fixed height */
+            width: 70px; /* Set fixed width */
+            display: flex; /* Flexbox for centering content */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            perspective: 1000px; /* Added perspective for 3D effect */
+        }
+
+        .nav-item:active {
+            transform: translateY(-10px) scale(1.1); /* Move up and scale for depth */
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
+        }
+
+        /* Active state */
+        .nav-item.active {
+            color: #2563eb; /* Original blue */
+            font-weight: bold; /* Make active item bold */
+            transform: translateY(-10px) scale(1.1); /* Enhanced 3D effect with higher lift */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
+            background: rgb(255, 255, 255); /* Light background for active item */
+        }
+
+        /* Hover effects */
+        .nav-item:hover {
+            background: rgba(0, 0, 0, 0.05); /* Light hover effect */
+            transform: translateY(-5px); /* Slight lift on hover */
+        }
+
+        /* Active bubble effect */
+        #activeIndicator {
+            bottom: -20px; /* Adjusted position for better visibility */
+            left: 0;
+            width: 60px; /* Increased width for a more prominent look */
+            height: 60px; /* Increased height for a more prominent look */
+            background: rgba(59, 130, 246, 0.5); /* Slightly darker background for better visibility */
+            border: 2px solid #2563eb; /* Added border for contrast */
+            transition: all 0.3s ease-in-out;
+        }
+
+
         .form-label {
             font-weight: 500; /* Medium weight for better visibility */
             margin-bottom: 0.25rem; /* Reduced margin for compactness */
             color: #333; /* Darker color for better contrast */
-            font-size: 0.875rem; /* Adjusted font size for minimalism */
+            font-size: 0.75rem; /* Adjusted font size for minimalism */
         }
 
         .form-control, .form-select {
@@ -53,6 +114,11 @@
             margin-bottom: 0.75rem; /* Consistent spacing */
             width: 100%;
             transition: border-color 0.3s; /* Smooth transition for focus */
+        }
+
+        .form-control-lg, .form-select {
+            font-size: 0.75rem; /* Set font size to smaller */
+            padding: 0.5rem; /* Adjust padding if necessary */
         }
 
         .form-control:focus, .form-select:focus {
@@ -86,6 +152,25 @@
             padding: 0.5rem 1rem; /* Reduced padding for compactness */
             transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
         }
+        .mb-3 {
+            margin-bottom: 0px;
+        }
+
+        .mb-4 {
+            margin-bottom: 0px !important;
+        }
+
+        .col-md-6.mb-3 {
+            margin-bottom: 12px !important;
+        }
+        
+        .form-control.form-control-lg {
+            margin-bottom: 0px !important;
+        }
+
+        .form-footer.text-center.mt-4 {
+            margin-top: 0px;
+        }
 
         .btn-primary {
             background-color: #4f46e5; /* Primary button color */
@@ -114,9 +199,11 @@
         }
 
         .main-content {
-            height: calc(100vh - 125px);
+            padding-top: 55px;
+            height: calc(100vh - 25px);
             overflow-y: auto;
-            padding: 0; /* Removed padding for a more compact layout */
+            padding-bottom: 40px; 
+            
         }
 
         /* Hide scrollbar but allow scrolling */
@@ -126,6 +213,11 @@
         }
         .main-content::-webkit-scrollbar {
             display: none;
+        }
+
+        .pet-photo-upload {
+            height: 100px; /* Adjust height as needed */
+            width: 100px; /* Adjust width as needed */
         }
     </style>
 
@@ -216,41 +308,41 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 bottom-nav-height safe-bottom">
-        <div class="flex justify-around items-center h-full">
+    <nav id="bottomNav"
+        class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg transition-all duration-300 ease-in-out">
+        <div class="flex justify-around items-center h-full relative">
+
             <a href="{{ route('pet-owner.dashboard') }}" 
-               class="flex flex-col items-center justify-center space-y-1 {{ request()->routeIs('pet-owner.dashboard') ? 'text-blue-600' : 'text-gray-600' }}">
+            class="nav-item flex flex-col items-center justify-center p-2 transition-all duration-300"
+            data-target="home">
                 <i class="fas fa-home text-xl"></i>
                 <span class="text-xs">Home</span>
             </a>
-            
-            <a href="{{ route('pet-owner.pets.index') }}"
-               class="flex flex-col items-center justify-center space-y-1 {{ request()->routeIs('pet-owner.pets.*') ? 'text-blue-600' : 'text-gray-600' }}">
+
+            <a href="{{ route('pet-owner.pets.index') }}" 
+            class="nav-item flex flex-col items-center justify-center p-2 transition-all duration-300"
+            data-target="pets">
                 <i class="fas fa-paw text-xl"></i>
                 <span class="text-xs">Pets</span>
             </a>
-            
-            <a href="{{ route('pet-owner.appointments.create') }}"
-               class="flex flex-col items-center justify-center -mt-5">
-                <div class="bg-blue-600 text-white rounded-full p-3 shadow-lg">
-                    <i class="fas fa-plus text-xl"></i>
-                </div>
-                <span class="text-xs mt-1">Book</span>
-            </a>
-            
-            <a href="{{ route('pet-owner.appointments.index') }}"
-               class="flex flex-col items-center justify-center space-y-1 {{ request()->routeIs('pet-owner.appointments.*') ? 'text-blue-600' : 'text-gray-600' }}">
+
+            <a href="{{ route('pet-owner.appointments.index') }}" 
+            class="nav-item flex flex-col items-center justify-center p-2 transition-all duration-300"
+            data-target="schedule">
                 <i class="fas fa-calendar text-xl"></i>
                 <span class="text-xs">Schedule</span>
             </a>
-            
-            <a href="{{ route('pet-owner.messages.index') }}"
-               class="flex flex-col items-center justify-center space-y-1 {{ request()->routeIs('pet-owner.messages.*') ? 'text-blue-600' : 'text-gray-600' }}">
+
+            <a href="{{ route('pet-owner.messages.index') }}" 
+            class="nav-item flex flex-col items-center justify-center p-2 transition-all duration-300"
+            data-target="messages">
                 <i class="fas fa-comments text-xl"></i>
                 <span class="text-xs">Messages</span>
             </a>
         </div>
     </nav>
+
+
 
     <!-- Notifications Panel (Hidden by default) -->
     <div id="notifications-panel" 
@@ -284,6 +376,67 @@
         // Add this to debug
         console.log('Cookie consent status:', localStorage.getItem('cookieConsent'));
         console.log('Cookie consent cookie:', document.cookie.match(/cookie_consent=([^;]+)/));
+    </script>
+
+    <script>
+        // Function to handle the active state
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('text-blue-600', 'transform', 'translate-y-[-5px]');
+                    nav.classList.add('text-gray-600');
+                });
+                // Add active class to the clicked item
+                this.classList.add('text-blue-600', 'transform', 'translate-y-[-5px]');
+                this.classList.remove('text-gray-600');
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const navItems = document.querySelectorAll(".nav-item");
+        const indicator = document.getElementById("activeIndicator");
+
+        function updateActiveNav() {
+            let activeItem = document.querySelector(".nav-item.active");
+            if (!activeItem) return;
+
+            let rect = activeItem.getBoundingClientRect();
+            let parentRect = activeItem.parentElement.getBoundingClientRect();
+            indicator.style.left = `${rect.left - parentRect.left + rect.width / 2 - 25}px`;
+        }
+
+        function setActiveNav(target) {
+            navItems.forEach(nav => nav.classList.remove("active"));
+            let activeItem = document.querySelector(`[data-target="${target}"]`);
+            if (activeItem) {
+                activeItem.classList.add("active");
+                updateActiveNav();
+            }
+        }
+
+        // Restore from localStorage on page load
+        let savedTab = localStorage.getItem("activeNav");
+        if (savedTab) {
+            setActiveNav(savedTab);
+        } else {
+            // If no saved tab, default to "home"
+            setActiveNav("home");
+        }
+
+        // Add click event to update active tab
+        navItems.forEach(item => {
+            item.addEventListener("click", function () {
+                let target = this.getAttribute("data-target");
+                localStorage.setItem("activeNav", target);
+                setActiveNav(target);
+            });
+        });
+
+        setTimeout(updateActiveNav, 300);
+    });
+
+
     </script>
 </body>
 </html> 

@@ -33,7 +33,6 @@
         "twilio/sdk": "^8.3"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.9",
         "beyondcode/laravel-query-detector": "^1.7",
         "fakerphp/faker": "^1.9.1",
         "kyslik/column-sortable": "^6.5",
