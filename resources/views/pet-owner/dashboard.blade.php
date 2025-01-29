@@ -1,32 +1,32 @@
 @extends('layouts.mobile-app')
 
 @section('content')
-<div class="px-4 py-6 bg-gray-50 min-h-screen">
+<div class="px-4 py-4 bg-gray-50 min-h-screen overflow-hidden">
     <!-- Profile Setup Alert -->
     @if(!auth()->user()->profile_completed)
-    <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-xl p-4 shadow-sm mb-8 border-l-4 border-yellow-400 transform hover:scale-102 transition-transform duration-200">
-        <div class="flex items-start">
-            <div class="flex-shrink-0 bg-yellow-200 rounded-full p-2">
-                <i class="fas fa-user-edit text-yellow-600 text-xl"></i>
+    <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-2 shadow-sm mb-3 border-l-4 border-yellow-400 transform hover:scale-102 transition-transform duration-200">
+        <div class="flex items-center justify-between">
+            <div class="flex-shrink-0 bg-yellow-200 rounded-full p-1">
+                <i class="fas fa-user-edit text-yellow-600 text-lg"></i>
             </div>
-            <div class="ml-4 flex-1">
-                <h3 class="text-sm font-semibold text-gray-800">Complete Your Profile</h3>
+            <div class="ml-2 flex-1">
+                <h3 class="text-base font-semibold text-gray-800">Profile Setup</h3>
                 <p class="mt-1 text-sm text-gray-600 leading-relaxed">
-                    Please complete your profile to better serve you and your pets.
+                    Complete your profile for better service.
                 </p>
-                <div class="mt-4">
-                    <a href="{{ route('pet-owner.profile.setup') }}" 
-                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full text-yellow-700 bg-yellow-200 hover:bg-yellow-300 transition-colors duration-200">
-                        Complete Profile <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
-                </div>
+            </div>
+            <div class="flex-shrink-0">
+                <a href="{{ route('pet-owner.profile.setup') }}" 
+                   class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-600 text-white hover:bg-yellow-700 transition-colors duration-200">
+                    <i class="fas fa-arrow-right text-base"></i>
+                </a>
             </div>
         </div>
     </div>
     @endif
 
     <!-- Header -->
-    <div class="text-center mb-8">
+    <div class="text-center mb-6">
         <div class="relative inline-block">
             @php
                 $defaultAvatarPath = asset('storage/user_photos/no-avatar.jpg');
@@ -35,43 +35,49 @@
                     $defaultAvatarPath;
             @endphp
             
+            @if(auth()->user()->verified)
+                <div class="absolute -top-2 -right-2 bg-green-500 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                    <i class="fas fa-check text-white text-lg"></i>
+                </div>
+            @else
+                <div class="absolute -top-2 -right-2 bg-yellow-500 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center">
+                    <i class="fas fa-hourglass-half text-white text-sm"></i>
+                </div>
+            @endif
+            
             <img src="{{ $avatarUrl }}" 
                  alt="{{ auth()->user()->name }}" 
-                 class="w-24 h-24 mx-auto mb-4 rounded-full shadow-lg object-cover"
+                 class="w-24 h-24 mx-auto rounded-full shadow-lg object-cover"
                  data-fallback="{{ $defaultAvatarPath }}"
                  onError="if (!this.hasError) { this.hasError = true; this.src = this.dataset.fallback; }">
-            
-            <div class="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center">
-                <i class="fas fa-check text-white text-xs"></i>
-            </div>
         </div>
-        <h1 class="text-2xl font-bold text-gray-800">Welcome back, {{ auth()->user()->name }}!</h1>
-        <p class="text-gray-500 mt-2">Let's take care of your pets today</p>
+        <h1 class="text-xl font-bold text-gray-800">Welcome, {{ auth()->user()->name }}!</h1>
+        <p class="text-gray-500 mt-1">Ready to take care of your pets?</p>
     </div>
 
     <!-- Stats Grid -->
-    <div class="mb-8">
+    <div class="mb-6">
         <!-- My Pets Card -->
-        <div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 mb-4">
-            <div class="flex items-center justify-between mb-4">
+        <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3">
+            <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center text-indigo-600">
-                    <div class="bg-indigo-100 rounded-full p-2 mr-3">
-                        <i class="fas fa-paw text-xl"></i>
+                    <div class="bg-indigo-100 rounded-full p-2 mr-2">
+                        <i class="fas fa-paw text-lg"></i>
                     </div>
                     <span class="font-semibold">My Pets</span>
                 </div>
             </div>
 
-            <div class="flex space-x-4 overflow-x-auto pb-2">
+            <div class="flex space-x-3 overflow-hidden pb-2">
                 @foreach($pets as $pet)
                     <div class="flex-shrink-0">
-                        <div class="relative w-16 h-16">
+                        <div class="relative w-14 h-14">
                             <img src="{{ $pet->photo ? asset('storage/' . $pet->photo) : asset('storage/pet_photos/no-image.jpg') }}"
                                  alt="{{ $pet->name }}"
                                  class="w-full h-full rounded-full object-cover border-2 border-indigo-100"
                                  data-fallback="{{ asset('storage/pet_photos/no-image.jpg') }}"
                                  onError="if (!this.hasError) { this.hasError = true; this.src = this.dataset.fallback; }">
-                            <p class="text-xs text-center mt-1 text-gray-600 font-medium">{{ $pet->name }}</p>
+                            <p class="text-xs text-center mt-1 text-gray-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis" title="{{ $pet->name }}">{{ $pet->name }}</p>
                         </div>
                     </div>
                 @endforeach
@@ -79,8 +85,8 @@
                 <!-- Add New Pet Button -->
                 <div class="flex-shrink-0">
                     <a href="{{ route('pet-owner.pets.create') }}" 
-                       class="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition-colors duration-200">
-                        <i class="fas fa-plus text-indigo-400 text-xl"></i>
+                       class="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center border-2 border-dashed border-indigo-200 hover:bg-indigo-100 transition-colors duration-200">
+                        <i class="fas fa-plus text-indigo-400 text-lg"></i>
                     </a>
                     <p class="text-xs text-center mt-1 text-indigo-600 font-medium">Add Pet</p>
                 </div>
@@ -88,11 +94,11 @@
         </div>
 
         <!-- Featured Products Card -->
-        <div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 mb-4">
-            <div class="flex justify-between items-center mb-4">
+        <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3">
+            <div class="flex justify-between items-center mb-3">
                 <div class="flex items-center text-blue-600">
-                    <div class="bg-blue-100 rounded-full p-2 mr-3">
-                        <i class="fas fa-shopping-bag text-xl"></i>
+                    <div class="bg-blue-100 rounded-full p-2 mr-2">
+                        <i class="fas fa-shopping-bag text-lg"></i>
                     </div>
                     <span class="font-semibold">Featured Products</span>
                 </div>
@@ -103,11 +109,11 @@
             </div>
 
             @if($products->isNotEmpty())
-                <div class="space-y-4">
+                <div class="space-y-3">
                     @foreach($products as $product)
-                        <div class="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
+                        <div class="flex items-center space-x-3 p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
                             <!-- Product Image -->
-                            <div class="relative w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0">
+                            <div class="relative w-14 h-14 bg-gray-100 rounded-lg flex-shrink-0">
                                 <img src="{{ $product->image_url }}" 
                                      alt="{{ $product->name }}"
                                      class="w-full h-full object-cover rounded-lg"
@@ -152,17 +158,17 @@
         </div>
 
         <!-- Upcoming Visits Card -->
-        <div class="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
-            <div class="flex items-center text-purple-600 mb-3">
-                <div class="bg-purple-100 rounded-full p-2 mr-3">
-                    <i class="fas fa-calendar text-xl"></i>
+        <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 mb-3">
+            <div class="flex items-center text-purple-600 mb-2">
+                <div class="bg-purple-100 rounded-full p-2 mr-2">
+                    <i class="fas fa-calendar text-lg"></i>
                 </div>
                 <span class="font-semibold">Visits</span>
             </div>
-            <div class="text-3xl font-bold text-gray-800 mb-1">
+            <div class="text-2xl font-bold text-gray-800 mb-1">
                 {{ $appointments->where('appointment_date', '>=', now())->count() }}
             </div>
-            <div class="text-sm text-gray-500 mb-4">Scheduled Visits</div>
+            <div class="text-sm text-gray-500 mb-2">Scheduled Visits</div>
             <a href="{{ route('pet-owner.appointments.create') }}" 
                class="text-purple-600 text-sm flex items-center hover:text-purple-700 transition-colors duration-200">
                 <i class="fas fa-plus mr-2"></i>
@@ -172,12 +178,12 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="mb-8">
-        <h2 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h2>
-        <div class="space-y-3">
+    <div class="mb-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-3">Quick Actions</h2>
+        <div class="space-y-2">
             <a href="{{ route('pet-owner.appointments.create') }}" 
-               class="flex items-center bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                <div class="bg-blue-100 rounded-full p-3 mr-4">
+               class="flex items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+                <div class="bg-blue-100 rounded-full p-2 mr-3">
                     <i class="fas fa-calendar-plus text-blue-600 text-lg"></i>
                 </div>
                 <span class="text-gray-700 font-medium">Book Appointment</span>
@@ -185,8 +191,8 @@
             </a>
             
             <a href="{{ route('pet-owner.pets.create') }}" 
-               class="flex items-center bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                <div class="bg-green-100 rounded-full p-3 mr-4">
+               class="flex items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+                <div class="bg-green-100 rounded-full p-2 mr-3">
                     <i class="fas fa-plus text-green-600 text-lg"></i>
                 </div>
                 <span class="text-gray-700 font-medium">Add New Pet</span>
@@ -194,8 +200,8 @@
             </a>
             
             <a href="{{ route('pet-owner.messages.index') }}" 
-               class="flex items-center bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                <div class="bg-purple-100 rounded-full p-3 mr-4">
+               class="flex items-center bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+                <div class="bg-purple-100 rounded-full p-2 mr-3">
                     <i class="fas fa-comments text-purple-600 text-lg"></i>
                 </div>
                 <div class="flex-1">
@@ -217,8 +223,8 @@
             </a>
             
             <a href="tel:+1234567890" 
-               class="flex items-center bg-gradient-to-r from-red-50 to-red-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                <div class="bg-red-200 rounded-full p-3 mr-4">
+               class="flex items-center bg-gradient-to-r from-red-50 to-red-100 p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+                <div class="bg-red-200 rounded-full p-2 mr-3">
                     <i class="fas fa-phone text-red-600 text-lg"></i>
                 </div>
                 <div class="flex-1">
@@ -231,16 +237,16 @@
     </div>
 
     <!-- Recent Appointments -->
-    <div class="mb-8">
-        <h2 class="text-lg font-bold text-gray-800 mb-4">Recent Appointments</h2>
+    <div class="mb-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-3">Recent Appointments</h2>
         @if($appointments->isEmpty())
-            <div class="bg-white rounded-xl p-8 text-center shadow-sm">
-                <div class="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <div class="bg-white rounded-lg p-6 text-center shadow-sm">
+                <div class="bg-gray-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
                     <i class="fas fa-calendar-day text-gray-400 text-2xl"></i>
                 </div>
-                <p class="text-gray-500 mb-6">No appointments scheduled yet</p>
+                <p class="text-gray-500 mb-4">No appointments scheduled yet</p>
                 <a href="{{ route('pet-owner.appointments.create') }}" 
-                   class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-full hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:-translate-y-1">
+                   class="inline-flex items-center px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-full hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:-translate-y-1">
                     <i class="fas fa-plus mr-2"></i>
                     Book Your First Appointment
                 </a>

@@ -29,7 +29,56 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Add Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
+        /* Custom styles for forms */
+        body {
+            font-family: 'Inter', sans-serif; /* Use the imported font */
+        }
+
+        .form-label {
+            font-weight: 600; /* Slightly bolder for better visibility */
+            margin-bottom: 0.5rem;
+            color: #333; /* Darker color for better contrast */
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #e4e6ef; /* Added border for better visibility */
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            transition: border-color 0.3s; /* Smooth transition for focus */
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #6777ef;
+            box-shadow: 0 0 0 0.2rem rgba(103, 119, 239, 0.25);
+        }
+
+        .required:after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem;
+            background-color: #fff; /* White background for cards */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+
+        .card-header {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 1.5rem;
+            font-weight: 600; /* Bold header */
+            color: #333; /* Darker color for better contrast */
+        }
+
         /* Custom styles for iPhone XR */
         @media only screen 
         and (device-width: 414px) 
@@ -49,6 +98,7 @@
         .main-content {
             height: calc(100vh - 125px);
             overflow-y: auto;
+            padding: 1rem; /* Added padding for main content */
         }
 
         /* Hide scrollbar but allow scrolling */

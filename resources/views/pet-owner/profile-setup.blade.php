@@ -7,7 +7,7 @@
             <a href="{{ route('pet-owner.dashboard') }}" class="text-gray-600 mr-2">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <h1 class="text-xl font-semibold text-gray-800">Complete Your Profile</h1>
+            <h1 class="text-xl font-semibold text-gray-800">Profile Setup</h1>
         </div>
         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
             <div class="flex">
@@ -16,7 +16,7 @@
                 </div>
                 <div class="ml-3">
                     <p class="text-sm text-blue-700">
-                        Please complete your profile information to access all features.
+                        Complete your profile for full access.
                     </p>
                 </div>
             </div>
@@ -80,7 +80,7 @@
 
                 <!-- Emergency Contact Section -->
                 <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Emergency Contact</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Emergency Info</h3>
                     
                     <!-- Emergency Contact Name -->
                     <div class="mb-4">
