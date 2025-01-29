@@ -48,6 +48,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\UserManagementController;
 
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\PetOwner\PetOwnerController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -656,4 +657,12 @@ Route::get('/test-twilio', function () {
             'error' => $e->getMessage()
         ]);
     }
+});
+
+Route::post('/pet-owner/pets', [PetController::class, 'store'])->name('pet-owner.pets.store');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/pet-owner/pets/create', [PetOwnerController::class, 'create'])->name('pet-owner.pets.create');
+    Route::post('/pet-owner/pets', [PetOwnerController::class, 'store'])->name('pet-owner.pets.store');
+    // Add other routes as needed
 });

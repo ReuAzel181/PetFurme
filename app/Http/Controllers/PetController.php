@@ -67,6 +67,8 @@ class PetController extends Controller
             if ($request->hasFile('photo')) {
                 $photoPath = $request->file('photo')->store('pet_photos', 'public');
                 $validated['photo'] = $photoPath;
+            } else {
+                $validated['photo'] = null;
             }
 
             // Create the pet record with explicit data
@@ -80,21 +82,21 @@ class PetController extends Controller
                 'weight' => $validated['weight'],
                 'allergies' => $validated['allergies'] ?? null,
                 'notes' => $validated['notes'] ?? null,
-                'photo' => $validated['photo'] ?? null,
+                'photo' => $validated['photo'],
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Pet registered successfully',
                 'redirect' => route('pets.index')
-            ]);
+            ], 201);
 
         } catch (\Exception $e) {
             \Log::error('Pet creation error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error creating pet: ' . $e->getMessage()
-            ], 500);
+                'message' => 'Error registering pet: ' . $e->getMessage()
+            ], 422);
         }
     }
 

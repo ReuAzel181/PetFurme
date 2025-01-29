@@ -36,26 +36,28 @@
         /* Custom styles for forms */
         body {
             font-family: 'Inter', sans-serif; /* Use the imported font */
+            background-color: #f9fafb; /* Light background for better contrast */
         }
 
         .form-label {
-            font-weight: 600; /* Slightly bolder for better visibility */
-            margin-bottom: 0.5rem;
+            font-weight: 500; /* Medium weight for better visibility */
+            margin-bottom: 0.25rem; /* Reduced margin for compactness */
             color: #333; /* Darker color for better contrast */
+            font-size: 0.875rem; /* Adjusted font size for minimalism */
         }
 
         .form-control, .form-select {
-            border-radius: 8px;
+            border-radius: 6px; /* Slightly smaller radius for a neater look */
             border: 1px solid #e4e6ef; /* Added border for better visibility */
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
+            padding: 0.5rem 1rem; /* Reduced padding for compactness */
+            margin-bottom: 0.75rem; /* Consistent spacing */
             width: 100%;
             transition: border-color 0.3s; /* Smooth transition for focus */
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: #6777ef;
-            box-shadow: 0 0 0 0.2rem rgba(103, 119, 239, 0.25);
+            border-color: #4f46e5; /* Darker blue for focus */
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
         }
 
         .required:after {
@@ -65,18 +67,34 @@
 
         .card {
             border: none;
-            border-radius: 12px;
-            padding: 1.5rem;
+            border-radius: 10px; /* Slightly smaller radius for a neater look */
+            padding: 1rem; /* Reduced padding for compactness */
             margin: 1rem;
-            background-color: #fff; /* White background for cards */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            background-color: #ffffff; /* White background for cards */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
         }
 
         .card-header {
             border-bottom: 1px solid #f0f0f0;
-            padding: 1.5rem;
+            padding: 1rem; /* Reduced padding for compactness */
             font-weight: 600; /* Bold header */
             color: #333; /* Darker color for better contrast */
+        }
+
+        .btn {
+            border-radius: 6px; /* Rounded corners for buttons */
+            padding: 0.5rem 1rem; /* Reduced padding for compactness */
+            transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+        }
+
+        .btn-primary {
+            background-color: #4f46e5; /* Primary button color */
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca; /* Darker shade on hover */
+            transform: translateY(-1px); /* Slight lift effect */
         }
 
         /* Custom styles for iPhone XR */
@@ -98,7 +116,7 @@
         .main-content {
             height: calc(100vh - 125px);
             overflow-y: auto;
-            padding: 1rem; /* Added padding for main content */
+            padding: 0; /* Removed padding for a more compact layout */
         }
 
         /* Hide scrollbar but allow scrolling */
@@ -124,7 +142,7 @@
         }
     </script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 min-h-screen overflow-hidden">
     <!-- Top Navigation -->
     <nav class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50 top-nav-height safe-top">
         <div class="flex items-center justify-between px-4 h-full">
@@ -181,7 +199,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="main-content pt-[60px] pb-[65px]">
+    <main class="main-content">
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
                 {{ session('success') }}
