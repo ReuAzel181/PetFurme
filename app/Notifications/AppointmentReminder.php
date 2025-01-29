@@ -28,8 +28,12 @@ class AppointmentReminder extends Notification
 
     public function toTwilio($notifiable)
     {
-        return "Hi {$notifiable->name}, this is a reminder for your appointment on " . 
+        $phoneNumber = $notifiable->phone; // Assuming this is how you access the phone number
+        \Log::info('Sending SMS to:', ['to' => $phoneNumber]); // Log the phone number
+
+        // Include appointment details and pet's name in the message
+        return "Hi {$notifiable->name}, this is a reminder for your appointment for {$this->appointment->pet_name} on " . 
                $this->appointment->scheduled_at->format('M d, Y h:i A') . 
-               " at PawfectCare Veterinary Clinic.";
+               " at PetCare Veterinary Clinic.";
     }
 } 

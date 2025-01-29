@@ -22,7 +22,7 @@ class UpcomingAppointmentNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['nexmo'];
+        return ['nexmo']; // This can be changed to use Twilio if desired
     }
 
     public function toNexmo($notifiable)

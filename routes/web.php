@@ -609,3 +609,51 @@ Route::middleware(['auth', 'can:access-admin'])->group(function () {
 });
 
 Route::view('privacy-policy', 'privacy-policy')->name('privacy-policy');
+
+Route::get('/test-twilio', function () {
+    try {
+        $twilio = new \Twilio\Rest\Client(
+            env('TWILIO_ACCOUNT_SID'),
+            env('TWILIO_AUTH_TOKEN')
+        );
+
+        $toNumber = '+639214017593'; // Example number
+        $fromNumber = env('TWILIO_PHONE_NUMBER'); // Your Twilio number
+
+        // Log the details before sending the message
+        \Log::info('Twilio Client Created', [
+            'account_sid' => env('TWILIO_ACCOUNT_SID'),
+            'from_number' => $fromNumber,
+            'to_number' => $toNumber,
+        ]);
+
+        // Send a test message
+        $message = $twilio->messages->create(
+            $toNumber,
+            [
+                'from' => $fromNumber,
+                'body' => 'This is a test message from your Laravel application!'
+            ]
+        );
+
+        // Log the response from Twilio
+        \Log::info('Twilio SMS Response:', [
+            'sid' => $message->sid,
+            'status' => $message->status,
+            'to' => $toNumber,
+            'body' => 'This is a test message from your Laravel application!'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'SMS sent successfully!',
+            'message_sid' => $message->sid
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Twilio SMS Error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+    }
+});

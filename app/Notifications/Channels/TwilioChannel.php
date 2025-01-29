@@ -31,13 +31,27 @@ class TwilioChannel
 
         $to = $notifiable->routeNotificationForTwilio($notification);
 
+        // Log the message details
+        \Log::info('Twilio SMS Details:');
+        \Log::info('To: ' . $to);
+        \Log::info('Message: ' . $message);
+
         try {
-            $this->client->messages->create($to, [
+            $messageResponse = $this->client->messages->create($to, [
                 'from' => config('services.twilio.phone_number'),
+                'body' => $message
+            ]);
+
+            // Log the response from Twilio
+            \Log::info('Twilio SMS Response:', [
+                'sid' => $messageResponse->sid,
+                'status' => $messageResponse->status,
+                'to' => $to,
                 'body' => $message
             ]);
         } catch (\Exception $e) {
             \Log::error('Twilio SMS Error: ' . $e->getMessage());
+            throw $e;
         }
     }
 } 
