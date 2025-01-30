@@ -48,7 +48,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\UserManagementController;
 
 use App\Http\Controllers\NotificationsController;
-use App\Http\Controllers\PetOwner\PetOwnerController;
+use App\Http\Controllers\PetOwner\PetOwnerProductController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -239,7 +239,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('products/import/', [ProductImportController::class, 'create'])->name('products.import.view');
     Route::post('products/import/', [ProductImportController::class, 'store'])->name('products.import.store');
     Route::get('products/export/', [ProductExportController::class, 'create'])->name('products.export.store');
-    Route::resource('/products', \App\Http\Controllers\Product\ProductController::class);
+    Route::resource('products', ProductController::class);
 
 
 
@@ -665,4 +665,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/pet-owner/pets/create', [PetOwnerController::class, 'create'])->name('pet-owner.pets.create');
     Route::post('/pet-owner/pets', [PetOwnerController::class, 'store'])->name('pet-owner.pets.store');
     // Add other routes as needed
+});
+
+Route::middleware(['auth', 'role:pet_owner'])->prefix('pet-owner')->name('pet-owner.')->group(function () {
+    Route::get('/products', [PetOwnerProductController::class, 'index'])->name('products.index');
 });

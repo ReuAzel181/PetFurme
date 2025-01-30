@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Carbon;
+use App\Http\Requests\User\StoreUserRequest;
 
 class RegisterController extends Controller
 {
@@ -22,6 +23,9 @@ class RegisterController extends Controller
             'password' => 'required|min:8|confirmed',
             'terms' => 'required',
         ]);
+
+        // Log the incoming request data for debugging
+        \Log::info('Registration request data:', $request->all());
 
         // Generate 6 digit OTP
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -66,27 +70,39 @@ class RegisterController extends Controller
 
         // Get registration data from session
         $data = $request->session()->get('registration_data');
-        
-        // Create user with pet_owner role
-        $user = User::create([
-            'username' => $data['username'],
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role' => 'pet_owner'  // Set the role here
-        ]);
 
-        // Delete used OTP
-        PasswordResetOtp::where('email', session('email'))->delete();
-        
-        // Clear session data
-        $request->session()->forget(['registration_data', 'verify_otp']);
+        // Debugging: Log the registration data
+        \Log::info('Registering user with data:', $data);
 
-        // Log the user in
-        Auth::login($user);
+        try {
+            // Create user with pet_owner role
+            $user = User::create([
+                'username' => $data['username'],
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role' => 'pet_owner'  // Set the role here
+            ]);
 
-        return redirect()->route('pet-owner.dashboard')
-            ->with('status', 'Your account has been created successfully!');
+            // Debugging: Log the created user
+            \Log::info('User created:', $user->toArray());
+
+            // Delete used OTP
+            PasswordResetOtp::where('email', session('email'))->delete();
+            
+            // Clear session data
+            $request->session()->forget(['registration_data', 'verify_otp']);
+
+            // Log the user in
+            Auth::login($user);
+
+            return redirect()->route('pet-owner.dashboard')
+                ->with('status', 'Your account has been created successfully!');
+        } catch (\Exception $e) {
+            // Log any exceptions that occur during user creation
+            \Log::error('User creation failed: ' . $e->getMessage());
+            return back()->withErrors(['registration' => 'Failed to create account. Please try again.']);
+        }
     }
 
     /**
@@ -103,5 +119,30 @@ class RegisterController extends Controller
             ->first();
 
         return $passwordReset !== null;
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|confirmed|min:8',
+        ]);
+
+        // Debugging: Log the registration request data
+        \Log::info('Registering user with data:', $request->all());
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Debugging: Log the created user
+        \Log::info('User created:', $user->toArray());
+
+        Auth::login($user);
+
+        return redirect()->route('pet-owner.dashboard')->with('status', 'Your account has been created successfully!');
     }
 } 

@@ -161,7 +161,7 @@
                                         </div>
                                     </div>
 
-                                <div class="form-footer">
+                                    <div class="form-footer">
                                         <button type="submit" class="btn btn-primary w-100">Create Account</button>
                                     </div>
                                 </form>
@@ -824,6 +824,7 @@
             // Find and click the submit button
             const submitButton = this.querySelector('button[type="submit"]');
             if (submitButton) {
+                console.log('Submitting login form...'); // Debugging log
                 submitButton.click();
             }
         }
@@ -882,6 +883,7 @@
 
     toggleFormBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        console.log('Toggling to registration form...'); // Debugging log
         loginForm.style.opacity = '0';
         loginForm.style.visibility = 'hidden';
         setTimeout(() => {
@@ -895,6 +897,7 @@
 
     toggleLoginBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        console.log('Toggling to login form...'); // Debugging log
         registerForm.style.opacity = '0';
         registerForm.style.visibility = 'hidden';
         setTimeout(() => {

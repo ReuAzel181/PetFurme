@@ -41,45 +41,90 @@
 
         /* Bottom navigation styling */
         #bottomNav {
-            height: 80px; /* Increased height for better touch targets */
-            display: flex;
-            justify-content: space-around; /* Changed to space-around for better spacing */
-            align-items: center;
-            background-color: #ffffff; /* Reverted to original background color */
-            border-top: 2px solid #2563eb; /* Added a thicker border for separation */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Stronger shadow for depth */
+            box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.05);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            @apply relative py-2 px-3 rounded-xl transition-all duration-200;
+            min-width: 64px;
+        }
+
+        .nav-icon-wrapper {
+            @apply relative flex items-center justify-center w-6 h-6 mb-1;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-icon {
+            @apply w-6 h-6 transition-colors duration-200;
+            color: #64748b;
+        }
+
+        .nav-label {
+            @apply text-xs font-medium transition-colors duration-200;
+            color: #64748b;
+        }
+
+        .nav-indicator {
+            @apply absolute -bottom-2 left-1/2 w-1 h-1 rounded-full transform -translate-x-1/2 transition-all duration-200 opacity-0;
+            background-color: #2563eb;
+        }
+
+        /* Active & Hover States */
+        .nav-item.active .nav-icon,
+        .nav-item.active .nav-label {
+            color: #2563eb;
+        }
+
+        .nav-item.active .nav-indicator {
+            @apply opacity-100;
+            width: 16px;
+            height: 2px;
+        }
+
+        .nav-item.active .nav-icon-wrapper {
+            transform: translateY(-2px);
+        }
+
+        .nav-item:not(.active):hover .nav-icon,
+        .nav-item:not(.active):hover .nav-label {
+            color: #3b82f6;
+        }
+
+        /* Safe Area Adjustments */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            #bottomNav {
+                height: calc(4rem + env(safe-area-inset-bottom));
+            }
+            .nav-item {
+                padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+            }
         }
 
         /* Navigation items */
         .nav-item {
-            position: relative;
-            flex-grow: 1;
-            text-align: center;
-            color: #4b5563; /* Reverted to original darker gray */
-            transition: color 0.3s, transform 0.3s, box-shadow 0.3s; /* Include box-shadow in transition */
-            margin: 0 10px; /* Added margin for spacing */
-            border-radius: 10px; /* Rounded corners for a modern look */
-            padding: 10px; /* Added padding for better touch targets */
-            height: 70px; /* Set fixed height */
-            width: 70px; /* Set fixed width */
-            display: flex; /* Flexbox for centering content */
-            justify-content: center; /* Center content horizontally */
-            align-items: center; /* Center content vertically */
-            perspective: 1000px; /* Added perspective for 3D effect */
+            @apply relative flex-grow text-center transition-all duration-300 mx-2 rounded-xl py-2 px-3 h-[60px] w-[60px] flex justify-center items-center;
+            color: #64748b;
         }
 
-        .nav-item:active {
-            transform: translateY(-10px) scale(1.1); /* Move up and scale for depth */
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
+        .nav-item.active {
+            color: #2563eb;
+            font-weight: 500;
+            background: #eff6ff;
+        }
+
+        .nav-item.active svg {
+            @apply text-blue-600;
+        }
+
+        .nav-item:not(.active):hover {
+            @apply bg-gray-50;
         }
 
         /* Active state */
-        .nav-item.active {
-            color: #2563eb; /* Original blue */
-            font-weight: bold; /* Make active item bold */
-            transform: translateY(-10px) scale(1.1); /* Enhanced 3D effect with higher lift */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
-            background: rgb(255, 255, 255); /* Light background for active item */
+        .nav-item:active {
+            transform: translateY(-10px) scale(1.1); /* Move up and scale for depth */
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
         }
 
         /* Hover effects */
@@ -308,55 +353,179 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <nav id="bottomNav"
-        class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg transition-all duration-300 ease-in-out">
-        <div class="flex justify-around items-center h-full relative">
+    <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50">
+        <div class="max-w-screen-sm mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <a href="{{ route('pet-owner.dashboard') }}" 
+                   class="nav-item group {{ request()->routeIs('pet-owner.dashboard') ? 'active' : '' }}">
+                    <div class="relative flex flex-col items-center">
+                        <div class="nav-icon-wrapper">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+                                <path class="nav-icon-primary" d="M9.157 20.771v-3.066c0-.78.636-1.414 1.424-1.42h2.886c.792 0 1.433.636 1.433 1.42v3.076c0 .662.534 1.204 1.203 1.219h1.924c1.918 0 3.473-1.54 3.473-3.438v0-8.724a2.44 2.44 0 00-.962-1.905l-6.58-5.248a3.18 3.18 0 00-3.945 0L3.462 7.943A2.42 2.42 0 002.5 9.847v8.715C2.5 20.46 4.055 22 5.973 22h1.924c.685 0 1.241-.55 1.241-1.229v0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="nav-label">Home</span>
+                        <div class="nav-indicator"></div>
+                    </div>
+                </a>
 
-            <a href="{{ route('pet-owner.dashboard') }}" 
-            class="nav-item flex flex-col items-center justify-center p-2 transition-all duration-300"
-            data-target="home">
-                <i class="fas fa-home text-xl"></i>
-                <span class="text-xs">Home</span>
-            </a>
+                <a href="{{ route('pet-owner.pets.index') }}" 
+                   class="nav-item group {{ request()->routeIs('pet-owner.pets.*') ? 'active' : '' }}">
+                    <div class="relative flex flex-col items-center">
+                        <div class="nav-icon-wrapper">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+                                <path class="nav-icon-primary" d="M4.64 15.27c0-3.56 3.88-7.14 7.75-7.14s7.75 3.58 7.75 7.14c0 1.81-.6 3.48-1.61 4.76a5.88 5.88 0 01-4.07 2.32c-.68.1-1.37.1-2.05 0a5.88 5.88 0 01-4.07-2.32 7.37 7.37 0 01-1.61-4.76z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path class="nav-icon-secondary" d="M7.65 10.23c-.55-2.96.77-5.06 3.01-5.54 2.24-.48 4.29.9 4.85 3.13M19.05 7.32c1.01 2.44.41 4.85-1.35 5.41-1.76.56-3.8-.74-4.56-2.92" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="nav-label">Pets</span>
+                        <div class="nav-indicator"></div>
+                    </div>
+                </a>
 
-            <a href="{{ route('pet-owner.pets.index') }}" 
-            class="nav-item flex flex-col items-center justify-center p-2 transition-all duration-300"
-            data-target="pets">
-                <i class="fas fa-paw text-xl"></i>
-                <span class="text-xs">Pets</span>
-            </a>
+                <a href="{{ route('pet-owner.appointments.index') }}" 
+                   class="nav-item group {{ request()->routeIs('pet-owner.appointments.*') ? 'active' : '' }}">
+                    <div class="relative flex flex-col items-center">
+                        <div class="nav-icon-wrapper">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+                                <path class="nav-icon-primary" d="M3.093 9.404h17.814M16.442 13.31h.01M12.005 13.31h.009M7.558 13.31h.01M16.442 17.196h.01M12.005 17.196h.009M7.558 17.196h.01M16.044 2v3.29M7.965 2v3.29" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path class="nav-icon-secondary" d="M16.238 3.58H7.771C4.834 3.58 3 5.214 3 8.221v9.05C3 20.326 4.834 22 7.771 22h8.458C19.175 22 21 20.326 21 17.272V8.221c.009-3.007-1.816-4.641-4.762-4.641z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="nav-label">Schedule</span>
+                        <div class="nav-indicator"></div>
+                    </div>
+                </a>
 
-            <a href="{{ route('pet-owner.appointments.index') }}" 
-            class="nav-item flex flex-col items-center justify-center p-2 transition-all duration-300"
-            data-target="schedule">
-                <i class="fas fa-calendar text-xl"></i>
-                <span class="text-xs">Schedule</span>
-            </a>
-
-            <a href="{{ route('pet-owner.messages.index') }}" 
-            class="nav-item flex flex-col items-center justify-center p-2 transition-all duration-300"
-            data-target="messages">
-                <i class="fas fa-comments text-xl"></i>
-                <span class="text-xs">Messages</span>
-            </a>
+                <a href="{{ route('pet-owner.messages.index') }}" 
+                   class="nav-item group {{ request()->routeIs('pet-owner.messages.*') ? 'active' : '' }}">
+                    <div class="relative flex flex-col items-center">
+                        <div class="nav-icon-wrapper">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+                                <path class="nav-icon-primary" d="M17.268 9.061l-4.266 3.434a2.223 2.223 0 01-2.746 0L5.954 9.061" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path class="nav-icon-secondary" d="M6.888 3h9.428c1.36.015 2.653.59 3.58 1.59a5.017 5.017 0 011.326 3.704v6.528a5.017 5.017 0 01-1.326 3.704 4.957 4.957 0 01-3.58 1.59H6.888C3.968 20.116 2 17.741 2 14.822V8.294C2 5.375 3.968 3 6.888 3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="nav-label">Messages</span>
+                        <div class="nav-indicator"></div>
+                    </div>
+                </a>
+            </div>
         </div>
     </nav>
 
+    <style>
+        #bottomNav {
+            box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.05);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
 
+        .nav-item {
+            @apply relative py-2 px-3 rounded-xl transition-all duration-300;
+            min-width: 64px;
+        }
 
-    <!-- Notifications Panel (Hidden by default) -->
-    <div id="notifications-panel" 
-         class="fixed inset-y-0 right-0 w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-200 ease-in-out">
-        <div class="p-4">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold">Notifications</h2>
-                <button onclick="toggleNotifications()" class="text-gray-500">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <!-- Add your notifications content here -->
-        </div>
-    </div>
+        .nav-icon-wrapper {
+            @apply relative flex items-center justify-center w-7 h-7 mb-1;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-icon {
+            @apply w-7 h-7 transition-all duration-300;
+            color: #64748b;
+        }
+
+        .nav-icon-primary {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-icon-secondary {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.5;
+        }
+
+        .nav-label {
+            @apply text-xs font-medium transition-all duration-300;
+            color: #64748b;
+            transform: translateY(0);
+        }
+
+        .nav-indicator {
+            @apply absolute -bottom-2 left-1/2 w-1 h-1 rounded-full transform -translate-x-1/2 transition-all duration-300 opacity-0;
+            background-color: #2563eb;
+        }
+
+        /* Active & Hover States */
+        .nav-item.active .nav-icon,
+        .nav-item.active .nav-label {
+            color: #2563eb;
+        }
+
+        .nav-item.active .nav-icon-wrapper {
+            transform: translateY(-4px) scale(1.15);
+        }
+
+        .nav-item.active .nav-label {
+            transform: translateY(2px);
+            font-weight: 600;
+        }
+
+        .nav-item.active .nav-indicator {
+            @apply opacity-100;
+            width: 20px;
+            height: 3px;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
+        }
+
+        .nav-item.active .nav-icon-secondary {
+            opacity: 1;
+        }
+
+        /* Hover Animations */
+        .nav-item:not(.active):hover .nav-icon-wrapper {
+            transform: translateY(-2px);
+        }
+
+        .nav-item:not(.active):hover .nav-icon {
+            color: #3b82f6;
+        }
+
+        .nav-item:not(.active):hover .nav-label {
+            color: #3b82f6;
+            transform: translateY(1px);
+        }
+
+        /* Animation Keyframes */
+        @keyframes iconPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes labelSlide {
+            0% { transform: translateY(0); opacity: 0.5; }
+            100% { transform: translateY(2px); opacity: 1; }
+        }
+
+        /* Active Animation Classes */
+        .nav-item.active .nav-icon-wrapper {
+            animation: iconPop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item.active .nav-label {
+            animation: labelSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Safe Area Adjustments */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            #bottomNav {
+                height: calc(4rem + env(safe-area-inset-bottom));
+            }
+            .nav-item {
+                padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
 
     <script>
         function toggleNotifications() {
@@ -439,4 +608,4 @@
 
     </script>
 </body>
-</html> 
+</html>

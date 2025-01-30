@@ -102,7 +102,7 @@
                     </div>
                     <span class="font-semibold">Featured Products</span>
                 </div>
-                <a href="{{ route('products.index') }}" class="text-sm text-blue-600 hover:text-blue-700 flex items-center">
+                <a href="{{ route('pet-owner.products.index') }}" class="text-sm text-blue-600 hover:text-blue-700 flex items-center">
                     View All 
                     <i class="fas fa-arrow-right ml-1 text-xs"></i>
                 </a>
