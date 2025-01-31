@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
 
      protected $commands = [
         \App\Console\Commands\MigrateMessagesToConversations::class,
+        Commands\VerifyExistingUsers::class,
     ];
     
     protected function schedule(Schedule $schedule): void

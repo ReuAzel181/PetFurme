@@ -6,11 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
+        // First, drop the table if it exists
+        Schema::dropIfExists('users');
+
+        // Recreate the table with the correct structure
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
@@ -32,11 +33,8 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('users');
     }
-};
+}; 

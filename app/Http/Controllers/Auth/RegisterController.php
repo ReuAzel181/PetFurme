@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Carbon;
 use App\Http\Requests\User\StoreUserRequest;
+use Illuminate\Support\Facades\Validator;
+use App\Mail\OTPMail;
 
 class RegisterController extends Controller
 {
@@ -58,50 +60,57 @@ class RegisterController extends Controller
     public function verifyOTP(Request $request)
     {
         $request->validate([
-            'otp' => 'required|digits:6'
+            'otp' => 'required|string|size:6'
         ]);
 
-        if (!$this->verifyOTPCode($request->otp)) {
-            return back()
-                ->withInput()
-                ->withErrors(['otp' => 'Invalid or expired OTP.'])
-                ->with('verify_otp', true);
+        $storedOtp = PasswordResetOtp::where('email', session('email'))
+            ->where('otp', $request->otp)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$storedOtp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired verification code'
+            ], 422);
         }
 
-        // Get registration data from session
-        $data = $request->session()->get('registration_data');
-
-        // Debugging: Log the registration data
-        \Log::info('Registering user with data:', $data);
-
         try {
-            // Create user with pet_owner role
-            $user = User::create([
-                'username' => $data['username'],
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'role' => 'pet_owner'  // Set the role here
+            // Find the unverified user
+            $user = User::where('email', session('email'))
+                ->whereNull('email_verified_at')
+                ->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found or already verified'
+                ], 422);
+            }
+
+            // Mark user as verified
+            $user->email_verified_at = now();
+            $user->save();
+
+            // Clear verification data
+            session()->forget(['registration_data', 'email']);
+            $storedOtp->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email verified successfully! You can now login.',
+                'redirect' => route('login')
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Verification error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
-            // Debugging: Log the created user
-            \Log::info('User created:', $user->toArray());
-
-            // Delete used OTP
-            PasswordResetOtp::where('email', session('email'))->delete();
-            
-            // Clear session data
-            $request->session()->forget(['registration_data', 'verify_otp']);
-
-            // Log the user in
-            Auth::login($user);
-
-            return redirect()->route('pet-owner.dashboard')
-                ->with('status', 'Your account has been created successfully!');
-        } catch (\Exception $e) {
-            // Log any exceptions that occur during user creation
-            \Log::error('User creation failed: ' . $e->getMessage());
-            return back()->withErrors(['registration' => 'Failed to create account. Please try again.']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to verify email. Please try again.'
+            ], 500);
         }
     }
 
@@ -123,26 +132,169 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|confirmed|min:8',
+                'username' => 'required|string|unique:users',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Store registration data in session
+            $request->session()->put([
+                'registration_data' => $request->all(),
+                'email' => $request->email
+            ]);
+
+            // Generate OTP
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            // Create unverified user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'pet_owner',
+                'username' => $request->username,
+                'email_verified_at' => null // Mark as unverified
+            ]);
+
+            // Store OTP
+            PasswordResetOtp::updateOrCreate(
+                ['email' => $request->email],
+                [
+                    'otp' => $otp,
+                    'expires_at' => now()->addMinutes(10)
+                ]
+            );
+
+            try {
+                // Send verification email
+                Mail::to($request->email)->send(new OTPMail($otp));
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Please check your email for the verification code.',
+                    'verify_otp' => true
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Failed to send verification email', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+
+                // Delete the unverified user since email failed
+                $user->delete();
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unable to send verification email. Please try again.'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Registration error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process registration. Please try again.'
+            ], 500);
+        }
+    }
+
+    public function checkEmail(Request $request)
+    {
+        $exists = User::where('email', $request->email)->exists();
+        
+        return response()->json([
+            'exists' => $exists,
+            'message' => $exists ? 'This email is already taken. Please use a different email or login instead.' : 'Email available'
+        ]);
+    }
+
+    public function checkEmailDelivery(Request $request)
+    {
+        $email = session('email');
+        
+        if (!$email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email session expired'
+            ]);
+        }
+
+        $otp = PasswordResetOtp::where('email', $email)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$otp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP expired or not found'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email sent successfully'
+        ]);
+    }
+
+    public function resendVerification(Request $request)
+    {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|confirmed|min:8',
+            'email' => 'required|email'
         ]);
 
-        // Debugging: Log the registration request data
-        \Log::info('Registering user with data:', $request->all());
+        $user = User::where('email', $request->email)
+            ->whereNull('email_verified_at')
+            ->first();
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found or already verified'
+            ], 422);
+        }
 
-        // Debugging: Log the created user
-        \Log::info('User created:', $user->toArray());
+        // Generate new OTP
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        Auth::login($user);
+        // Store new OTP
+        PasswordResetOtp::updateOrCreate(
+            ['email' => $user->email],
+            [
+                'otp' => $otp,
+                'expires_at' => now()->addMinutes(10)
+            ]
+        );
 
-        return redirect()->route('pet-owner.dashboard')->with('status', 'Your account has been created successfully!');
+        try {
+            Mail::to($user->email)->send(new OTPMail($otp));
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Verification code has been resent to your email.'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to resend verification email', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send verification code. Please try again.'
+            ], 500);
+        }
     }
 } 

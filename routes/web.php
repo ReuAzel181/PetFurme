@@ -49,6 +49,7 @@ use App\Http\Controllers\UserManagementController;
 
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PetOwner\PetOwnerProductController;
+use App\Http\Controllers\PetOwner\DashboardController as PetOwnerDashboardController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -447,11 +448,18 @@ Route::middleware('guest')->group(function () {
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::post('register/send-otp', [RegisterController::class, 'sendOTP'])
+        ->name('register.send-otp');
+});
+
+Route::middleware(['auth', 'role:pet_owner'])->group(function () {
+    Route::get('/pet-owner/dashboard', [App\Http\Controllers\PetOwner\DashboardController::class, 'index'])
+        ->name('pet-owner.dashboard.home');
 });
 
 // Pet owner routes
-Route::middleware(['auth', 'role:pet_owner'])->prefix('pet-owner')->name('pet-owner.')->group(function () {
-    Route::get('/dashboard', [PetOwner\DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', 'verified', 'role:pet_owner'])->prefix('pet-owner')->name('pet-owner.')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\PetOwner\DashboardController::class, 'index'])->name('dashboard');
     
     // Profile routes
     Route::get('/profile', [PetOwner\ProfileController::class, 'index'])->name('profile');
@@ -662,11 +670,54 @@ Route::get('/test-twilio', function () {
 Route::post('/pet-owner/pets', [PetController::class, 'store'])->name('pet-owner.pets.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/pet-owner/pets/create', [PetOwnerController::class, 'create'])->name('pet-owner.pets.create');
-    Route::post('/pet-owner/pets', [PetOwnerController::class, 'store'])->name('pet-owner.pets.store');
+    Route::get('/pet-owner/pets/create', [App\Http\Controllers\PetOwner\PetOwnerController::class, 'create'])->name('pet-owner.pets.create');
+    Route::post('/pet-owner/pets', [App\Http\Controllers\PetOwner\PetOwnerController::class, 'store'])->name('pet-owner.pets.store');
     // Add other routes as needed
 });
 
 Route::middleware(['auth', 'role:pet_owner'])->prefix('pet-owner')->name('pet-owner.')->group(function () {
     Route::get('/products', [PetOwnerProductController::class, 'index'])->name('products.index');
+});
+
+// Add the dashboard route
+Route::middleware(['auth', 'verified', 'role:pet_owner'])->group(function () {
+    Route::get('/pet-owner/dashboard', function () {
+        return view('pet-owner.dashboard');
+    })->name('pet-owner.dashboard');
+});
+
+Route::get('/test-log', function() {
+    \Log::info('Test log entry');
+    return 'Logged! Check storage/logs/laravel.log';
+});
+
+// Add this near your other route groups
+Route::middleware(['auth', 'role:pet_owner'])->group(function () {
+    Route::get('/', [PetOwnerDashboardController::class, 'index'])
+        ->name('pet-owner.dashboard');
+    
+    Route::get('/pet-owner/dashboard', [PetOwnerDashboardController::class, 'index'])
+        ->name('pet-owner.dashboard');
+});
+
+Route::get('/check-email', [RegisterController::class, 'checkEmail'])
+    ->name('check.email')
+    ->middleware('guest');
+
+Route::post('/verify-otp', [RegisterController::class, 'verifyOTP'])
+    ->name('verify.otp')
+    ->middleware('guest');
+
+Route::post('/resend-verification', [RegisterController::class, 'resendVerification'])
+    ->name('verification.resend')
+    ->middleware('guest');
+
+// Add this route temporarily and remove after use
+Route::get('/verify-all-users', function() {
+    if (!app()->environment('production')) {
+        $count = \App\Models\User::whereNull('email_verified_at')
+            ->update(['email_verified_at' => now()]);
+        return "{$count} users have been verified.";
+    }
+    return 'Not available in production.';
 });

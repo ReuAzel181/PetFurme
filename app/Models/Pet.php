@@ -53,12 +53,11 @@ class Pet extends Model
         return self::whereDate('created_at', today())->count();
     }
 
-    // Add accessor for photo URL
     public function getPhotoUrlAttribute()
     {
-        if ($this->photo) {
-            return asset('storage/' . $this->photo);
+        if ($this->photo && Storage::disk('public')->exists('pet_photos/' . $this->photo)) {
+            return asset('storage/pet_photos/' . $this->photo);
         }
-        return asset('images/default-pet.png');
+        return asset('storage/defaults/default-pet.png');
     }
 }

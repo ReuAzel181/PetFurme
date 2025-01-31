@@ -7,8 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, SoftDeletes;
 
@@ -17,16 +18,22 @@ class User extends Authenticatable
     const ROLE_ADMIN = 'admin';
     const ROLE_STAFF = 'staff';
 
+    protected $dates = ['deleted_at'];
+
     protected $fillable = [
         'name',
         'email',
         'password',
-        'phone',
+        'username',
+        'uuid',
+        'role',
         'address',
-        'emergency_contact_name',
-        'emergency_contact_phone',
-        'profile_completed',
-        'role'
+        'phone',
+        'photo',
+        'store_name',
+        'store_address',
+        'store_email',
+        'email_verified_at'
     ];
 
     // Hidden fields when the user is serialized
@@ -38,6 +45,7 @@ class User extends Authenticatable
     // Cast attributes
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'verified' => 'boolean',
         'profile_completed' => 'boolean',
         'role' => 'string',
     ];

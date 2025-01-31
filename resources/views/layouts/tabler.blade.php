@@ -1410,15 +1410,128 @@
     <script src="{{ asset('dist/js/demo-theme.min.js') }}"></script>
 
     <div class="page" style="overflow: hidden;">
-        <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50 top-nav-height safe-top">
-            <nav class="navbar navbar-expand-md d-print-none">
-                <div class="container">
-                    <a class="navbar-brand" href="{{ route('pet-owner.dashboard') }}">Pet Owner</a>
-                    <!-- Other navbar content -->
+        <header class="navbar navbar-expand-md d-print-none">
+            <div class="container-xl">
+                <div class="header-content">
+                    <!-- Left Section -->
+                    <div class="header-left">
+                        <button class="navbar-toggler me-3" type="button">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <a href="{{ route('dashboard') }}" class="navbar-brand d-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M6 4h-1a2 2 0 0 0 -2 2v3.5h0a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1"/>
+                                <path d="M8 15a6 6 0 1 0 12 0v-3"/>
+                                <path d="M11 3v2"/>
+                                <path d="M6 3v2"/>
+                                <path d="M20 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                            </svg>
+                            <span class="ms-2">VetCare</span>
+                        </a>
+                    </div>
+
+                    <!-- Center Section -->
+                    <div class="header-center">
+                        <div class="search-wrapper">
+                            <form action="{{ route('search') }}" method="GET" class="search-form">
+                                <div class="input-icon">
+                                    <span class="input-icon-addon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/>
+                                            <path d="M21 21l-6 -6"/>
+                                        </svg>
+                                    </span>
+                                    <input type="text" 
+                                        value="{{ request('q') }}"
+                                        class="form-control form-control-rounded search-input" 
+                                        placeholder="Type a command (e.g., 'add', 'show')" 
+                                        name="q" 
+                                        autocomplete="off">
+                                </div>
+                                <div class="search-suggestions" style="display: none;"></div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right Section -->
+                    <div class="header-right">
+                        <div class="header-actions">
+                            <button class="btn btn-icon btn-outline-secondary" id="theme-toggle" title="Toggle theme">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sun" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/>
+                                    <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"/>
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-moon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                                    <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+                                </svg>
+                            </button>
+                            
+                            <!-- User Menu -->
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link d-flex lh-1 text-reset p-0 user-menu" data-bs-toggle="dropdown">
+                                    @auth
+                                        <span class="avatar avatar-sm" style="background-image: url('{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('assets/img2/default-avatar.png') }}')"></span>
+                                        <div class="d-none d-xl-block ps-2 user-info">
+                                            <div class="fw-bold">{{ Auth::user()->name }}</div>
+                                            <div class="mt-1 small text-muted">{{ Auth::user()->role ?? 'User' }}</div>
+                                        </div>
+                                    @else
+                                        <span class="avatar avatar-sm" style="background-image: url('{{ asset('assets/img2/default-avatar.png') }}')"></span>
+                                        <div class="d-none d-xl-block ps-2 user-info">
+                                            <div class="fw-bold">Guest</div>
+                                            <div class="mt-1 small text-muted">Not logged in</div>
+                                        </div>
+                                    @endauth
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    @auth
+                                        <a href="{{ route('profile.edit') }}" class="dropdown-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0 -2.573-1.066c-1.543 .94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 001.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/>
+                                                <path d="M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 0 0 -6 0"/>
+                                            </svg>
+                                            Account Settings
+                                        </a>
+                                        <form action="{{ route('logout') }}" method="post">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/>
+                                                    <path d="M9 12h12l-3-3"/>
+                                                    <path d="M18 15l3-3"/>
+                                                </svg>
+                                                Logout
+                                            </button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('login') }}" class="dropdown-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/>
+                                                <path d="M20 12h-13l3-3m0 6l-3-3"/>
+                                            </svg>
+                                            Login
+                                        </a>
+                                        <a href="{{ route('register') }}" class="dropdown-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/>
+                                                <path d="M16 19h6"/>
+                                                <path d="M19 16v6"/>
+                                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4"/>
+                                            </svg>
+                                            Register
+                                        </a>
+                                    @endauth
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </nav>
+            </div>
         </header>
 
+        <!-- here -->
         <div class="content-sd">
             <div class="collapse navbar-collapse show" id="navbar-menu">
                 <div class="navbar navbar-light">

@@ -69,7 +69,7 @@
             </div>
 
             <div class="flex space-x-3 overflow-hidden pb-2">
-                @foreach($pets as $pet)
+                @forelse($pets as $pet)
                     <div class="flex-shrink-0">
                         <div class="relative w-14 h-14">
                             <img src="{{ $pet->photo ? asset('storage/' . $pet->photo) : asset('storage/pet_photos/no-image.jpg') }}"
@@ -77,10 +77,16 @@
                                  class="w-full h-full rounded-full object-cover border-2 border-indigo-100"
                                  data-fallback="{{ asset('storage/pet_photos/no-image.jpg') }}"
                                  onError="if (!this.hasError) { this.hasError = true; this.src = this.dataset.fallback; }">
-                            <p class="text-xs text-center mt-1 text-gray-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis" title="{{ $pet->name }}">{{ $pet->name }}</p>
+                            <p class="text-xs text-center mt-1 text-gray-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis" 
+                               title="{{ $pet->name }}">{{ $pet->name }}</p>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="text-gray-500 text-sm">
+                        No pets registered yet. 
+                        <a href="{{ route('pets.create') }}" class="text-blue-500 hover:text-blue-600">Add your first pet</a>
+                    </div>
+                @endforelse
 
                 <!-- Add New Pet Button -->
                 <div class="flex-shrink-0">

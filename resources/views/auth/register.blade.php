@@ -104,46 +104,30 @@
 
                 @if (!session('verify_otp') && !old('verify_otp'))
                 <!-- Registration Form -->
-                <form action="{{ route('register.send-otp') }}" method="POST" autocomplete="off">
+                <form action="{{ route('register') }}" method="POST" autocomplete="off">
                     @csrf
-
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" name="username" id="username"
-                            class="form-control @error('username') is-invalid @enderror"
-                            value="{{ old('username') }}"
-                            placeholder="Enter username"
-                        >
-                        @error('username')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
 
                     <div class="mb-3">
                         <label for="name" class="form-label">Full Name</label>
                         <input type="text" name="name" id="name"
                             class="form-control @error('name') is-invalid @enderror"
                             value="{{ old('name') }}"
-                            placeholder="Enter Full Name"
-                        >
+                            required
+                            placeholder="Enter your full name">
                         @error('name')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
+                        <label for="email" class="form-label">Email Address</label>
                         <input type="email" name="email" id="email"
                             class="form-control @error('email') is-invalid @enderror"
                             value="{{ old('email') }}"
-                            placeholder="Enter email"
-                        >
+                            required
+                            placeholder="Enter your email">
                         @error('email')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -151,46 +135,35 @@
                         <label for="password" class="form-label">Password</label>
                         <input type="password" name="password" id="password"
                             class="form-control @error('password') is-invalid @enderror"
-                            placeholder="Password"
-                            autocomplete="off"
-                        >
+                            required
+                            placeholder="Create a password">
                         @error('password')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
+                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label for="password_confirmation" class="form-label">Confirm Password</label>
                         <input type="password" name="password_confirmation" id="password_confirmation"
-                            class="form-control @error('password') is-invalid @enderror"
-                            placeholder="Password Confirmation"
-                            autocomplete="off"
-                        >
-                        @error('password')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
+                            class="form-control"
+                            required
+                            placeholder="Confirm your password">
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-check">
-                            <input type="checkbox" name="terms" id="terms"
-                                class="form-check-input @error('terms') is-invalid @enderror"
-                            >
-                            <span class="form-check-label">
-                                Agree the <a href="./terms-of-service.html" tabindex="-1">terms and policy</a>.
-                            </span>
-                        </label>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="terms-of-service" id="terms-of-service" 
+                                   class="form-check-input @error('terms-of-service') is-invalid @enderror">
+                            <label class="form-check-label" for="terms-of-service">
+                                I agree to the Terms of Service
+                            </label>
+                            @error('terms-of-service')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
-                    <div class="form-footer">
-                        <button type="submit" class="btn btn-primary w-100">
-                            Send Verification OTP
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Create Account</button>
                 </form>
                 @else
                 <!-- OTP Verification Form -->
