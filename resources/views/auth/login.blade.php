@@ -7,176 +7,176 @@
         </div>
     @endif
 
-    <div class="page page-center">
-        <div class="background-shapes">
-            <div class="circle-1"></div>
-            <div class="circle-2"></div>
-            <div class="circle-3"></div>
-            <div class="circle-4"></div>
-            <div class="circle-5"></div>
-        </div>
-        <div class="container-xl py-4">
-            <div class="auth-card">
-                <div class="row g-0">
-                    <!-- Carousel Section -->
-                    <div class="col-lg-6 d-none d-lg-block carousel-side">
-                        <div class="welcome-header">
-                            <h1 class="display-5 fw-bold text-white mb-2" style="font-weight: bolder !important; text-shadow: 2px 2px 10px rgba(50, 50, 50, 0.5);  margin-bottom: -5px !important;">VetCare</h1>
-                            <p class="text-white-50 fs-5">Where caring means more.</p>
+<div class="page page-center">
+    <div class="background-shapes">
+        <div class="circle-1"></div>
+        <div class="circle-2"></div>
+        <div class="circle-3"></div>
+        <div class="circle-4"></div>
+        <div class="circle-5"></div>
+    </div>
+    <div class="container-xl py-4">
+        <div class="auth-card">
+            <div class="row g-0">
+                <!-- Carousel Section -->
+                <div class="col-lg-6 d-none d-lg-block carousel-side">
+                    <div class="welcome-header">
+                        <h1 class="display-5 fw-bold text-white mb-2" style="font-weight: bolder !important; text-shadow: 2px 2px 10px rgba(50, 50, 50, 0.5);  margin-bottom: -5px !important;">VetCare</h1>
+                        <p class="text-white-50 fs-5">Where caring means more.</p>
+                    </div>
+                    
+                    <div id="authCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="{{ asset('storage/carousel/Carousel1.jpg') }}" class="carousel-image" alt="Welcome">
+                                <div class="carousel-overlay"></div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="{{ asset('storage/carousel/Carousel2.jpg') }}" class="carousel-image" alt="Services">
+                                <div class="carousel-overlay"></div>
                         </div>
-                        
-                        <div id="authCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-                            <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <img src="{{ asset('storage/carousel/Carousel1.jpg') }}" class="carousel-image" alt="Welcome">
-                                    <div class="carousel-overlay"></div>
-                                </div>
-                                <div class="carousel-item">
-                                    <img src="{{ asset('storage/carousel/Carousel2.jpg') }}" class="carousel-image" alt="Services">
-                                    <div class="carousel-overlay"></div>
+                            <div class="carousel-item">
+                                <img src="{{ asset('storage/carousel/Carousel3.jpg') }}" class="carousel-image" alt="Health">
+                                <div class="carousel-overlay"></div>
                             </div>
-                                <div class="carousel-item">
-                                    <img src="{{ asset('storage/carousel/Carousel3.jpg') }}" class="carousel-image" alt="Health">
-                                    <div class="carousel-overlay"></div>
-                                </div>
-                            </div>
-                            <div class="carousel-controls">
-                                <div class="carousel-indicators">
-                                    <span class="indicator active" data-bs-target="#authCarousel" data-bs-slide-to="0"></span>
-                                    <span class="indicator" data-bs-target="#authCarousel" data-bs-slide-to="1"></span>
-                                    <span class="indicator" data-bs-target="#authCarousel" data-bs-slide-to="2"></span>
+                        </div>
+                        <div class="carousel-controls">
+                            <div class="carousel-indicators">
+                                <span class="indicator active" data-bs-target="#authCarousel" data-bs-slide-to="0"></span>
+                                <span class="indicator" data-bs-target="#authCarousel" data-bs-slide-to="1"></span>
+                                <span class="indicator" data-bs-target="#authCarousel" data-bs-slide-to="2"></span>
                         </div>
                     </div>
                 </div>
             </div>
 
-                    <!-- Login Form Section -->
-                <div class="col-lg-6">
-                        <div class="login-section">
-                            <div class="form-header text-center">
-                                <img src="{{ asset('storage/defaults/vc_logo.png') }}" alt="VetCare Logo" height="66" class="navbar-brand-image">
-                                <div id="headerText">
-                                    <h2 class="text-primary fw-bold">Welcome Back!</h>
-                                    <p class="text-muted">Please sign in to continue</p>
-                        </div>
+                <!-- Login Form Section -->
+            <div class="col-lg-6">
+                    <div class="login-section">
+                        <div class="form-header text-center">
+                            <img src="{{ asset('storage/defaults/vc_logo.png') }}" alt="VetCare Logo" height="66" class="navbar-brand-image">
+                            <div id="headerText">
+                                <h2 class="text-primary fw-bold">Welcome Back!</h>
+                                <p class="text-muted">Please sign in to continue</p>
+                    </div>
+                                </div>
+
+                        <div class="form-container">
+                            <!-- Login Form -->
+                            <div class="login-form-container" id="loginForm" style="margin-bottom: 70px;">
+                                <form action="{{ route('login') }}" method="POST" autocomplete="off">
+                                @csrf
+                                <div class="mb-3">
+                                    <label class="form-label">Email address</label>
+                                    <div class="input-icon">
+                                        <span class="input-icon-addon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
+                                        </span>
+                                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="your@email.com" value="{{ old('email') }}" required>
+                                    </div>
+                                    @error('email')
+                                        <div class="invalid-feedback">
+                                            The email or password you entered is incorrect. Please try again.
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label mb-0">Password</label>
+                                        @if (Route::has('password.request'))
+                                                <a href="{{ route('password.request') }}" class="text-muted small">Forgot password?</a>
+                                        @endif
+                                    </div>
+                                        <div class="input-icon">
+                                            <span class="input-icon-addon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
+                                            </span>
+                                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Your password" required>
+                                            <span class="input-icon-addon">
+                                                <a href="#" class="link-secondary toggle-password">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    @error('password')
+                                        <div class="invalid-feedback">
+                                            The email or password you entered is incorrect. Please try again.
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                    <div class="mb-3">
+                                    <label class="form-check">
+                                        <input type="checkbox" name="remember" class="form-check-input"/>
+                                            <span class="form-check-label">Keep me signed in</span>
+                                    </label>
                                     </div>
 
-                            <div class="form-container">
-                                <!-- Login Form -->
-                                <div class="login-form-container" id="loginForm" style="margin-bottom: 70px;">
-                                    <form action="{{ route('login') }}" method="POST" autocomplete="off">
+                                    <div class="form-footer">
+                                        <button type="submit" class="btn btn-primary w-100">Log in</button>
+                                    </div>
+                                </form>
+                                <div class="text-center mt-4" style="margin-top: 10px !important;">
+                                    <span class="text-muted" style="font-size: 12px;">Don't have an account?</span>
+                                    <a href="#" class="text-primary ms-2 fw-bold" id="toggleForm" style="font-size: 13px;">Create account</a>
+                                </div>
+                            </div>
+
+                            <!-- Registration Form -->
+                            <div class="login-form-container" id="registerForm" style="display: none; margin-bottom: 25px;">
+                                    <form method="POST" action="{{ route('register') }}" id="registrationForm">
                                     @csrf
+                                    <div class="mb-3">
+                                        <label class="form-label">Full Name</label>
+                                        <div class="input-icon">
+                                            <span class="input-icon-addon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /></svg>
+                                            </span>
+                                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="John Doe" required>
+                                        </div>
+                                            @error('name')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                    </div>
+
                                     <div class="mb-3">
                                         <label class="form-label">Email address</label>
                                         <div class="input-icon">
                                             <span class="input-icon-addon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
                                             </span>
-                                            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="your@email.com" value="{{ old('email') }}" required>
-                                        </div>
-                                        @error('email')
-                                            <div class="invalid-feedback">
-                                                The email or password you entered is incorrect. Please try again.
-                                            </div>
-                                        @enderror
-                                    </div>
-
-                                    <div class="mb-3">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label class="form-label mb-0">Password</label>
-                                            @if (Route::has('password.request'))
-                                                    <a href="{{ route('password.request') }}" class="text-muted small">Forgot password?</a>
-                                            @endif
-                                        </div>
-                                            <div class="input-icon">
-                                                <span class="input-icon-addon">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
-                                                </span>
-                                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Your password" required>
-                                                <span class="input-icon-addon">
-                                                    <a href="#" class="link-secondary toggle-password">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
-                                                    </a>
-                                                </span>
-                                            </div>
-                                        @error('password')
-                                            <div class="invalid-feedback">
-                                                The email or password you entered is incorrect. Please try again.
-                                            </div>
-                                        @enderror
-                                    </div>
-
-                                        <div class="mb-3">
-                                        <label class="form-check">
-                                            <input type="checkbox" name="remember" class="form-check-input"/>
-                                                <span class="form-check-label">Keep me signed in</span>
-                                        </label>
-                                        </div>
-
-                                        <div class="form-footer">
-                                            <button type="submit" class="btn btn-primary w-100">Log in</button>
-                                        </div>
-                                    </form>
-                                    <div class="text-center mt-4" style="margin-top: 10px !important;">
-                                        <span class="text-muted" style="font-size: 12px;">Don't have an account?</span>
-                                        <a href="#" class="text-primary ms-2 fw-bold" id="toggleForm" style="font-size: 13px;">Create account</a>
-                                    </div>
-                                </div>
-
-                                <!-- Registration Form -->
-                                <div class="login-form-container" id="registerForm" style="display: none; margin-bottom: 25px;">
-                                    <form method="POST" action="{{ route('register') }}" id="registrationForm">
-                                        @csrf
-                                        <div class="mb-3">
-                                            <label class="form-label">Full Name</label>
-                                            <div class="input-icon">
-                                                <span class="input-icon-addon">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /></svg>
-                                                </span>
-                                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="John Doe" required>
-                                            </div>
-                                            @error('name')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Email address</label>
-                                            <div class="input-icon">
-                                                <span class="input-icon-addon">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
-                                                </span>
                                                 <input type="email" 
                                                        name="email" 
                                                        class="form-control" 
                                                        placeholder="your@email.com" 
                                                        required>
-                                            </div>
-                                            <div class="invalid-feedback" style="display: none;"></div>
                                         </div>
+                                            <div class="invalid-feedback" style="display: none;"></div>
+                                    </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Password</label>
-                                            <div class="input-icon">
-                                                <span class="input-icon-addon">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
-                                                </span>
+                                    <div class="mb-3">
+                                        <label class="form-label">Password</label>
+                                        <div class="input-icon">
+                                            <span class="input-icon-addon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
+                                            </span>
                                                 <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" required>
-                                            </div>
+                                        </div>
                                             @error('password')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                        </div>
+                                    </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Confirm Password</label>
-                                            <div class="input-icon">
-                                                <span class="input-icon-addon">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
-                                                </span>
+                                    <div class="mb-3">
+                                        <label class="form-label">Confirm Password</label>
+                                        <div class="input-icon">
+                                            <span class="input-icon-addon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
+                                            </span>
                                                 <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm Password" required>
-                                            </div>
                                         </div>
+                                    </div>
 
                                         <div class="mb-3">
                                             <label class="form-check">
@@ -188,14 +188,13 @@
                                             @enderror
                                         </div>
 
-                                        <div class="form-footer">
+                                    <div class="form-footer">
                                             <button type="submit" class="btn btn-primary w-100" id="registerButton">Create Account</button>
-                                        </div>
-                                    </form>
-                                    <div class="text-center mt-4" style="margin-bottom: 10px;">
-                                        <span class="text-muted">Already have an account?</span>
-                                        <a href="#" class="text-primary ms-2 fw-bold" id="toggleLogin">Sign in</a>
                                     </div>
+                                </form>
+                                <div class="text-center mt-4" style="margin-bottom: 10px;">
+                                    <span class="text-muted">Already have an account?</span>
+                                    <a href="#" class="text-primary ms-2 fw-bold" id="toggleLogin">Sign in</a>
                                 </div>
                             </div>
                         </div>
@@ -204,6 +203,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <!-- Update the OTP verification modal -->
     <div class="modal fade" id="otpVerificationModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">

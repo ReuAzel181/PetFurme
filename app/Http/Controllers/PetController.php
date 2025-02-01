@@ -201,4 +201,15 @@ class PetController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function getMedicalHistory(Pet $pet)
+    {
+        // Fetch medical history records for the pet
+        $medicalHistory = $pet->medicalRecords()
+            ->select('date', 'service', 'diagnosis', 'treatment', 'notes')
+            ->orderBy('date', 'desc')
+            ->get();
+
+        return response()->json($medicalHistory);
+    }
 }

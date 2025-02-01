@@ -60,4 +60,12 @@ class Pet extends Model
         }
         return asset('storage/defaults/default-pet.png');
     }
+
+    /**
+     * Get the owner (user) that owns the pet.
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

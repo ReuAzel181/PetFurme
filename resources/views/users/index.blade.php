@@ -217,6 +217,122 @@
             margin-bottom: 1rem;
         }
     }
+    
+    .role-btn {
+        padding-left: 1rem !important;
+        transition: all 0.3s ease;
+        border-radius: 4px !important;
+        margin: 0 2px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .role-btn:hover {
+        transform: translateY(-1px);
+    }
+    
+    .role-btn.active {
+        font-weight: 500;
+    }
+    
+    .role-indicator {
+        transition: all 0.3s ease;
+    }
+    
+    .role-btn:hover .role-indicator {
+        height: 100%;
+        opacity: 0.15;
+        width: 100%;
+    }
+    
+    .role-btn.active .role-indicator {
+        height: 100%;
+        opacity: 0.1;
+        width: 100%;
+    }
+
+    /* New styles for role buttons */
+    .role-btn[data-role="admin"] {
+        background-color: rgba(214, 57, 57, 0.1);
+        border-color: #d63939;
+        color: #d63939;
+    }
+    
+    .role-btn[data-role="admin"]:hover {
+        background-color: rgba(214, 57, 57, 0.2);
+    }
+    
+    .role-btn[data-role="staff"],
+    .role-btn[data-role="sub_admin"] {
+        background-color: rgba(253, 126, 20, 0.1);
+        border-color: #fd7e14;
+        color: #fd7e14;
+    }
+    
+    .role-btn[data-role="staff"]:hover,
+    .role-btn[data-role="sub_admin"]:hover {
+        background-color: rgba(253, 126, 20, 0.2);
+    }
+    
+    .role-btn[data-role="pet_owner"] {
+        background-color: rgba(47, 179, 68, 0.1);
+        border-color: #2fb344;
+        color: #2fb344;
+    }
+    
+    .role-btn[data-role="pet_owner"]:hover {
+        background-color: rgba(47, 179, 68, 0.2);
+    }
+    
+    .role-btn.active[data-role="admin"] {
+        background-color: #d63939;
+        color: white;
+    }
+    
+    .role-btn.active[data-role="staff"],
+    .role-btn.active[data-role="sub_admin"] {
+        background-color: #fd7e14;
+        color: white;
+    }
+    
+    .role-btn.active[data-role="pet_owner"] {
+        background-color: #2fb344;
+        color: white;
+    }
+    
+    .card {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+    
+    .btn-primary {
+        transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .col-md-6 {
+            padding: 0.5rem;
+        }
+        
+        .card-body {
+            padding: 1rem !important;
+        }
+    }
 </style>
 
 <div class="page-wrapper">
@@ -236,12 +352,13 @@
             <div class="card">
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center w-100">
-                        <div class="btn-group">
+                        <div class="btn-group" id="roleToggle">
                             @foreach($roles as $key => $label)
-                                <a href="{{ route('user-management.index', ['role' => $key]) }}" 
-                                   class="btn btn-outline-secondary {{ request()->query('role', 'all') === $key ? 'active' : '' }}">
-                                    {{ $label }}
-                                </a>
+                                <button type="button"
+                                   class="btn role-btn {{ request()->query('role', 'all') === $key ? 'active' : '' }}"
+                                   data-role="{{ $key }}">
+                                    <span class="ms-1">{{ $label }}</span>
+                                </button>
                             @endforeach
                         </div>
                         <div class="d-flex gap-2">
@@ -375,7 +492,33 @@
                                         <td onclick="showUserDetails({{ $user->id }})">{{ $user->name }}</td>
                                         <td onclick="showUserDetails({{ $user->id }})">{{ $user->email }}</td>
                                         <td onclick="showUserDetails({{ $user->id }})">{{ $user->phone ?? '—' }}</td>
-                                        <td onclick="showUserDetails({{ $user->id }})">{{ ucfirst($user->role) }}</td>
+                                        <td onclick="showUserDetails({{ $user->id }})">
+                                            @php
+                                                $roleColors = [
+                                                    'admin' => ['bg' => '#d63939', 'text' => '#fff'],
+                                                    'staff' => ['bg' => '#fd7e14', 'text' => '#fff'],
+                                                    'sub_admin' => ['bg' => '#fd7e14', 'text' => '#fff'],
+                                                    'pet_owner' => ['bg' => '#2fb344', 'text' => '#fff']
+                                                ];
+                                                $roleColor = $roleColors[$user->role] ?? ['bg' => '#666', 'text' => '#fff'];
+                                            @endphp
+                                            <span class="badge" style="
+                                                background-color: {{ $roleColor['bg'] }}; 
+                                                color: {{ $roleColor['text'] }}; 
+                                                padding: 5px 10px;
+                                                font-weight: 500;
+                                                display: inline-flex;
+                                                align-items: center;
+                                                gap: 5px;
+                                            ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-shield" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M6 21v-2a4 4 0 0 1 4 -4h2"></path>
+                                                    <path d="M22 16c0 4 -2.5 6 -3.5 6s-3.5 -2 -3.5 -6c1 0 2.5 -.5 3.5 -1.5c1 1 2.5 1.5 3.5 1.5z"></path>
+                                                    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                                </svg>
+                                                {{ ucfirst(str_replace('_', ' ', $user->role)) }}
+                                            </span>
+                                        </td>
                                         <td onclick="showUserDetails({{ $user->id }})" class="text-center p-3">
                                             @if($user->pets_count > 0)
                                                 <span class="badge bg-blue fs-5 d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px; color: white; padding: 2px;">
@@ -446,24 +589,28 @@
                     </div>
                     <div class="ms-auto d-flex align-items-center gap-2">
                         @php
+                            $roleColors = [
+                                'admin' => ['bg' => '#d63939', 'lt' => 'red'],
+                                'staff' => ['bg' => '#fd7e14', 'lt' => 'orange'],
+                                'sub_admin' => ['bg' => '#fd7e14', 'lt' => 'orange'],
+                                'pet_owner' => ['bg' => '#2fb344', 'lt' => 'green']
+                            ];
+                            $roleColor = $roleColors[$user->role] ?? ['bg' => '#666', 'lt' => 'secondary'];
+                            
                             $roleLabels = [
                                 'admin' => 'ADMIN',
                                 'staff' => 'SUB-ADMIN',
+                                'sub_admin' => 'SUB-ADMIN',
                                 'pet_owner' => 'PET OWNER'
                             ];
-                            $roleColors = [
-                                'admin' => 'red',
-                                'staff' => 'green',
-                                'pet_owner' => 'blue'
-                            ];
                         @endphp
-                        <span class="badge fs-6 bg-{{ $roleColors[$user->role] ?? 'secondary' }}-lt">
+                        <span class="badge fs-6 bg-{{ $roleColor['lt'] }}-lt">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-shield me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M6 21v-2a4 4 0 0 1 4 -4h2"></path>
                                 <path d="M22 16c0 4 -2.5 6 -3.5 6s-3.5 -2 -3.5 -6c1 0 2.5 -.5 3.5 -1.5c1 1 2.5 1.5 3.5 1.5z"></path>
                                 <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
                             </svg>
-                            {{ $roleLabels[$user->role] ?? ucfirst($user->role) }}
+                            {{ $roleLabels[$user->role] ?? ucfirst(str_replace('_', ' ', $user->role)) }}
                         </span>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
@@ -576,25 +723,42 @@
                                     <!-- Pets Tab -->
                                     <div class="tab-pane fade show active" id="pets-{{ $user->id }}">
                                         @if($user->pets->count() > 0)
-                                            <div class="row g-2">
+                                            <div class="row g-3">
                                                 @foreach($user->pets as $pet)
                                                     <div class="col-md-6">
-                                                        <div class="card">
-                                                            <div class="card-body p-3">
-                                                                <div class="d-flex">
-                                                                    <img src="{{ $pet->photo ? asset('storage/' . $pet->photo) : asset('images/default-pet.png') }}" 
-                                                                         class="rounded me-3" style="width: 64px; height: 64px; object-fit: cover;">
-                                                                    <div>
-                                                                        <h4 class="mb-1">{{ $pet->name }}</h4>
-                                                                        <div class="text-muted mb-2">{{ $pet->breed }}</div>
-                                                                        <div class="d-flex gap-2">
-                                                                            <span class="badge bg-blue-lt">{{ $pet->type }}</span>
-                                                                            <span class="badge bg-green-lt">
-                                                                                {{ $pet->age }} {{ Str::plural('month', $pet->age) }} old
-                                                                            </span>
-                                                                            <span class="badge bg-purple-lt">{{ ucfirst($pet->gender) }}</span>
+                                                        <div class="card h-100">
+                                                            <div class="card-body p-4">
+                                                                <div class="d-flex flex-column">
+                                                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                                                        <div class="d-flex gap-3">
+                                                                            <img src="{{ $pet->photo ? asset('storage/' . $pet->photo) : asset('images/default-pet.png') }}" 
+                                                                                 class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                                                            <div>
+                                                                                <h4 class="mb-1">{{ $pet->name }}</h4>
+                                                                                <div class="text-muted">{{ $pet->breed }}</div>
+                                                                                <div class="d-flex gap-2 mt-2">
+                                                                                    <span class="badge bg-blue-lt">{{ $pet->type }}</span>
+                                                                                    <span class="badge bg-green-lt">
+                                                                                        {{ $pet->age }} {{ Str::plural('month', $pet->age) }} old
+                                                                                    </span>
+                                                                                    <span class="badge bg-purple-lt">{{ ucfirst($pet->gender) }}</span>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
+                                                                    
+                                                                    <a href="{{ route('appointments.create', ['pet_id' => $pet->id, 'owner_id' => $user->id]) }}" 
+                                                                       class="btn btn-primary btn-lg mt-2 w-100">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-plus me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                            <path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
+                                                                            <path d="M16 3v4"></path>
+                                                                            <path d="M8 3v4"></path>
+                                                                            <path d="M4 11h16"></path>
+                                                                            <path d="M10 16h4"></path>
+                                                                            <path d="M12 14v4"></path>
+                                                                        </svg>
+                                                                        Schedule Appointment
+                                                                    </a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -903,6 +1067,56 @@
     document.querySelectorAll('.user-select, .btn-icon').forEach(element => {
         element.addEventListener('click', (e) => {
             e.stopPropagation();
+        });
+    });
+
+    // Role filtering with AJAX
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleButtons = document.querySelectorAll('.role-btn');
+        const tableBody = document.querySelector('table tbody');
+        
+        roleButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                roleButtons.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                const role = this.dataset.role;
+                
+                // Show loading state
+                tableBody.style.opacity = '0.5';
+                
+                // Make AJAX request
+                fetch(`{{ route('user-management.index') }}?role=${role}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Create a temporary element to parse the HTML
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    
+                    // Extract the table body content
+                    const newTableBody = temp.querySelector('table tbody');
+                    
+                    if (newTableBody) {
+                        tableBody.innerHTML = newTableBody.innerHTML;
+                    }
+                    
+                    // Update URL without page reload
+                    window.history.pushState({}, '', `{{ route('user-management.index') }}?role=${role}`);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    // Remove loading state
+                    tableBody.style.opacity = '1';
+                });
+            });
         });
     });
 </script>

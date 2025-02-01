@@ -36,38 +36,60 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                    <label class="form-label required">Pet Owner</label>
-                                    <select id="user_id" name="user_id" class="form-select @error('user_id') is-invalid @enderror" required>
-                                        <option value="">Select Pet Owner</option>
-                                        <option value="no_account">No Account (Walk-in)</option>
-                                        @foreach($users as $user)
-                                            <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                                {{ $user->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('user_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <label class="form-label required">Pet Owner</label>
+                                <select name="owner_id" id="owner_id" class="form-select" {{ isset($owner) ? 'disabled' : '' }}>
+                                    <option value="">Select Owner</option>
+                                    @foreach($owners as $ownerOption)
+                                        <option value="{{ $ownerOption->id }}" 
+                                            {{ (old('owner_id') == $ownerOption->id || (isset($owner) && $owner->id == $ownerOption->id)) ? 'selected' : '' }}>
+                                            {{ $ownerOption->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('owner_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div id="owner_name_group" class="col-md-6" style="display: none;">
-                                    <label class="form-label required">Owner Name</label>
-                                    <input type="text" id="owner_name" name="owner_name" class="form-control @error('owner_name') is-invalid @enderror" value="{{ old('owner_name') }}">
-                                    @error('owner_name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <label class="form-label required">Owner Name</label>
+                                <input type="text" id="owner_name" name="owner_name" class="form-control @error('owner_name') is-invalid @enderror" value="{{ old('owner_name') }}">
+                                @error('owner_name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div id="pet_selection_group" class="col-md-6">
-                                    <label class="form-label required">Select Pet</label>
-                                    <select id="pet_id" name="pet_id" class="form-select @error('pet_id') is-invalid @enderror">
-                                        <option value="">Choose a pet</option>
-                                    </select>
-                                    @error('pet_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <label class="form-label required">Select Pet</label>
+                                <select name="pet_id" id="pet_id" class="form-select" {{ isset($pet) ? 'disabled' : '' }}>
+                                    <option value="">Select Pet</option>
+                                    @if(isset($ownerPets))
+                                        @foreach($ownerPets as $petOption)
+                                            <option value="{{ $petOption->id }}" 
+                                                {{ (old('pet_id') == $petOption->id || (isset($pet) && $pet->id == $petOption->id)) ? 'selected' : '' }}
+                                                data-type="{{ $petOption->type }}"
+                                                data-age="{{ $petOption->age }}">
+                                                {{ $petOption->name }} ({{ $petOption->type }})
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('pet_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Add this debugging section temporarily -->
+                            @if(app()->environment('local'))
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        Debug Info:
+                                        <br>Pet ID: {{ request('pet_id') }}
+                                        <br>Owner ID: {{ request('owner_id') }}
+                                        <br>Selected Pet: {{ isset($pet) ? $pet->id : 'none' }}
+                                    </div>
                                 </div>
+                            @endif
 
                             <div id="walkin_pet_group" class="col-12" style="display: none;">
                                 <div class="row g-3">
@@ -112,66 +134,66 @@
 
                             <div id="registered_pet_details" class="row g-3">
                                 <div class="col-md-4">
-                                                    <label class="form-label">Pet Name</label>
-                                                    <input type="text" id="pet_name" class="form-control" readonly>
-                                                </div>
+                                    <label class="form-label">Pet Name</label>
+                                    <input type="text" id="pet_name" class="form-control" readonly>
+                                </div>
 
                                 <div class="col-md-4">
-                                                    <label class="form-label">Pet Type</label>
-                                                    <input type="text" id="pet_type" class="form-control" readonly>
-                                                </div>
+                                    <label class="form-label">Pet Type</label>
+                                    <input type="text" id="pet_type" class="form-control" readonly>
+                                </div>
 
                                 <div class="col-md-4">
-                                                    <label class="form-label">Pet Age</label>
-                                                    <div class="input-group">
-                                                        <input type="number" id="pet_age" class="form-control" readonly>
+                                    <label class="form-label">Pet Age</label>
+                                    <div class="input-group">
+                                        <input type="number" id="pet_age" class="form-control" readonly>
                                         <select id="age_unit" class="form-select" style="max-width: 100px;" disabled>
-                                                            <option value="years">Years</option>
-                                                            <option value="months">Months</option>
-                                                        </select>
+                                            <option value="years">Years</option>
+                                            <option value="months">Months</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
-                                                    <label class="form-label required">Date</label>
-                                                    <input type="date" id="appointment_date" name="appointment_date" 
-                                                           class="form-control @error('appointment_date') is-invalid @enderror" 
-                                                           required value="{{ old('appointment_date') }}">
-                                                    @error('appointment_date')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
+                                <label class="form-label required">Date</label>
+                                <input type="date" id="appointment_date" name="appointment_date" 
+                                       class="form-control @error('appointment_date') is-invalid @enderror" 
+                                       required value="{{ old('appointment_date') }}">
+                                @error('appointment_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
                             <div class="col-md-6">
-                                                    <label class="form-label required">Time</label>
-                                                    <select id="appointment_time" name="appointment_time" 
-                                                            class="form-select @error('appointment_time') is-invalid @enderror" 
-                                                            required>
-                                                        <option value="">Select Time</option>
-                                                        <optgroup label="Morning">
-                                                            @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'] as $time)
-                                                                <option value="{{ $time }}" {{ old('appointment_time') == $time ? 'selected' : '' }}>
-                                                                    {{ $time }}
-                                                                </option>
-                                                            @endforeach
-                                                        </optgroup>
-                                                        <optgroup label="Afternoon">
-                                                            @foreach(['13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'] as $time)
-                                                                <option value="{{ $time }}" {{ old('appointment_time') == $time ? 'selected' : '' }}>
-                                                                    {{ $time }}
-                                                                </option>
-                                                            @endforeach
-                                                        </optgroup>
-                                                    </select>
-                                                    @error('appointment_time')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
+                                <label class="form-label required">Time</label>
+                                <select id="appointment_time" name="appointment_time" 
+                                        class="form-select @error('appointment_time') is-invalid @enderror" 
+                                        required>
+                                    <option value="">Select Time</option>
+                                    <optgroup label="Morning">
+                                        @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'] as $time)
+                                            <option value="{{ $time }}" {{ old('appointment_time') == $time ? 'selected' : '' }}>
+                                                {{ $time }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                    <optgroup label="Afternoon">
+                                        @foreach(['13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'] as $time)
+                                            <option value="{{ $time }}" {{ old('appointment_time') == $time ? 'selected' : '' }}>
+                                                {{ $time }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                </select>
+                                @error('appointment_time')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label required">Reason for Visit</label>
-                                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <div class="d-flex flex-wrap gap-2 mb-2">
                                     @foreach([
                                         'Vaccination' => [
                                             'icon' => 'vaccine',
@@ -194,7 +216,9 @@
                                             'sub' => ['Blood Test', 'Urinalysis', 'X-ray']
                                         ]
                                     ] as $category => $details)
-                                        <button type="button" class="btn btn-soft reason-btn" data-reason="{{ $category }}">
+                                        <button type="button" 
+                                            class="btn reason-btn" 
+                                            data-reason="{{ $category }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-{{ $details['icon'] }}" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 @if($details['icon'] === 'vaccine')
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -231,37 +255,396 @@
                                                 @endif
                                             </svg>
                                             {{ $category }}
-                                                    </button>
-                                                @endforeach
-                                    <button type="button" class="btn btn-soft" id="other-reason-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                        Other
-                                    </button>
+                                        </button>
+                                    @endforeach
+                                </div>
+
+                                <!-- Add the checkup history table here -->
+                                <div id="checkup-history-table" class="mt-4" style="display: none;">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h3 class="card-title">Check-up History</h3>
                                             </div>
-                                            <div id="other_reason_group" style="display: none;">
-                                                <div class="input-group mb-2">
-                                                    <input type="text" id="other_reason" class="form-control" placeholder="Enter other reason">
-                                                    <button type="button" class="btn btn-primary" id="add-other-reason">Add</button>
-                                                </div>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table table-vcenter card-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Previous Checkup Date</th>
+                                                            <th>
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <span>Category</span>
+                                                                    <select class="form-select form-select-sm" style="width: auto;" id="checkupTypeSelect">
+                                                                        <option value="Hematology">Hematology</option>
+                                                                        <option value="Microbiology">Microbiology</option>
+                                                                        <option value="Microscopy">Microscopy</option>
+                                                                        <option value="Blood Chemistry">Blood Chemistry</option>
+                                                                        <option value="Ultrasound">Ultrasound</option>
+                                                                        <option value="Immunology">Immunology</option>
+                                                                        <option value="Culture & Sensitivity">Culture & Sensitivity</option>
+                                                                        <option value="Radiology">Radiology</option>
+                                                                        <option value="Parasitology">Parasitology</option>
+                                                                        <option value="Virology">Virology</option>
+                                                                    </select>
+                                                                </div>
+                                                            </th>
+                                                            <th>Existing Symptoms</th>
+                                                            <th>Current Medication & Dosage</th>
+                                                            <th>New Meds & Dosage</th>
+                                                            <th>Notes</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="checkupHistoryBody">
+                                                        <tr class="text-center no-data-row">
+                                                            <td colspan="6">
+                                                                <div class="empty">
+                                                                    <div class="empty-icon">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                                            <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
+                                                                        </svg>
+                                                                    </div>
+                                                                    <p class="empty-title">No check-up history found</p>
+                                                                    <p class="empty-subtitle text-muted">
+                                                                        This pet has no previous check-up records.
+                                                                    </p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="selected-reasons-box">
-                                            <div id="selected-reasons" class="d-flex flex-wrap gap-2"></div>
+                                    <div id="selected-reasons" class="d-flex flex-wrap gap-2"></div>
                                     <div id="empty-reason-text" class="text-muted">No reasons selected</div>
                                 </div>
                                 <input type="hidden" name="reason_for_visit" id="reason_for_visit" value="{{ old('reason_for_visit') }}" required>
                                 @error('reason_for_visit')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <!-- Medical History Modal -->
+                            <div class="modal modal-blur fade" id="medical-history-section" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static">
+                                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title"><i class="fas fa-stethoscope me-2"></i>Medical Record</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
+                                        <div class="modal-body">
+                                            <!-- Patient Information Card -->
+                                            <div class="card mb-3">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">Patient Information</h3>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-bold">Owner Information</label>
+                                                            <div id="owner-details" class="form-control-plaintext"></div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-bold">Pet Information</label>
+                                                            <div id="pet-details" class="form-control-plaintext"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Medical History Table -->
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">Medical History</h3>
+                                                </div>
+                                                <div class="card-body p-0">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-vcenter card-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Date</th>
+                                                                    <th>Service</th>
+                                                                    <th>Diagnosis</th>
+                                                                    <th>Treatment</th>
+                                                                    <th>Notes</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="medicalHistoryBody">
+                                                                <tr class="text-center no-data-row">
+                                                                    <td colspan="5">
+                                                                        <div class="empty">
+                                                                            <div class="empty-icon">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                                                    <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
+                                                                                </svg>
+                                                                            </div>
+                                                                            <p class="empty-title">No medical history found</p>
+                                                                            <p class="empty-subtitle text-muted">
+                                                                                This pet has no previous medical records.
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="col-12">
-                                            <label class="form-label">Additional Notes</label>
-                                            <textarea name="notes" class="form-control" rows="3" 
-                                          placeholder="Any additional information about the visit...">{{ old('notes') }}</textarea>
+                                <label class="form-label">Additional Notes</label>
+                                <textarea name="notes" class="form-control" rows="3" 
+                                      placeholder="Any additional information about the visit...">{{ old('notes') }}</textarea>
+                            </div>
+
+                            <!-- Add the modal content here -->
+                            <div class="col-12 mt-4">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h3 class="card-title mb-0"><i class="fas fa-stethoscope me-2"></i>Medical Record</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Patient Information Card -->
+                                        <div class="card mb-3">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Patient Information</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Owner Information</label>
+                                                        <div id="owner-details" class="form-control-plaintext"></div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Pet Information</label>
+                                                        <div id="pet-details" class="form-control-plaintext"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Section Navigation -->
+                                        <div class="btn-group w-100 mb-3">
+                                            <button type="button" class="btn btn-outline-primary active" onclick="showSection('vital-signs')">
+                                                <i class="fas fa-heartbeat me-2"></i>Vital Signs
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary" onclick="showSection('diagnosis')">
+                                                <i class="fas fa-stethoscope me-2"></i>Diagnosis
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary" onclick="showSection('billing')">
+                                                <i class="fas fa-file-invoice-dollar me-2"></i>Billing
+                                            </button>
+                                        </div>
+
+                                        <!-- Form Sections -->
+                                        <div class="form-sections border rounded p-3">
+                                            <!-- Vital Signs Section -->
+                                            <div id="vital-signs-section" class="form-section">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h3 class="card-title">Vital Signs</h3>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="row g-2">
+                                                            <div class="col-md-3">
+                                                                <label class="form-label">Temperature (°C)</label>
+                                                                <input type="number" class="form-control" name="temperature" step="0.1">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="form-label">Weight (kg)</label>
+                                                                <input type="number" class="form-control" name="weight" step="0.01">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="form-label">Heart Rate (bpm)</label>
+                                                                <input type="number" class="form-control" name="heart_rate">
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="form-label">Respiratory Rate (/min)</label>
+                                                                <input type="number" class="form-control" name="respiratory_rate">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Diagnosis Section -->
+                                            <div id="diagnosis-section" class="form-section" style="display: none;">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h3 class="card-title">Diagnosis Information</h3>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="diagnosis-group">
+                                                            <div class="mb-3">
+                                                                <label class="form-label required">Existing Symptoms</label>
+                                                                <textarea class="form-control" name="existing_symptoms" rows="2" required></textarea>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Examination Findings</label>
+                                                                <textarea class="form-control" name="examination_findings" rows="2"></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="diagnosis-group">
+                                                            <div class="mb-3">
+                                                                <label class="form-label required">Diagnosis/Results</label>
+                                                                <textarea class="form-control" name="results" rows="2" required></textarea>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label">Treatment Plan</label>
+                                                                <textarea class="form-control" name="treatment_notes" rows="2"></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row g-2">
+                                                            <div class="col-md-4">
+                                                                <label class="form-label">Follow-up Date</label>
+                                                                <input type="date" class="form-control" name="followup_date">
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="form-label">Follow-up Type</label>
+                                                                <select class="form-select" name="followup_type">
+                                                                    <option value="">Select type</option>
+                                                                    <option value="checkup">Check-up</option>
+                                                                    <option value="vaccination">Vaccination</option>
+                                                                    <option value="treatment">Treatment</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Billing Section -->
+                                            <div id="billing-section" class="form-section" style="display: none;">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h3 class="card-title">Billing Information</h3>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <!-- Services -->
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Services</label>
+                                                            <select class="form-select mb-2" name="service">
+                                                                <option value="">Select Service</option>
+                                                                <option value="consultation">Consultation</option>
+                                                                <option value="vaccination">Vaccination</option>
+                                                                <option value="treatment">Treatment</option>
+                                                            </select>
+                                                            <div class="input-group mb-2">
+                                                                <span class="input-group-text">₱</span>
+                                                                <input type="number" class="form-control" name="service_amount" step="0.01">
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Medications -->
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Medications</label>
+                                                            <input type="text" class="form-control mb-2" name="medication" placeholder="Medication name">
+                                                            <div class="row g-2">
+                                                                <div class="col-6">
+                                                                    <div class="input-group">
+                                                                        <input type="number" class="form-control" name="quantity" placeholder="Qty">
+                                                                        <span class="input-group-text">units</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text">₱</span>
+                                                                        <input type="number" class="form-control" name="medication_amount" step="0.01">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Payment Summary -->
+                                                        <div class="card bg-light mt-4">
+                                                            <div class="card-body">
+                                                                <div class="row g-2">
+                                                                    <div class="col-12">
+                                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                            <span>Subtotal:</span>
+                                                                            <span id="subtotal" class="fw-bold">₱0.00</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                            <span>Discount:</span>
+                                                                            <div class="input-group" style="width: 150px">
+                                                                                <input type="number" class="form-control" id="discountAmount" min="0" step="0.01" onchange="updateTotals()">
+                                                                                <select class="form-select" id="discountType" style="width: 60px" onchange="updateTotals()">
+                                                                                    <option value="percent">%</option>
+                                                                                    <option value="fixed">₱</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                                                            <span class="fw-bold">Total Amount:</span>
+                                                                            <span id="total" class="fw-bold text-primary">₱0.00</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <hr class="my-2">
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label">Payment Method</label>
+                                                                        <select class="form-select" name="payment_method" id="paymentMethod">
+                                                                            <option value="cash">Cash</option>
+                                                                            <option value="card">Card</option>
+                                                                            <option value="gcash">GCash</option>
+                                                                            <option value="maya">Maya</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label">Payment Status</label>
+                                                                        <select class="form-select" name="payment_status" id="paymentStatus" onchange="toggleAmountPaid()">
+                                                                            <option value="paid">Fully Paid</option>
+                                                                            <option value="partial">Partial Payment</option>
+                                                                            <option value="pending">Pending Payment</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12" id="amountPaidSection">
+                                                                        <label class="form-label">Amount Tendered</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text">₱</span>
+                                                                            <input type="number" class="form-control" name="amount_paid" id="amountPaid" step="0.01" onchange="calculateChange()">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12" id="changeSection">
+                                                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                                                            <span>Change:</span>
+                                                                            <span id="changeAmount" class="fw-bold text-success">₱0.00</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12" id="remainingSection" style="display: none;">
+                                                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                                                            <span>Remaining Balance:</span>
+                                                                            <span id="remainingAmount" class="fw-bold text-danger">₱0.00</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -274,12 +657,146 @@
         </div>
     </div>
 </div>
+
+<!-- Add this JavaScript function right after the section navigation buttons -->
+<script>
+function showSection(sectionName) {
+    // Hide all sections first
+    document.querySelectorAll('.form-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show the selected section
+    document.getElementById(sectionName + '-section').style.display = 'block';
+    
+    // Add active class to the clicked button
+    document.querySelector(`button[onclick="showSection('${sectionName}')"]`).classList.add('active');
+}
+</script>
+
 @endsection
 
 @push('page-scripts')
 <script>
+// Move these functions outside the DOMContentLoaded event listener
+function toggleMedicalHistory() {
+    const modal = new bootstrap.Modal(document.getElementById('medical-history-section'));
+    const petId = document.getElementById('pet_id').value;
+    const petSelect = document.getElementById('pet_id');
+    const userSelect = document.getElementById('owner_id');
+    
+    if (!petId || userSelect.value === 'no_account') {
+        Swal.fire({
+            icon: 'warning',
+            title: 'No Pet Selected',
+            text: 'Please select a registered pet to view medical history.',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    // Update owner and pet details
+    const selectedPet = petSelect.options[petSelect.selectedIndex];
+    const petName = selectedPet.text;
+    const petType = selectedPet.dataset.type;
+    const ownerName = userSelect.options[userSelect.selectedIndex].text;
+    
+    // Update pet and owner details
+    document.getElementById('owner-details').innerHTML = `
+        <div class="d-flex flex-column">
+            <span class="fw-bold">${ownerName}</span>
+            <span class="badge ${userSelect.value === 'no_account' ? 'bg-yellow-lt' : 'bg-azure-lt'} mt-1">
+                <i class="${userSelect.value === 'no_account' ? 'fas fa-walking' : 'fas fa-user-check'} me-1"></i>
+                ${userSelect.value === 'no_account' ? 'Walk-in' : 'Registered'}
+            </span>
+        </div>
+    `;
+    
+    document.getElementById('pet-details').innerHTML = `
+        <div class="d-flex flex-column">
+            <span class="fw-bold">${petName}</span>
+            <div class="mt-1">
+                <span class="badge bg-blue-lt">${petType}</span>
+            </div>
+        </div>
+    `;
+    
+    // Load medical history
+    loadMedicalHistory(petId);
+    
+    modal.show();
+}
+
+function loadMedicalHistory(petId) {
+    // Show loading state
+    const tbody = document.getElementById('medicalHistoryBody');
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="5" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </td>
+        </tr>
+    `;
+
+    fetch(`/api/pets/${petId}/medical-history`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `
+                    <tr class="text-center">
+                        <td colspan="5">
+                            <div class="empty">
+                                <div class="empty-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
+                                    </svg>
+                                </div>
+                                <p class="empty-title">No medical history found</p>
+                                <p class="empty-subtitle text-muted">
+                                    This pet has no previous medical records.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(record => `
+                <tr>
+                    <td>${new Date(record.date).toLocaleDateString()}</td>
+                    <td>${record.service || '-'}</td>
+                    <td>${record.diagnosis || '-'}</td>
+                    <td>${record.treatment || '-'}</td>
+                    <td>${record.notes || '-'}</td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Error loading medical history:', error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-danger">
+                        Failed to load medical history. Please try again.
+                    </td>
+                </tr>`;
+        });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    const userSelect = document.getElementById('user_id');
+    const userSelect = document.getElementById('owner_id');
     const petSelect = document.getElementById('pet_id');
     const selectedReasons = new Set();
     const reasonButtons = document.querySelectorAll('.reason-btn');
@@ -294,9 +811,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const petSelectionGroup = document.getElementById('pet_selection_group');
     const appointmentDate = document.getElementById('appointment_date');
     const appointmentTime = document.getElementById('appointment_time');
+    const checkupTable = document.getElementById('checkup-history-table');
+    const checkupTypeSelect = document.getElementById('checkupTypeSelect');
+    const categoryHeader = document.getElementById('categoryHeader');
 
     // Check if there's an existing appointment and pre-select appropriate fields
-    const existingUserId = '{{ old("user_id", $appointment->user_id ?? "") }}';
+    const existingUserId = '{{ old("owner_id", $appointment->owner_id ?? "") }}';
     const existingOwnerName = '{{ old("owner_name", $appointment->owner_name ?? "") }}';
 
     if (existingOwnerName && !existingUserId) {
@@ -439,28 +959,58 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Handle reason button clicks
-    reasonButtons.forEach(button => {
-        button.addEventListener('click', function() {
+    reasonButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
             const reason = this.dataset.reason;
+            const checkupTable = document.getElementById('checkup-history-table');
             
-            if (selectedReasons.has(reason)) {
-                selectedReasons.delete(reason);
-                this.classList.remove('active');
-                
-                const badge = selectedReasonsContainer.querySelector(`[data-reason="${reason}"]`);
-                if (badge) badge.remove();
-            } else {
-                selectedReasons.add(reason);
-                this.classList.add('active');
-                
-                const badge = createReasonBadge(reason);
-                badge.dataset.reason = reason;
-                selectedReasonsContainer.appendChild(badge);
+            // Toggle active state for the clicked button
+            this.classList.toggle('active');
+            
+            // Show/hide checkup history only for Check-up button
+            if (reason === 'Check-up') {
+                if (this.classList.contains('active')) {
+                    checkupTable.style.display = 'block';
+                    if (petSelect.value) {
+                        loadCheckupHistory(petSelect.value, checkupTypeSelect.value);
+                    }
+                } else {
+                    checkupTable.style.display = 'none';
+                }
             }
             
+            // Update selected reasons
+            if (this.classList.contains('active')) {
+                selectedReasons.add(reason);
+            } else {
+                selectedReasons.delete(reason);
+            }
+            
+            // Update the hidden input
             updateReasonInput();
+            
+            // Update display of selected reasons
+            updateSelectedReasonsDisplay();
         });
     });
+
+    // Add this function to update the display of selected reasons
+    function updateSelectedReasonsDisplay() {
+        const selectedReasonsContainer = document.getElementById('selected-reasons');
+        const emptyReasonText = document.getElementById('empty-reason-text');
+        
+        selectedReasonsContainer.innerHTML = '';
+        
+        if (selectedReasons.size > 0) {
+            emptyReasonText.style.display = 'none';
+            selectedReasons.forEach(reason => {
+                const badge = createReasonBadge(reason);
+                selectedReasonsContainer.appendChild(badge);
+            });
+        } else {
+            emptyReasonText.style.display = 'block';
+        }
+    }
 
     // Handle "Other" reason
     otherReasonBtn.addEventListener('click', function() {
@@ -522,52 +1072,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (!isValid) {
-            alert('Please fill in all required fields');
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please fill in all required fields'
+            });
             return;
         }
 
-        // Create FormData object
-        const formData = new FormData(this);
-        
-        // If it's a walk-in appointment, remove pet_id requirement
-        if (userSelect.value === 'no_account') {
-            formData.delete('pet_id');
-        }
-
-        // Submit the form using fetch
-        fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        // Show loading state
+        Swal.fire({
+            title: 'Scheduling Appointment',
+            text: 'Please wait...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = data.redirect;
-            } else {
-                // Show error messages
-                const errors = data.errors || {};
-                Object.keys(errors).forEach(field => {
-                    const input = document.querySelector(`[name="${field}"]`);
-                    if (input) {
-                        input.classList.add('is-invalid');
-                        const feedback = input.parentElement.querySelector('.invalid-feedback') 
-                            || document.createElement('div');
-                        feedback.className = 'invalid-feedback';
-                        feedback.textContent = errors[field][0];
-                        input.parentElement.appendChild(feedback);
-                    }
-                });
-                alert(data.message || 'Please check the form for errors');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while saving the appointment');
         });
+
+        // Submit the form directly
+        this.submit();
     });
 
     // Set min date to today
@@ -686,6 +1211,188 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset time when date changes
         appointmentTime.value = '';
     });
+
+    // Load history when checkup type changes
+    checkupTypeSelect.addEventListener('change', function() {
+        categoryHeader.textContent = this.value;
+        if (petSelect.value) {
+            loadCheckupHistory(petSelect.value, this.value);
+        }
+    });
+
+    // Load history when pet changes
+    petSelect.addEventListener('change', function() {
+        if (this.value && isCheckupSelected()) {
+            loadCheckupHistory(this.value, checkupTypeSelect.value);
+        }
+    });
+
+    function isCheckupSelected() {
+        const activeReasonBtn = document.querySelector('.reason-btn[data-reason="Check-up"].active');
+        return activeReasonBtn !== null;
+    }
+
+    function loadCheckupHistory(petId, category) {
+        console.log('Loading history for pet:', petId, 'category:', category);
+        fetch(`/api/pet/${petId}/checkup-history/${category}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Received data:', data);
+                const tbody = document.getElementById('checkupHistoryBody');
+                if (data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr class="text-center no-data-row">
+                            <td colspan="6">
+                                <div class="empty">
+                                    <div class="empty-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="empty-title">No ${category} records found</p>
+                                    <p class="empty-subtitle text-muted">
+                                        This pet has no previous ${category.toLowerCase()} check-up records.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>`;
+                } else {
+                    tbody.innerHTML = data.map(record => `
+                        <tr>
+                            <td>${record.checkup_date}</td>
+                            <td>${record.results || '-'}</td>
+                            <td>${record.existing_symptoms || '-'}</td>
+                            <td>${record.current_medication || '-'}</td>
+                            <td>${record.new_medication || '-'}</td>
+                            <td>${record.notes || '-'}</td>
+                        </tr>
+                    `).join('');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading checkup history:', error);
+            });
+    }
+
+    // Get the button and modal elements
+    const viewMedicalHistoryBtn = document.querySelector('[data-bs-target="#appointmentModal"]');
+    const appointmentModal = document.getElementById('appointmentModal');
+
+    // Add click event listener to the button
+    viewMedicalHistoryBtn.addEventListener('click', function() {
+        const petId = document.getElementById('pet_id').value;
+        const userSelect = document.getElementById('owner_id');
+        const petSelect = document.getElementById('pet_id');
+        
+        if (!petId || userSelect.value === 'no_account') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Pet Selected',
+                text: 'Please select a registered pet to view medical history.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Update owner and pet details in the modal
+        const selectedPet = petSelect.options[petSelect.selectedIndex];
+        const petName = selectedPet.text;
+        const petType = selectedPet.dataset.type;
+        const ownerName = userSelect.options[userSelect.selectedIndex].text;
+        
+        // Update pet and owner details in the modal
+        document.getElementById('owner-details').innerHTML = `
+            <div class="d-flex flex-column">
+                <span class="fw-bold">${ownerName}</span>
+                <span class="badge ${userSelect.value === 'no_account' ? 'bg-yellow-lt' : 'bg-azure-lt'} mt-1">
+                    <i class="${userSelect.value === 'no_account' ? 'fas fa-walking' : 'fas fa-user-check'} me-1"></i>
+                    ${userSelect.value === 'no_account' ? 'Walk-in' : 'Registered'}
+                </span>
+            </div>
+        `;
+        
+        document.getElementById('pet-details').innerHTML = `
+            <div class="d-flex flex-column">
+                <span class="fw-bold">${petName}</span>
+                <div class="mt-1">
+                    <span class="badge bg-blue-lt">${petType}</span>
+                </div>
+            </div>
+        `;
+        
+        // Load medical history into the modal
+        loadMedicalHistoryForModal(petId);
+    });
+
+    function loadMedicalHistoryForModal(petId) {
+        // Show loading state
+        const tbody = document.getElementById('medicalHistoryBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        fetch(`/api/pets/${petId}/medical-history`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr class="text-center">
+                            <td colspan="5">
+                                <div class="empty">
+                                    <div class="empty-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
+                                    </svg>
+                                </div>
+                                <p class="empty-title">No medical history found</p>
+                                <p class="empty-subtitle text-muted">
+                                    This pet has no previous medical records.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(record => `
+                    <tr>
+                        <td>${new Date(record.date).toLocaleDateString()}</td>
+                        <td>${record.service || '-'}</td>
+                        <td>${record.diagnosis || '-'}</td>
+                        <td>${record.treatment || '-'}</td>
+                        <td>${record.notes || '-'}</td>
+                    </tr>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Error loading medical history:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-danger">
+                            Failed to load medical history. Please try again.
+                        </td>
+                    </tr>`;
+            });
+    }
+
+    // Add this to trigger the pet details update on page load
+    if (petSelect) {
+        // Trigger change event to update pet details
+        petSelect.dispatchEvent(new Event('change'));
+    }
 });
 </script>
 @endpush
@@ -900,6 +1607,77 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* Dark mode adjustments */
 [data-bs-theme="dark"] input[type="date"][data-booked="true"] {
     background-color: rgba(67, 97, 238, 0.15);
+}
+
+.form-section {
+    min-height: 450px;
+    overflow-y: auto;
+}
+
+.diagnosis-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 3.5rem);
+}
+
+.modal-content {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.form-control-plaintext {
+    padding: 0.5rem;
+    background-color: var(--tblr-bg-surface);
+    border-radius: 4px;
+    min-height: 40px;
+}
+
+.form-sections {
+    background-color: var(--tblr-bg-surface);
+    border-color: var(--tblr-border-color) !important;
+}
+
+.form-section {
+    transition: all 0.3s ease;
+}
+
+.btn-group .btn {
+    flex: 1;
+}
+
+.card-header.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.card-header.bg-primary .card-title {
+    color: white;
+}
+
+.form-sections {
+    min-height: 300px;
+    position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .diagnosis-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        border-radius: 4px !important;
+        margin-bottom: 0.25rem;
+    }
 }
 </style>
 @endpush

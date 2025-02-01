@@ -51,6 +51,8 @@ use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PetOwner\PetOwnerProductController;
 use App\Http\Controllers\PetOwner\DashboardController as PetOwnerDashboardController;
 
+use App\Http\Controllers\CheckupHistoryController;
+
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
 Route::get('/messages/users', [MessageController::class, 'showUsers'])->name('messages.users');
@@ -431,7 +433,8 @@ Route::get('/appointments/{id}/view', [ArchivesController::class, 'viewAppointme
 
 // Appointment routes
 Route::resource('appointments', AppointmentController::class);
-Route::get('appointments/create/{pet_id?}', [AppointmentController::class, 'create'])->name('appointments.create');
+Route::get('/appointments/create', [AppointmentController::class, 'create'])
+    ->name('appointments.create');
 
 // Add these routes if they don't exist
 Route::get('/analytics/archives', [ArchivesController::class, 'index'])->name('analytics.archives');
@@ -721,3 +724,8 @@ Route::get('/verify-all-users', function() {
     }
     return 'Not available in production.';
 });
+
+// Add this route
+Route::get('/pages/medical-records', [CheckupHistoryController::class, 'sampleRecords'])->name('pages.medical-records');
+
+Route::get('/api/pets/{pet}/medical-history', [PetController::class, 'getMedicalHistory']);

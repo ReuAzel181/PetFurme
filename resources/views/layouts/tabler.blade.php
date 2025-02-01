@@ -1404,6 +1404,7 @@
     {{-- - Page Styles - --}}
     @stack('page-styles')
     @livewireStyles
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body>

@@ -40,104 +40,115 @@
                 <table class="table table-vcenter card-table table-hover">
                     <thead class="bg-light">
                         <tr>
-                            <th>
-                                <div class="d-flex align-items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-paw me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M14.7 13.5c-1.1 1.4-2.3 2.5-3.7 2.5-1.4 0-2.6-1.1-3.7-2.5-2.2-2.8-3.3-6.5-3.3-8.5 0-1.1.9-2 2-2 .8 0 1.5.4 1.8 1.1l.2.4c.3.7 1 1.2 1.8 1.2.8 0 1.5-.5 1.8-1.2l.2-.4c.3-.7 1-1.1 1.8-1.1 1.1 0 2 .9 2 2 0 2-1.1 5.7-3.3 8.5z"/>
-                                    </svg>
-                                    Pet
-                                </div>
-                            </th>
-                            <th>
-                                <div class="d-flex align-items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0-18 0"/>
-                                        <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0"/>
-                                        <path d="M6.168 18.849a4 4 0 0 1 3.832-2.849h4a4 4 0 0 1 3.834 2.855"/>
-                                    </svg>
-                                    Owner
-                                </div>
-                            </th>
-                            <th>
-                                <div class="d-flex align-items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-category me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M4 4h6v6h-6z"/>
-                                        <path d="M14 4h6v6h-6z"/>
-                                        <path d="M4 14h6v6h-6z"/>
-                                        <path d="M14 14h6v6h-6z"/>
-                                    </svg>
-                                    Category
-                                </div>
-                            </th>
-                            <th>
-                                <div class="d-flex align-items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-event me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"/>
-                                        <path d="M16 3l0 4"/>
-                                        <path d="M8 3l0 4"/>
-                                        <path d="M4 11l16 0"/>
-                                        <path d="M8 15h2v2h-2z"/>
-                                    </svg>
-                                    Next Appointment
-                                </div>
-                            </th>
-                            <th class="w-1">
-                                <div class="d-flex align-items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                        <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                    </svg>
-                                    Actions
-                                </div>
-                            </th>
+                            <th>Pet</th>
+                            <th>Details</th>
+                            <th>Owner</th>
+                            <th>Category</th>
+                            <th>Next Appointment</th>
+                            <th class="w-1">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($pets as $pet)
                         <tr class="cursor-pointer" onclick="showPetDetails({{ $pet->id }})">
-                            <td>
+                            <td style="width: 15%">
                                 <div class="d-flex align-items-center">
-                                    <span class="avatar avatar-md me-2" style="background-image: url({{ $pet->photo ? asset('storage/' . $pet->photo) : asset('images/default-pet.png') }})"></span>
-                                    <div>
-                                        <div class="font-weight-bold text-primary">{{ $pet->name }}</div>
-                                        <div class="text-muted small">
-                                            {{ $pet->breed }} • 
-                                            <span class="text-azure">
-                                                @if($pet->age >= 12)
-                                                    {{ floor($pet->age/12) }}y
-                                                    @if($pet->age % 12 > 0)
-                                                        {{ $pet->age % 12 }}m
-                                                    @endif
-                                                @else
-                                                    {{ $pet->age }}m
-                                                @endif
-                                            </span>
-                                        </div>
+                                    <span class="avatar avatar-md me-2" style="background-image: url({{ 
+                                        $pet->photo 
+                                            ? Storage::disk('public')->exists($pet->photo) 
+                                                ? asset('storage/' . $pet->photo)
+                                                : asset('images/default-pet.png')
+                                            : asset('images/default-pet.png') 
+                                    }})"></span>
+                                    <div class="font-weight-bold text-primary">{{ $pet->name }}</div>
+                                </div>
+                            </td>
+                            <td style="width: 20%">
+                                <div class="d-flex flex-column">
+                                    <div class="text-muted">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-paw me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                            <path d="M14.7 13.5c-1.1 1.4-2.3 2.5-3.7 2.5-1.4 0-2.6-1.1-3.7-2.5-2.2-2.8-3.3-6.5-3.3-8.5 0-1.1.9-2 2-2 .8 0 1.5.4 1.8 1.1l.2.4c.3.7 1 1.2 1.8 1.2.8 0 1.5-.5 1.8-1.2l.2-.4c.3-.7 1-1.1 1.8-1.1 1.1 0 2 .9 2 2 0 2-1.1 5.7-3.3 8.5z"/>
+                                        </svg>
+                                        {{ $pet->breed }}
+                                    </div>
+                                    <div class="text-muted">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                                            <path d="M12 7v5l3 3"/>
+                                        </svg>
+                                        @if($pet->age >= 12)
+                                            {{ floor($pet->age/12) }}y
+                                            @if($pet->age % 12 > 0)
+                                                {{ $pet->age % 12 }}m
+                                            @endif
+                                        @else
+                                            {{ $pet->age }}m
+                                        @endif
+                                    </div>
+                                    <div class="text-muted">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-weight me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                            <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                                            <path d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
+                                        </svg>
+                                        {{ number_format($pet->weight, 1) }} kg
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <span class="avatar avatar-xs bg-blue-lt me-2">
-                                        {{ strtoupper(substr($pet->user ? $pet->user->name : $pet->owner_name, 0, 1)) }}
-                                    </span>
+                            <td style="width: 25%">
+                                <div class="d-flex align-items-center gap-2">
+                                    @if($pet->user && $pet->user->photo)
+                                        <span class="avatar avatar-sm" style="background-image: url({{ Storage::disk('public')->exists($pet->user->photo) ? asset('storage/' . $pet->user->photo) : asset('images/default-avatar.png') }})"></span>
+                                    @else
+                                        <span class="avatar avatar-sm bg-blue-lt">
+                                            {{ strtoupper(substr($pet->user ? $pet->user->name : $pet->owner_name, 0, 1)) }}
+                                        </span>
+                                    @endif
                                     <div>
-                                        <div>{{ $pet->user ? $pet->user->name : $pet->owner_name }}</div>
-                                        @if(!$pet->user)
+                                        <div class="font-weight-medium">{{ $pet->user ? $pet->user->name : $pet->owner_name }}</div>
+                                        @if($pet->user)
+                                            <div class="text-muted small">
+                                                {{ $pet->user->email }}
+                                                @if($pet->user->phone)
+                                                    <div>{{ $pet->user->phone }}</div>
+                                                @endif
+                                            </div>
+                                        @else
                                             <span class="badge bg-yellow">Not registered</span>
                                         @endif
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <span class="badge bg-{{ $pet->category === 'Dog' ? 'blue' : ($pet->category === 'Cat' ? 'purple' : 'green') }}-lt">
-                                    {{ $pet->category }}
-                                </span>
+                            <td style="width: 15%">
+                                <div class="d-flex flex-column gap-2">
+                                    <span class="badge bg-{{ $pet->category === 'Dog' ? 'blue' : ($pet->category === 'Cat' ? 'purple' : 'green') }}-lt">
+                                        {{ $pet->category }}
+                                    </span>
+                                    @if($pet->gender)
+                                        <span class="text-muted small d-flex align-items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler {{ $pet->gender === 'Male' ? 'icon-tabler-gender-male' : 'icon-tabler-gender-female' }} me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                @if($pet->gender === 'Male')
+                                                    <path d="M10 14m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/>
+                                                    <path d="M19 5l-5.4 5.4"/>
+                                                    <path d="M19 5h-5"/>
+                                                    <path d="M19 5v5"/>
+                                                @else
+                                                    <path d="M12 9m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/>
+                                                    <path d="M12 14v7"/>
+                                                    <path d="M9 18h6"/>
+                                                @endif
+                                            </svg>
+                                            {{ $pet->gender }}
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td>
                                 @php
                                     $nextAppointment = $pet->appointments 
                                         ? $pet->appointments->where('appointment_date', '>=', now())->sortBy('appointment_date')->first() 
+                                        : null;
+                                    $lastAppointment = $pet->appointments 
+                                        ? $pet->appointments->where('appointment_date', '<', now())->sortByDesc('appointment_date')->first() 
                                         : null;
                                 @endphp
                                 @if($nextAppointment)
@@ -148,10 +159,18 @@
                                             <div class="text-muted small">{{ $nextAppointment->service_type }}</div>
                                         </div>
                                     </div>
+                                @elseif($lastAppointment)
+                                    <div class="d-flex align-items-center">
+                                        <span class="status-dot status-gray me-2"></span>
+                                        <div>
+                                            <div class="text-muted">Last visit: {{ $lastAppointment->appointment_date->format('M d, Y') }}</div>
+                                            <div class="text-muted small">{{ $lastAppointment->service_type }}</div>
+                                        </div>
+                                    </div>
                                 @else
                                     <div class="d-flex align-items-center">
                                         <span class="status-dot status-gray me-2"></span>
-                                        <span class="text-muted">No upcoming appointments</span>
+                                        <span class="text-muted">No appointment history</span>
                                     </div>
                                 @endif
                             </td>

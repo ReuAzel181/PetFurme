@@ -43,3 +43,27 @@
             'consent' => request()->cookie('cookie_consent', 'declined')
         ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     })->middleware('web');
+
+    Route::get('/pet/{pet}/checkup-history/{category}', [App\Http\Controllers\Api\PetCheckupController::class, 'getHistory']);
+
+    Route::get('/pets/{pet}/medical-history', function ($pet) {
+        // Return the medical history for the pet
+        $history = \App\Models\MedicalRecord::where('pet_id', $pet)
+            ->orderBy('checkup_date', 'desc')
+            ->get()
+            ->map(function ($record) {
+                return [
+                    'id' => $record->id,
+                    'checkup_date' => $record->checkup_date,
+                    'diagnosis' => $record->diagnosis,
+                    'treatment' => $record->treatment,
+                    'status' => $record->status,
+                ];
+            });
+
+        return response()->json($history);
+    });
+
+    Route::get('/owners/{owner}/pets', function (User $owner) {
+        return $owner->pets;
+    });

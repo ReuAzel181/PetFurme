@@ -9,9 +9,43 @@
             </div>
             <div class="card-body">
                 <div class="row row-cards">
-                    <!-- Suppliers Section -->
-                    <div class="col-md-4">
-                        <div class="card card-link card-link-pop">
+                    <div class="col-md-6 mb-4">
+                        <div class="card card-link card-link-pop h-100">
+                            <div class="card-stamp">
+                                <div class="card-stamp-icon bg-green">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-stethoscope" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M6 4h-1a2 2 0 0 0 -2 2v3.5h0a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1" />
+                                        <path d="M8 15a6 6 0 1 0 12 0v-3" />
+                                        <path d="M11 3v2" />
+                                        <path d="M6 3v2" />
+                                        <circle cx="20" cy="10" r="2" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="card-title">Medical Records</h3>
+                                <p class="text-muted flex-grow-1">
+                                    View and manage patient medical records, diagnoses, and treatment histories.
+                                </p>
+                                <div class="mt-3">
+                                    <a href="{{ route('pages.medical-records') }}" class="btn btn-green">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-medical me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                            <path d="M10 14h4" />
+                                            <path d="M12 12v4" />
+                                        </svg>
+                                        View Records
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card card-link card-link-pop h-100">
                             <div class="card-stamp">
                                 <div class="card-stamp-icon bg-primary">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-truck-delivery" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
@@ -22,31 +56,22 @@
                                     </svg>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <h2 class="card-title">Suppliers</h2>
-                                <p class="text-muted">Manage your product suppliers and vendors</p>
-                                <div class="mt-4">
-                                    <div class="d-flex mb-2">
-                                        <div class="stat-label">Total Suppliers</div>
-                                        <div class="ms-auto">
-                                            <span class="badge bg-primary stat-badge">
-                                                {{ \App\Models\Supplier::count() }}
-                                            </span>
-                                        </div>
-                                    </div>
+                            <div class="card-body d-flex flex-column">
+                                <h3 class="card-title">Suppliers</h3>
+                                <p class="text-muted flex-grow-1">
+                                    Manage your suppliers and their contact information.
+                                </p>
+                                <div class="mt-3">
+                                    <a href="{{ route('suppliers.index') }}" class="btn btn-primary">
+                                        View Suppliers
+                                    </a>
                                 </div>
-                            </div>
-                            <div class="card-footer">
-                                <a href="{{ route('suppliers.index') }}" class="btn btn-primary w-100">
-                                    Manage Suppliers
-                                </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Categories Section -->
-                    <div class="col-md-4">
-                        <div class="card card-link card-link-pop">
+                    <div class="col-md-6 mb-4">
+                        <div class="card card-link card-link-pop h-100">
                             <div class="card-stamp">
                                 <div class="card-stamp-icon bg-green">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-category" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
@@ -58,9 +83,9 @@
                                     </svg>
                                 </div>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                                 <h2 class="card-title">Categories</h2>
-                                <p class="text-muted">Organize products by categories</p>
+                                <p class="text-muted flex-grow-1">Organize products by categories</p>
                                 <div class="mt-4">
                                     <div class="d-flex mb-2">
                                         <div class="stat-label">Total Categories</div>
@@ -80,9 +105,8 @@
                         </div>
                     </div>
 
-                    <!-- Units Section -->
-                    <div class="col-md-4">
-                        <div class="card card-link card-link-pop">
+                    <div class="col-md-6 mb-4">
+                        <div class="card card-link card-link-pop h-100">
                             <div class="card-stamp">
                                 <div class="card-stamp-icon bg-orange">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-ruler-2" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
@@ -95,9 +119,9 @@
                                     </svg>
                                 </div>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                                 <h2 class="card-title">Units</h2>
-                                <p class="text-muted">Define measurement units for products</p>
+                                <p class="text-muted flex-grow-1">Define measurement units for products</p>
                                 <div class="mt-4">
                                     <div class="d-flex mb-2">
                                         <div class="stat-label">Total Units</div>

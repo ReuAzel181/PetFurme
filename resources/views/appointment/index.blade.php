@@ -59,92 +59,40 @@
                         <table class="table table-vcenter card-table table-striped">
                             <thead>
                                 <tr>
-                                    <th width="5%">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M5 9l14 0"></path>
-                                            <path d="M5 15l14 0"></path>
-                                            <path d="M11 4l-4 16"></path>
-                                            <path d="M17 4l-4 16"></path>
-                                        </svg>
-                                        ID
-                                    </th>
-                                    <th width="13%">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
-                                            <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
-                                        </svg>
-                                        Owner Details
-                                    </th>
-                                    <th width="13%">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-dog" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M11 5h2"></path>
-                                            <path d="M19 12c-.667 5.333 -2.333 8 -5 8h-4c-2.667 0 -4.333 -2.667 -5 -8"></path>
-                                            <path d="M11 16c0 .667 .333 1 1 1s1 -.333 1 -1h-2z"></path>
-                                            <path d="M12 18v2"></path>
-                                            <path d="M10 11v.01"></path>
-                                            <path d="M14 11v.01"></path>
-                                            <path d="M5 4l6 .97l6 -.97l2 4l-4 2l-8 0l-4 -2z"></path>
-                                        </svg>
-                                        Pet Details
-                                    </th>
-                                    <th width="13%">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
-                                            <path d="M16 3v4"></path>
-                                            <path d="M8 3v4"></path>
-                                            <path d="M4 11h16"></path>
-                                            <path d="M12 14m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
-                                            <path d="M12 14l1 2"></path>
-                                        </svg>
-                                        Schedule
-                                    </th>
-                                    <th width="13%">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-status-change" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M6 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                                            <path d="M18 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
-                                            <path d="M6 12l6 0"></path>
-                                            <path d="M12 12l6 0"></path>
-                                            <path d="M6 6l12 0"></path>
-                                        </svg>
-                                        Status
-                                    </th>
-                                    <th width="15%">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"></path>
-                                            <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"></path>
-                                            <path d="M9 12l.01 0"></path>
-                                            <path d="M13 12l2 0"></path>
-                                            <path d="M9 16l.01 0"></path>
-                                            <path d="M13 16l2 0"></path>
-                                        </svg>
-                                        Reason
-                                    </th>
-                                    <th width="15%">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
-                                            <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5"></path>
-                                            <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z"></path>
-                                        </svg>
-                                        Created By
-                                    </th>
-                                    <th width="13%" class="text-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                            <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                        </svg>
-                                        Actions
-                                    </th>
+                                    <th width="5%">ID</th>
+                                    <th width="12%">Owner Details</th>
+                                    <th width="12%">Pet Details</th>
+                                    <th width="12%">Schedule</th>
+                                    <th width="12%">Reason</th>
+                                    <th width="12%">Status</th>
+                                    <th width="12%">Created By</th>
+                                    <th width="8%">Complete</th>
+                                    <th width="15%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($appointments as $appointment)
-                                    <tr>
+                                    <tr style="cursor: pointer" 
+                                        onclick="showAppointmentDetails({{ json_encode($appointment) }})"
+                                        class="appointment-row">
                                         <td class="text-muted">
                                             #{{ str_pad($appointment->id, 5, '0', STR_PAD_LEFT) }}
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column gap-1">
-                                                <div class="text-dark fw-bold">{{ $appointment->display_name }}</div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    @if($appointment->user && $appointment->user->photo)
+                                                        <img src="{{ asset('storage/' . $appointment->user->photo) }}" 
+                                                             alt="{{ $appointment->display_name }}" 
+                                                             class="avatar avatar-sm rounded-circle"
+                                                             style="width: 32px; height: 32px; object-fit: cover;">
+                                                    @else
+                                                        <span class="avatar avatar-sm rounded-circle bg-primary-lt">
+                                                            {{ strtoupper(substr($appointment->display_name, 0, 1)) }}
+                                                        </span>
+                                                    @endif
+                                                    <div class="text-dark fw-bold">{{ $appointment->display_name }}</div>
+                                                </div>
                                                 @if($appointment->is_walk_in)
                                                     <span class="badge bg-yellow-lt" title="Walk-in appointment">
                                                         <i class="fas fa-walking me-1"></i>Walk-in
@@ -158,7 +106,20 @@
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column">
-                                                <div class="text-dark">{{ $appointment->pet_name }}</div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    @if($appointment->pet && $appointment->pet->photo)
+                                                        <img src="{{ asset('storage/' . $appointment->pet->photo) }}" 
+                                                             alt="{{ $appointment->pet_name }}" 
+                                                             class="avatar avatar-sm rounded-circle"
+                                                             style="width: 32px; height: 32px; object-fit: cover;">
+                                                    @else
+                                                        <img src="{{ asset('images/default-pet.png') }}" 
+                                                             alt="Default Pet" 
+                                                             class="avatar avatar-sm rounded-circle"
+                                                             style="width: 32px; height: 32px; object-fit: cover;">
+                                                    @endif
+                                                    <div class="text-dark">{{ $appointment->pet_name }}</div>
+                                                </div>
                                                 <div class="text-muted small">
                                                     <span class="badge bg-blue-lt">{{ $appointment->pet_type }}</span>
                                                     <span class="ms-2 badge bg-green-lt">{{ $appointment->age_display }}</span>
@@ -173,6 +134,15 @@
                                                 <div class="text-muted small">
                                                     {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('g:i A') }}
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @forelse($appointment->reason_for_visit as $reason)
+                                                    <span class="badge bg-primary-lt">{{ $reason }}</span>
+                                                @empty
+                                                    <span class="text-muted">No reasons specified</span>
+                                                @endforelse
                                             </div>
                                         </td>
                                         <td>
@@ -218,39 +188,26 @@
                                             @endswitch
                                         </td>
                                         <td>
-                                            <div class="d-flex flex-wrap gap-1">
-                                                @forelse($appointment->reason_for_visit as $reason)
-                                                    <span class="badge bg-primary-lt">{{ $reason }}</span>
-                                                @empty
-                                                    <span class="text-muted">No reasons specified</span>
-                                                @endforelse
+                                            <div class="d-flex flex-column">
+                                                <div class="text-dark">{{ $appointment->creator->name ?? 'N/A' }}</div>
+                                                <div class="text-muted small">
+                                                    {{ $appointment->created_at->format('M d, Y g:i A') }}
+                                                </div>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="d-flex flex-column gap-1">
-                                                @if($appointment->created_by_id)
-                                                    <div class="d-flex align-items-center">
-                                                        @if($appointment->creator_type === 'staff')
-                                                            <span class="badge bg-primary-lt">
-                                                                <i class="fas fa-user-shield me-1"></i>Staff
-                                                            </span>
-                                                        @else
-                                                            <span class="badge bg-secondary-lt">
-                                                                <i class="fas fa-user me-1"></i>User
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="text-dark small">{{ $appointment->creator->name }}</div>
-                                                    <div class="text-muted small">
-                                                        <i class="fas fa-clock me-1"></i>
-                                                        {{ $appointment->created_at->format('M d, Y') }}
-                                                        <br>
-                                                        {{ $appointment->created_at->format('g:i A') }}
-                                                    </div>
-                                                @else
-                                                    <span class="text-muted">Not available</span>
-                                                @endif
-                                            </div>
+                                            @if($appointment->status !== 'completed')
+                                                <button onclick="showDiagnosisForm({{ json_encode($appointment) }})" 
+                                                        class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-clipboard-check me-1"></i>
+                                                    Complete
+                                                </button>
+                                            @else
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>
+                                                    Done
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="text-center">
                                             <div class="d-flex gap-2 justify-content-center">
@@ -316,6 +273,7 @@
         </div>
     </div>
 </div>
+
 @endsection
 
 @section('scripts')
@@ -353,50 +311,39 @@
     }
     
     .table td {
-        padding: 1rem;
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
     }
     
-    .table > :not(caption) > * > * {
-        padding: 1rem;
+    .table th {
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
+        color: var(--tblr-muted);
     }
     
-    .btn-group {
-        gap: 0.5rem;
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
     }
     
-    .badge.bg-primary-lt {
-        color: var(--tblr-primary);
-        background-color: var(--tblr-primary-lt);
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
     }
     
-    .badge.bg-azure-lt {
-        color: #0284c7;
-        background-color: #e0f2fe;
+    .d-flex.flex-column {
+        gap: 0.25rem;
     }
     
-    .badge.bg-green-lt {
-        color: #16a34a;
-        background-color: #dcfce7;
+    .text-muted.small {
+        font-size: 0.75rem;
     }
     
-    .badge.bg-yellow-lt {
-        color: #ca8a04;
-        background-color: #fef9c3;
-    }
-    
-    .badge.bg-red-lt {
-        color: #dc2626;
-        background-color: #fee2e2;
-    }
-    
-    .badge.bg-gray-lt {
-        color: #4b5563;
-        background-color: #f3f4f6;
-    }
-    
-    .badge.bg-blue-lt {
-        color: #2563eb;
-        background-color: #dbeafe;
+    .d-flex.gap-2.justify-content-end {
+        padding-right: 0.5rem;
     }
     
     .table-striped > tbody > tr:nth-of-type(odd) {
@@ -433,5 +380,425 @@
     .d-flex.gap-2 {
         gap: 0.75rem !important;
     }
+
+    .appointment-row:hover {
+        background-color: rgba(var(--tblr-primary-rgb), 0.05) !important;
+    }
+
+    .modal-body .form-control-plaintext {
+        padding: 0.5rem;
+        background-color: var(--tblr-bg-surface);
+        border-radius: 4px;
+        min-height: 40px;
+    }
+
+    /* Add these modal styles */
+    .modal-backdrop {
+        display: none !important;
+    }
+
+    .modal {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        min-height: calc(100% - 1rem);
+    }
+
+    @media (min-width: 576px) {
+        .modal-dialog-centered {
+            min-height: calc(100% - 3.5rem);
+        }
+    }
+
+    .modal-content {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        min-height: 700px;
+    }
+
+    .modal-body {
+        padding: 1.25rem;
+    }
+
+    .input-group-flat .form-control {
+        border-right: 0;
+    }
+
+    .input-group-flat .input-group-text {
+        background: #fff;
+        border-left: 0;
+    }
+
+    .nav-tabs .nav-link {
+        color: #666;
+    }
+
+    .nav-tabs .nav-link.active {
+        font-weight: 600;
+        color: var(--tblr-primary);
+    }
+
+    .tab-content {
+        padding: 1rem 0;
+    }
+
+    .modal-lg {
+        max-width: 850px;
+    }
+    
+    .form-section {
+        min-height: 450px;
+        height: 450px;
+        overflow-y: auto;
+    }
+    
+    .form-section .card {
+        margin-bottom: 0;
+        height: 100%;
+    }
+    
+    .form-section .card-body {
+        height: calc(100% - 45px);
+        overflow-y: auto;
+    }
+    
+    .btn-group .btn {
+        flex: 1;
+    }
+    
+    .form-control-plaintext {
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        min-height: 60px;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    textarea.form-control {
+        min-height: 65px;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    .row.g-3 {
+        --bs-gutter-y: 1rem;
+    }
+
+    .form-control, .form-select {
+        min-height: 36px;
+        padding: 0.4rem 0.75rem;
+    }
+
+    .diagnosis-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 0.875rem;
+    }
+
+    .bg-primary-lt {
+        background-color: rgba(32, 107, 196, 0.1);
+        color: #206bc4;
+    }
+
+    .d-flex.align-items-center.gap-2 {
+        gap: 0.5rem !important;
+    }
+
+    .avatar {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        vertical-align: middle;
+        font-weight: 500;
+        text-align: center;
+        text-transform: uppercase;
+        user-select: none;
+        background: #f8f9fa;
+        border-radius: 50%;
+    }
 </style>
+@endpush
+
+@push('page-scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show success toast if there's a success message
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: "{{ session('success') }}",
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+    @endif
+});
+
+function showAppointmentDetails(appointment) {
+    // Prevent row click when clicking action buttons
+    if (event.target.closest('.btn')) {
+        return;
+    }
+
+    const modalElement = document.getElementById('appointmentModal');
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Set hidden fields for relationships
+    document.getElementById('appointment_id').value = appointment.id;
+    document.getElementById('pet_id').value = appointment.pet_id;
+
+    // Display owner and pet details properly
+    document.getElementById('owner-details').innerHTML = `
+        <div class="d-flex flex-column">
+            <span class="fw-bold">${appointment.display_name}</span>
+            <span class="badge ${appointment.is_walk_in ? 'bg-yellow-lt' : 'bg-azure-lt'} mt-1">
+                <i class="${appointment.is_walk_in ? 'fas fa-walking' : 'fas fa-user-check'} me-1"></i>
+                ${appointment.is_walk_in ? 'Walk-in' : 'Registered'}
+            </span>
+        </div>
+    `;
+
+    document.getElementById('pet-details').innerHTML = `
+        <div class="d-flex flex-column">
+            <span class="fw-bold">${appointment.pet_name}</span>
+            <div class="mt-1">
+                <span class="badge bg-blue-lt">${appointment.pet_type}</span>
+                <span class="badge bg-green-lt ms-1">${appointment.age_display}</span>
+            </div>
+        </div>
+    `;
+
+    modal.show();
+}
+
+function removeBackdrop() {
+    // Remove any lingering backdrop
+    const backdrops = document.getElementsByClassName('modal-backdrop');
+    while(backdrops.length > 0) {
+        backdrops[0].parentNode.removeChild(backdrops[0]);
+    }
+    
+    // Remove modal-open class from body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
+
+// Add event listener for modal hidden event
+document.getElementById('appointmentModal').addEventListener('hidden.bs.modal', removeBackdrop);
+
+function saveDiagnosis() {
+    const form = document.getElementById('diagnosisForm');
+    const formData = new FormData(form);
+
+    Swal.fire({
+        title: 'Saving Medical Record',
+        text: 'Please wait...',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    fetch('/medical-records', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Medical record has been saved',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                location.reload();
+            });
+        } else {
+            throw new Error(data.message || 'Error saving medical record');
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message
+        });
+    });
+}
+
+function showDiagnosisForm(appointment) {
+    const modal = new bootstrap.Modal(document.getElementById('appointmentModal'));
+    
+    // Set hidden fields
+    document.getElementById('appointment_id').value = appointment.id;
+    document.getElementById('pet_id').value = appointment.pet_id;
+
+    // Set owner details
+    document.getElementById('owner-details').innerHTML = `
+        <strong>${appointment.display_name}</strong>
+        <span class="badge ${appointment.is_walk_in ? 'bg-yellow-lt' : 'bg-azure-lt'} ms-1">
+            ${appointment.is_walk_in ? 'Walk-in' : 'Registered'}
+        </span>
+    `;
+
+    // Set pet details
+    document.getElementById('pet-details').innerHTML = `
+        <strong>${appointment.pet_name}</strong>
+        <span class="badge bg-blue-lt ms-1">${appointment.pet_type}</span>
+    `;
+
+    modal.show();
+}
+
+function addServiceRow() {
+    const tbody = document.querySelector('#servicesTable tbody');
+    const newRow = tbody.rows[0].cloneNode(true);
+    newRow.querySelectorAll('input, select').forEach(input => input.value = '');
+    tbody.appendChild(newRow);
+    updateTotals();
+}
+
+function removeServiceRow(btn) {
+    const tbody = document.querySelector('#servicesTable tbody');
+    if (tbody.rows.length > 1) {
+        btn.closest('tr').remove();
+    }
+    updateTotals();
+}
+
+function addMedicationRow() {
+    const tbody = document.querySelector('#medicationsTable tbody');
+    const newRow = tbody.rows[0].cloneNode(true);
+    newRow.querySelectorAll('input').forEach(input => input.value = '');
+    tbody.appendChild(newRow);
+    updateTotals();
+}
+
+function removeMedicationRow(btn) {
+    const tbody = document.querySelector('#medicationsTable tbody');
+    if (tbody.rows.length > 1) {
+        btn.closest('tr').remove();
+    }
+    updateTotals();
+}
+
+function updateTotals() {
+    let subtotal = 0;
+
+    // Calculate services subtotal
+    document.querySelectorAll('.service-amount').forEach(input => {
+        subtotal += parseFloat(input.value || 0);
+    });
+
+    // Calculate medications subtotal
+    document.querySelectorAll('.medication-amount').forEach(input => {
+        const qty = input.closest('tr').querySelector('.medication-qty').value || 1;
+        subtotal += parseFloat(input.value || 0) * parseInt(qty);
+    });
+
+    // Update subtotal display
+    document.getElementById('subtotal').textContent = `₱${subtotal.toFixed(2)}`;
+
+    // Calculate discount
+    const discountAmount = parseFloat(document.getElementById('discountAmount').value || 0);
+    const discountType = document.getElementById('discountType').value;
+    let discount = 0;
+
+    if (discountType === 'percent') {
+        discount = subtotal * (discountAmount / 100);
+    } else {
+        discount = discountAmount;
+    }
+
+    // Update total
+    const total = subtotal - discount;
+    document.getElementById('total').textContent = `₱${total.toFixed(2)}`;
+    
+    // Recalculate change/remaining amount
+    calculateChange();
+}
+
+// Add event listeners for real-time calculation
+document.querySelectorAll('#tabs-invoice input, #tabs-invoice select').forEach(element => {
+    element.addEventListener('input', updateTotals);
+});
+
+function showSection(sectionId) {
+    // Hide all sections
+    document.querySelectorAll('.form-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Show selected section
+    document.getElementById(`${sectionId}-section`).style.display = 'block';
+    
+    // Update button states
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+function toggleAmountPaid() {
+    const status = document.getElementById('paymentStatus').value;
+    const amountPaidSection = document.getElementById('amountPaidSection');
+    const changeSection = document.getElementById('changeSection');
+    const remainingSection = document.getElementById('remainingSection');
+    
+    if (status === 'pending') {
+        amountPaidSection.style.display = 'none';
+        changeSection.style.display = 'none';
+        remainingSection.style.display = 'none';
+    } else {
+        amountPaidSection.style.display = 'block';
+        calculateChange();
+    }
+}
+
+function calculateChange() {
+    const total = parseFloat(document.getElementById('total').textContent.replace('₱', '')) || 0;
+    const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+    const status = document.getElementById('paymentStatus').value;
+    const changeSection = document.getElementById('changeSection');
+    const remainingSection = document.getElementById('remainingSection');
+    
+    if (status === 'partial') {
+        const remaining = total - amountPaid;
+        changeSection.style.display = 'none';
+        remainingSection.style.display = 'block';
+        document.getElementById('remainingAmount').textContent = `₱${remaining.toFixed(2)}`;
+    } else {
+        const change = amountPaid - total;
+        changeSection.style.display = 'block';
+        remainingSection.style.display = 'none';
+        document.getElementById('changeAmount').textContent = `₱${Math.max(0, change).toFixed(2)}`;
+    }
+}
+</script>
 @endpush

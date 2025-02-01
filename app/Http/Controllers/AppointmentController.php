@@ -51,18 +51,37 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        // Get all users with role 'pet_owner', including those without pets yet
-        $users = User::where('role', 'pet_owner')
+        $pet = null;
+        $owner = null;
+        
+        // Get all users with role 'pet_owner'
+        $owners = User::where('role', 'pet_owner')
             ->orderBy('name')
             ->get();
-        
-        $pets = Pet::with('user')  // Eager load user relationship
-            ->orderBy('name')
-            ->get();
-        
-        return view('appointment.create', compact('users', 'pets'));
+
+        if ($request->pet_id) {
+            $pet = Pet::with('owner')->findOrFail($request->pet_id);
+            $owner = $pet->owner;
+            $ownerPets = $owner->pets;
+        } elseif ($request->owner_id) {
+            $owner = User::with('pets')->findOrFail($request->owner_id);
+            $ownerPets = $owner->pets;
+            
+            // If pet_id is provided in the URL, pre-select it
+            if ($request->pet_id) {
+                $pet = $ownerPets->firstWhere('id', $request->pet_id);
+            }
+        } else {
+            $ownerPets = collect();
+        }
+
+        // Add these lines for debugging
+        \Log::info('Pet ID from request: ' . $request->pet_id);
+        \Log::info('Selected Pet:', ['pet' => $pet]);
+
+        return view('appointment.create', compact('pet', 'owner', 'owners', 'ownerPets'));
     }
 
     public function store(Request $request)
@@ -148,19 +167,16 @@ class AppointmentController extends Controller
             $appointment->save();
 
             DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Appointment scheduled successfully!',
-                'redirect' => route('appointment.index')
-            ]);
+            
+            // Use flash message with session
+            session()->flash('success', 'Appointment scheduled successfully');
+            return redirect()->route('appointment.index');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Error creating appointment: ' . $e->getMessage()
-            ], 422);
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to schedule appointment. Please try again.');
         }
     }
 

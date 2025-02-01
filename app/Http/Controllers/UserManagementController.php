@@ -144,4 +144,15 @@ class UserManagementController extends Controller
         
         return response()->stream($callback, 200, $headers);
     }
+
+    public function index(Request $request)
+    {
+        // Your existing query logic here
+        
+        if ($request->ajax()) {
+            return view('users.index', compact('users', 'roles'))->render();
+        }
+        
+        return view('users.index', compact('users', 'roles'));
+    }
 } 
