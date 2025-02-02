@@ -729,3 +729,6 @@ Route::get('/verify-all-users', function() {
 Route::get('/pages/medical-records', [CheckupHistoryController::class, 'sampleRecords'])->name('pages.medical-records');
 
 Route::get('/api/pets/{pet}/medical-history', [PetController::class, 'getMedicalHistory']);
+
+// Add this test route
+Route::get('/test/pet/{id}', [PetController::class, 'testPetData']);

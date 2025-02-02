@@ -35,160 +35,250 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label required">Pet Owner</label>
-                                <select name="owner_id" id="owner_id" class="form-select" {{ isset($owner) ? 'disabled' : '' }}>
-                                    <option value="">Select Owner</option>
-                                    @foreach($owners as $ownerOption)
-                                        <option value="{{ $ownerOption->id }}" 
-                                            {{ (old('owner_id') == $ownerOption->id || (isset($owner) && $owner->id == $ownerOption->id)) ? 'selected' : '' }}>
-                                            {{ $ownerOption->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('owner_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div id="owner_name_group" class="col-md-6" style="display: none;">
-                                <label class="form-label required">Owner Name</label>
-                                <input type="text" id="owner_name" name="owner_name" class="form-control @error('owner_name') is-invalid @enderror" value="{{ old('owner_name') }}">
-                                @error('owner_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div id="pet_selection_group" class="col-md-6">
-                                <label class="form-label required">Select Pet</label>
-                                <select name="pet_id" id="pet_id" class="form-select" {{ isset($pet) ? 'disabled' : '' }}>
-                                    <option value="">Select Pet</option>
-                                    @if(isset($ownerPets))
-                                        @foreach($ownerPets as $petOption)
-                                            <option value="{{ $petOption->id }}" 
-                                                {{ (old('pet_id') == $petOption->id || (isset($pet) && $pet->id == $petOption->id)) ? 'selected' : '' }}
-                                                data-type="{{ $petOption->type }}"
-                                                data-age="{{ $petOption->age }}">
-                                                {{ $petOption->name }} ({{ $petOption->type }})
-                                            </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                @error('pet_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <!-- Add this debugging section temporarily -->
-                            @if(app()->environment('local'))
-                                <div class="col-12">
-                                    <div class="alert alert-info">
-                                        Debug Info:
-                                        <br>Pet ID: {{ request('pet_id') }}
-                                        <br>Owner ID: {{ request('owner_id') }}
-                                        <br>Selected Pet: {{ isset($pet) ? $pet->id : 'none' }}
-                                    </div>
-                                </div>
-                            @endif
-
-                            <div id="walkin_pet_group" class="col-12" style="display: none;">
+                            <!-- Owner and Pet Selection Row -->
+                            <div class="col-12">
                                 <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label required">Pet Name</label>
-                                        <input type="text" id="walkin_pet_name" name="walkin_pet_name" class="form-control @error('walkin_pet_name') is-invalid @enderror">
-                                        @error('walkin_pet_name')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label class="form-label required">Pet Type</label>
-                                        <select id="walkin_pet_type" name="walkin_pet_type" class="form-select @error('walkin_pet_type') is-invalid @enderror">
-                                            <option value="">Select Pet Type</option>
-                                            <option value="Canine">Canine</option>
-                                            <option value="Feline">Feline</option>
-                                            <option value="Avian">Avian</option>
-                                            <option value="Lapine">Lapine</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                        @error('walkin_pet_type')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label class="form-label required">Pet Age</label>
-                                        <div class="input-group">
-                                            <input type="number" id="walkin_pet_age" name="walkin_pet_age" class="form-control @error('walkin_pet_age') is-invalid @enderror" min="0">
-                                            <select id="walkin_age_unit" name="walkin_age_unit" class="form-select" style="max-width: 100px;">
-                                                <option value="years">Years</option>
-                                                <option value="months">Months</option>
-                                            </select>
+                                    <!-- Pet Owner Selection -->
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <div class="avatar-wrapper me-3">
+                                                        <img src="/img/default-avatar.png" 
+                                                             class="avatar avatar-lg" 
+                                                             id="owner_avatar"
+                                                             alt="Owner Avatar"
+                                                             style="width: 64px; height: 64px;">
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <label class="form-label required">Pet Owner</label>
+                                                        <select name="owner_id" id="owner_id" class="form-select" {{ isset($owner) ? 'disabled' : '' }}>
+                                                            <option value="">Select Owner</option>
+                                                            <option value="no_account">No Account (Walk-in)</option>
+                                                            @foreach($owners as $ownerOption)
+                                                                <option value="{{ $ownerOption->id }}" 
+                                                                    data-avatar="{{ $ownerOption->avatar_url ?? '/img/default-avatar.png' }}"
+                                                                    {{ (old('owner_id') == $ownerOption->id || (isset($owner) && $owner->id == $ownerOption->id)) ? 'selected' : '' }}>
+                                                                    {{ $ownerOption->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('owner_id')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        @error('walkin_pet_age')
+                                    </div>
+
+                                    <!-- Dynamic Second Column (Pet Selection OR Owner Name) -->
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <div class="avatar-wrapper me-3">
+                                                        <img src="/img/default-pet.png" 
+                                                             class="avatar avatar-lg" 
+                                                             id="dynamic_avatar"
+                                                             alt="Avatar"
+                                                             style="width: 64px; height: 64px;">
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <!-- Pet Selection (for registered users) -->
+                                                        <div id="pet_select_container">
+                                                            <label class="form-label required">Select Pet</label>
+                                                            <select name="pet_id" id="pet_id" class="form-select" {{ isset($pet) ? 'disabled' : '' }}>
+                                                                <option value="">Select Pet</option>
+                                                                @if(isset($ownerPets))
+                                                                    @foreach($ownerPets as $petOption)
+                                                                        <option value="{{ $petOption->id }}" 
+                                                                            data-photo="{{ $petOption->photo_url ?? '/img/default-pet.png' }}"
+                                                                            {{ (old('pet_id') == $petOption->id || (isset($pet) && $pet->id == $petOption->id)) ? 'selected' : '' }}
+                                                                            data-name="{{ $petOption->name }}"
+                                                                            data-category="{{ $petOption->category }}"
+                                                                            data-breed="{{ $petOption->breed }}"
+                                                                            data-age="{{ $petOption->age }}"
+                                                                            data-weight="{{ $petOption->weight }}"
+                                                                            data-gender="{{ strtolower($petOption->gender) }}">
+                                                                            {{ $petOption->name }} ({{ $petOption->category }})
+                                                                        </option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
+                                                            @error('pet_id')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+
+                                                        <!-- Owner Name Input (for walk-ins) -->
+                                                        <div id="owner_name_container" style="display: none;">
+                                                            <label class="form-label required">Owner Name</label>
+                                                            <input type="text" id="owner_name" name="owner_name" 
+                                                                   class="form-control @error('owner_name') is-invalid @enderror" 
+                                                                   value="{{ old('owner_name') }}">
+                                                            @error('owner_name')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Walk-in Pet Details -->
+                            <div id="walkin_pet_group" class="col-12" style="display: none;">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label required">Pet Name</label>
+                                                <input type="text" id="walkin_pet_name" name="walkin_pet_name" class="form-control @error('walkin_pet_name') is-invalid @enderror">
+                                                @error('walkin_pet_name')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label required">Pet Type</label>
+                                                <select id="walkin_pet_type" name="walkin_pet_type" class="form-select @error('walkin_pet_type') is-invalid @enderror">
+                                                    <option value="">Select Pet Type</option>
+                                                    <option value="Canine">Canine</option>
+                                                    <option value="Feline">Feline</option>
+                                                    <option value="Avian">Avian</option>
+                                                    <option value="Lapine">Lapine</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                                @error('walkin_pet_type')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label required">Gender</label>
+                                                <select id="walkin_pet_gender" name="walkin_pet_gender" class="form-select @error('walkin_pet_gender') is-invalid @enderror">
+                                                    <option value="">Select</option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                </select>
+                                                @error('walkin_pet_gender')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label required">Pet Age</label>
+                                                <div class="input-group">
+                                                    <input type="number" id="walkin_pet_age" name="walkin_pet_age" class="form-control @error('walkin_pet_age') is-invalid @enderror" min="0">
+                                                    <select id="walkin_age_unit" name="walkin_age_unit" class="form-select" style="max-width: 100px;">
+                                                        <option value="years">Years</option>
+                                                        <option value="months">Months</option>
+                                                    </select>
+                                                </div>
+                                                @error('walkin_pet_age')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label required">Weight (kg)</label>
+                                                <input type="number" id="walkin_pet_weight" name="walkin_pet_weight" class="form-control @error('walkin_pet_weight') is-invalid @enderror" step="0.01" min="0">
+                                                @error('walkin_pet_weight')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Registered Pet Details Card -->
+                            <div id="registered_pet_details" class="col-12" style="min-height: 300px; margin-bottom: 1.5rem;">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Pet Name</label>
+                                                <input type="text" id="pet_name" class="form-control" readonly>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label">Category</label>
+                                                <input type="text" id="pet_category" class="form-control" readonly>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label">Breed</label>
+                                                <input type="text" id="pet_breed" class="form-control" readonly>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label">Pet Age</label>
+                                                <div class="input-group">
+                                                    <input type="number" id="pet_age" class="form-control" readonly>
+                                                    <select id="age_unit" class="form-select" style="max-width: 100px;" disabled>
+                                                        <option value="years">Years</option>
+                                                        <option value="months">Months</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label">Weight (kg)</label>
+                                                <input type="number" id="pet_weight" class="form-control" step="0.01" readonly>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label">Gender</label>
+                                                <input type="text" id="pet_gender" class="form-control" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Appointment Date/Time Row -->
+                            <div class="col-12">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Date</label>
+                                        <input type="date" id="appointment_date" name="appointment_date" 
+                                               class="form-control @error('appointment_date') is-invalid @enderror" 
+                                               required value="{{ old('appointment_date') }}">
+                                        @error('appointment_date')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required">Time</label>
+                                        <select id="appointment_time" name="appointment_time" 
+                                                class="form-select @error('appointment_time') is-invalid @enderror" 
+                                                required>
+                                            <option value="">Select Time</option>
+                                            <optgroup label="Morning">
+                                                @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'] as $time)
+                                                    <option value="{{ $time }}" {{ old('appointment_time') == $time ? 'selected' : '' }}>
+                                                        {{ $time }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
+                                            <optgroup label="Afternoon">
+                                                @foreach(['13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'] as $time)
+                                                    <option value="{{ $time }}" {{ old('appointment_time') == $time ? 'selected' : '' }}>
+                                                        {{ $time }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
+                                        </select>
+                                        @error('appointment_time')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
-
-                            <div id="registered_pet_details" class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label">Pet Name</label>
-                                    <input type="text" id="pet_name" class="form-control" readonly>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="form-label">Pet Type</label>
-                                    <input type="text" id="pet_type" class="form-control" readonly>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label class="form-label">Pet Age</label>
-                                    <div class="input-group">
-                                        <input type="number" id="pet_age" class="form-control" readonly>
-                                        <select id="age_unit" class="form-select" style="max-width: 100px;" disabled>
-                                            <option value="years">Years</option>
-                                            <option value="months">Months</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label required">Date</label>
-                                <input type="date" id="appointment_date" name="appointment_date" 
-                                       class="form-control @error('appointment_date') is-invalid @enderror" 
-                                       required value="{{ old('appointment_date') }}">
-                                @error('appointment_date')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label required">Time</label>
-                                <select id="appointment_time" name="appointment_time" 
-                                        class="form-select @error('appointment_time') is-invalid @enderror" 
-                                        required>
-                                    <option value="">Select Time</option>
-                                    <optgroup label="Morning">
-                                        @foreach(['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'] as $time)
-                                            <option value="{{ $time }}" {{ old('appointment_time') == $time ? 'selected' : '' }}>
-                                                {{ $time }}
-                                            </option>
-                                        @endforeach
-                                    </optgroup>
-                                    <optgroup label="Afternoon">
-                                        @foreach(['13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'] as $time)
-                                            <option value="{{ $time }}" {{ old('appointment_time') == $time ? 'selected' : '' }}>
-                                                {{ $time }}
-                                            </option>
-                                        @endforeach
-                                    </optgroup>
-                                </select>
-                                @error('appointment_time')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
 
                             <div class="col-12">
@@ -833,13 +923,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to clear pet details
     function clearPetDetails() {
         document.getElementById('pet_name').value = '';
-        document.getElementById('pet_type').value = '';
+        document.getElementById('pet_category').value = '';
+        document.getElementById('pet_breed').value = '';
         document.getElementById('pet_age').value = '';
+        document.getElementById('pet_weight').value = '';
+        document.getElementById('pet_gender').value = '';
     }
 
     // Handle Pet Owner Selection with Walk-in Support
     userSelect.addEventListener('change', function() {
         const userId = this.value;
+        const ownerNameGroup = document.getElementById('owner_name_group');
+        const petSelectionGroup = document.getElementById('pet_selection_group');
         const walkinPetGroup = document.getElementById('walkin_pet_group');
         const registeredPetDetails = document.getElementById('registered_pet_details');
         
@@ -851,12 +946,18 @@ document.addEventListener('DOMContentLoaded', function() {
             registeredPetDetails.style.display = 'none';
             
             // Make walk-in fields required
+            document.getElementById('owner_name').setAttribute('required', 'required');
             document.getElementById('walkin_pet_name').setAttribute('required', 'required');
             document.getElementById('walkin_pet_type').setAttribute('required', 'required');
             document.getElementById('walkin_pet_age').setAttribute('required', 'required');
+            document.getElementById('walkin_pet_weight').setAttribute('required', 'required');
+            document.getElementById('walkin_pet_gender').setAttribute('required', 'required');
             
             // Remove requirement from pet selection
-            petSelect.removeAttribute('required');
+            document.getElementById('pet_id').removeAttribute('required');
+            
+            // Clear any selected pet data
+            clearPetDetails();
         } else {
             // Show registered user fields
             ownerNameGroup.style.display = 'none';
@@ -865,52 +966,87 @@ document.addEventListener('DOMContentLoaded', function() {
             registeredPetDetails.style.display = 'flex';
             
             // Make pet selection required
-            petSelect.setAttribute('required', 'required');
+            document.getElementById('pet_id').setAttribute('required', 'required');
             
             // Remove requirements from walk-in fields
+            document.getElementById('owner_name').removeAttribute('required');
             document.getElementById('walkin_pet_name').removeAttribute('required');
             document.getElementById('walkin_pet_type').removeAttribute('required');
             document.getElementById('walkin_pet_age').removeAttribute('required');
+            document.getElementById('walkin_pet_weight').removeAttribute('required');
+            document.getElementById('walkin_pet_gender').removeAttribute('required');
             
             // Load pets if a user is selected
             if (userId) {
-                petSelect.innerHTML = '<option value="">Loading pets...</option>';
-                clearPetDetails();
-
-                fetch(`/api/users/${userId}/pets`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        petSelect.innerHTML = '<option value="">Choose a pet</option>';
-                        
-                        if (Array.isArray(data.pets) && data.pets.length > 0) {
-                            data.pets.forEach(pet => {
-                                const option = document.createElement('option');
-                                option.value = pet.id;
-                                option.text = pet.name;
-                                option.dataset.type = pet.category || '';
-                                option.dataset.age = pet.age || '';
-                                petSelect.appendChild(option);
-                            });
-                        } else {
-                            petSelect.innerHTML = '<option value="">No pets found</option>';
-                            clearPetDetails();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        petSelect.innerHTML = '<option value="">Error loading pets</option>';
-                        clearPetDetails();
-                    });
+                loadPetsForOwner(userId);
             } else {
-                petSelect.innerHTML = '<option value="">Choose a pet</option>';
+                clearPetSelect();
             }
         }
     });
 
-    // Handle Pet Selection
+    // Add these helper functions
+    function loadPetsForOwner(userId) {
+        const petSelect = document.getElementById('pet_id');
+        petSelect.innerHTML = '<option value="">Loading pets...</option>';
+        clearPetDetails();
+
+        fetch(`/api/users/${userId}/pets`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                console.log('Raw pets data:', data); // Debug log
+                updatePetSelect(data.pets);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                petSelect.innerHTML = '<option value="">Error loading pets</option>';
+            });
+    }
+
+    // Find and update the updatePetSelect function
+    function updatePetSelect(pets) {
+        const petSelect = document.getElementById('pet_id');
+        petSelect.innerHTML = '<option value="">Choose a pet</option>';
+        
+        if (Array.isArray(pets) && pets.length > 0) {
+            console.log('Received pets data:', pets);
+            
+            pets.forEach(pet => {
+                const option = document.createElement('option');
+                option.value = pet.id;
+                option.text = `${pet.name} (${pet.category})`;
+                
+                // Make sure to set all data attributes from the pet object
+                option.dataset.name = pet.name || '';
+                option.dataset.category = pet.category || '';
+                option.dataset.type = pet.type || pet.category || ''; // Fallback to category if type is null
+                option.dataset.breed = pet.breed || '';
+                option.dataset.age = pet.age ? pet.age.toString() : '';
+                option.dataset.weight = pet.weight ? pet.weight.toString() : '';
+                // Capitalize first letter of gender
+                option.dataset.gender = pet.gender ? 
+                    pet.gender.charAt(0).toUpperCase() + pet.gender.slice(1).toLowerCase() : '';
+                
+                // Debug log for each option
+                console.log('Setting data attributes for:', pet.name, option.dataset);
+                
+                petSelect.appendChild(option);
+            });
+        } else {
+            petSelect.innerHTML = '<option value="">No pets found</option>';
+        }
+    }
+
+    function clearPetSelect() {
+        const petSelect = document.getElementById('pet_id');
+        petSelect.innerHTML = '<option value="">Choose a pet</option>';
+        clearPetDetails();
+    }
+
+    // Update the pet selection event listener
     petSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         
@@ -919,13 +1055,27 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        document.getElementById('pet_name').value = selectedOption.text || '';
-        document.getElementById('pet_type').value = selectedOption.dataset.type === 'Canine' ? 'Dog' : 
-            (selectedOption.dataset.type === 'Feline' ? 'Cat' : 
-            (selectedOption.dataset.type === 'Avian' ? 'Bird' :
-            (selectedOption.dataset.type === 'Lapine' ? 'Rabbit' : 
-            selectedOption.dataset.type))) || '';
-        document.getElementById('pet_age').value = selectedOption.dataset.age || '';
+        // Debug log
+        console.log('Selected pet option:', selectedOption);
+        console.log('Selected pet dataset:', selectedOption.dataset);
+        
+        // Test endpoint call
+        fetch(`/test/pet/${this.value}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Pet test data:', data);
+                
+                // Update fields with direct data
+                document.getElementById('pet_name').value = data.pet.name || '';
+                document.getElementById('pet_category').value = data.pet.category || '';
+                document.getElementById('pet_breed').value = data.pet.breed || '';
+                document.getElementById('pet_age').value = data.pet.age || '';
+                document.getElementById('pet_weight').value = data.pet.weight || '';
+                // Capitalize first letter of gender
+                document.getElementById('pet_gender').value = data.pet.gender ? 
+                    data.pet.gender.charAt(0).toUpperCase() + data.pet.gender.slice(1).toLowerCase() : '';
+            })
+            .catch(error => console.error('Error fetching pet test data:', error));
     });
 
     // Function to update the hidden input with selected reasons
@@ -1394,6 +1544,303 @@ document.addEventListener('DOMContentLoaded', function() {
         petSelect.dispatchEvent(new Event('change'));
     }
 });
+
+// Find the pet selection event listener and update it
+document.getElementById('pet_id').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    
+    if (!this.value) {
+        clearPetDetails();
+        return;
+    }
+    
+    // Update pet details fields
+    document.getElementById('pet_name').value = selectedOption.text.split(' (')[0] || '';
+    document.getElementById('pet_type').value = selectedOption.dataset.type || '';
+    document.getElementById('pet_age').value = selectedOption.dataset.age || '';
+    document.getElementById('pet_weight').value = selectedOption.dataset.weight || '';
+    document.getElementById('pet_gender').value = selectedOption.dataset.gender || '';
+});
+
+// Add this at the end of your DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+
+    // Trigger the change event on pet select if a pet is pre-selected
+    const petSelect = document.getElementById('pet_id');
+    if (petSelect && petSelect.value) {
+        petSelect.dispatchEvent(new Event('change'));
+    }
+});
+
+// Update owner avatar when owner is selected
+const ownerSelect = document.getElementById('owner_id');
+const ownerAvatar = document.getElementById('owner_avatar');
+
+ownerSelect.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    if (selectedOption.dataset.avatar) {
+        ownerAvatar.src = selectedOption.dataset.avatar;
+    } else {
+        ownerAvatar.src = '/img/default-avatar.png';
+    }
+});
+
+// Update pet photo when pet is selected
+const petSelect = document.getElementById('pet_id');
+const petAvatar = document.getElementById('pet_avatar');
+
+petSelect.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    if (selectedOption.dataset.photo) {
+        petAvatar.src = selectedOption.dataset.photo;
+    } else {
+        petAvatar.src = '/img/default-pet.png';
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const userSelect = document.getElementById('owner_id');
+    const petSelectContainer = document.getElementById('pet_select_container');
+    const ownerNameDisplay = document.getElementById('owner_name_display');
+    const ownerNameValue = document.getElementById('owner_name_value');
+    const ownerNameInput = document.getElementById('owner_name');
+    const registeredPetDetails = document.getElementById('registered_pet_details');
+
+    userSelect.addEventListener('change', function() {
+        const isWalkIn = this.value === 'no_account';
+        
+        // Toggle visibility of pet selection and owner name display
+        petSelectContainer.style.display = isWalkIn ? 'none' : 'block';
+        ownerNameDisplay.style.display = isWalkIn ? 'block' : 'none';
+        registeredPetDetails.style.display = isWalkIn ? 'none' : 'block';
+        
+        // Update owner name display when input changes
+        if (isWalkIn) {
+            ownerNameInput.addEventListener('input', function() {
+                ownerNameValue.textContent = this.value || 'Not specified';
+            });
+        }
+    });
+
+    // Initialize owner name display if walk-in is selected on page load
+    if (userSelect.value === 'no_account') {
+        petSelectContainer.style.display = 'none';
+        ownerNameDisplay.style.display = 'block';
+        registeredPetDetails.style.display = 'none';
+        ownerNameValue.textContent = ownerNameInput.value || 'Not specified';
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const ownerSelect = document.getElementById('owner_id');
+    const ownerAvatar = document.getElementById('owner_avatar');
+    const dynamicAvatar = document.getElementById('dynamic_avatar');
+    const petSelectContainer = document.getElementById('pet_select_container');
+    const ownerNameContainer = document.getElementById('owner_name_container');
+    const walkinPetGroup = document.getElementById('walkin_pet_group');
+    const registeredPetDetails = document.getElementById('registered_pet_details');
+
+    ownerSelect.addEventListener('change', function() {
+        const isWalkIn = this.value === 'no_account';
+        
+        // Toggle visibility
+        petSelectContainer.style.display = isWalkIn ? 'none' : 'block';
+        ownerNameContainer.style.display = isWalkIn ? 'block' : 'none';
+        walkinPetGroup.style.display = isWalkIn ? 'block' : 'none';
+        registeredPetDetails.style.display = isWalkIn ? 'none' : 'block';
+        
+        // Update avatars
+        if (isWalkIn) {
+            dynamicAvatar.src = '/img/default-avatar.png';
+            dynamicAvatar.alt = 'Owner Avatar';
+        } else {
+            dynamicAvatar.src = '/img/default-pet.png';
+            dynamicAvatar.alt = 'Pet Avatar';
+            
+            // Update owner avatar if a registered owner is selected
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.dataset.avatar) {
+                ownerAvatar.src = selectedOption.dataset.avatar;
+            }
+        }
+        
+        // Toggle required fields
+        const ownerNameInput = document.getElementById('owner_name');
+        const petSelect = document.getElementById('pet_id');
+        
+        if (isWalkIn) {
+            ownerNameInput.setAttribute('required', 'required');
+            petSelect.removeAttribute('required');
+        } else {
+            ownerNameInput.removeAttribute('required');
+            petSelect.setAttribute('required', 'required');
+        }
+    });
+
+    // Initialize form state on page load
+    if (ownerSelect.value === 'no_account') {
+        ownerSelect.dispatchEvent(new Event('change'));
+    }
+
+    // Handle pet selection changes
+    const petSelect = document.getElementById('pet_id');
+    petSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption && selectedOption.dataset.photo) {
+            dynamicAvatar.src = selectedOption.dataset.photo;
+        } else {
+            dynamicAvatar.src = '/img/default-pet.png';
+        }
+    });
+});
+</script>
+
+<!-- Add this script section after your existing scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ownerSelect = document.getElementById('owner_id');
+    const ownerAvatar = document.getElementById('owner_avatar');
+    const petSelect = document.getElementById('pet_id');
+    const petAvatar = document.getElementById('pet_avatar');
+    const ownerNameGroup = document.getElementById('owner_name_group');
+    const petSelectionGroup = document.getElementById('pet_selection_group');
+    const walkinPetGroup = document.getElementById('walkin_pet_group');
+    const registeredPetDetails = document.getElementById('registered_pet_details');
+
+    // Function to handle owner selection
+    ownerSelect.addEventListener('change', async function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (selectedOption.value === 'no_account') {
+            // Handle walk-in customer
+            ownerAvatar.src = '/img/default-avatar.png';
+            ownerNameGroup.style.display = 'block';
+            petSelectionGroup.style.display = 'block';
+            walkinPetGroup.style.display = 'block';
+            registeredPetDetails.style.display = 'none';
+            petSelect.innerHTML = '<option value="">Select Pet</option>';
+        } else if (selectedOption.value) {
+            try {
+                // Fetch owner details
+                const response = await fetch(`/api/owners/${selectedOption.value}`);
+                if (!response.ok) throw new Error('Failed to fetch owner data');
+                const ownerData = await response.json();
+                
+                // Update owner avatar
+                ownerAvatar.src = ownerData.avatar_url || '/img/default-avatar.png';
+                
+                // Fetch and update pets dropdown
+                const petsResponse = await fetch(`/api/owners/${selectedOption.value}/pets`);
+                if (!petsResponse.ok) throw new Error('Failed to fetch pets data');
+                const petsData = await petsResponse.json();
+                
+                // Update pets dropdown
+                updatePetsDropdown(petsData);
+                
+                // Show/hide appropriate sections
+                ownerNameGroup.style.display = 'none';
+                petSelectionGroup.style.display = 'block';
+                walkinPetGroup.style.display = 'none';
+                registeredPetDetails.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                // Show error notification
+                showNotification('error', 'Failed to fetch owner data');
+            }
+        } else {
+            // Reset everything
+            resetForm();
+        }
+    });
+
+    // Function to handle pet selection
+    petSelect.addEventListener('change', async function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (selectedOption.value) {
+            try {
+                // Fetch pet details
+                const response = await fetch(`/api/pets/${selectedOption.value}`);
+                if (!response.ok) throw new Error('Failed to fetch pet data');
+                const petData = await response.json();
+                
+                // Update pet avatar and details
+                petAvatar.src = petData.photo_url || '/img/default-pet.png';
+                updatePetDetails(petData);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('error', 'Failed to fetch pet data');
+            }
+        } else {
+            resetPetDetails();
+        }
+    });
+
+    // Helper Functions
+    function updatePetsDropdown(pets) {
+        petSelect.innerHTML = '<option value="">Select Pet</option>';
+        pets.forEach(pet => {
+            const option = document.createElement('option');
+            option.value = pet.id;
+            option.textContent = `${pet.name} (${pet.category})`;
+            option.dataset.photo = pet.photo_url || '/img/default-pet.png';
+            option.dataset.name = pet.name;
+            option.dataset.category = pet.category;
+            option.dataset.breed = pet.breed;
+            option.dataset.age = pet.age;
+            option.dataset.weight = pet.weight;
+            option.dataset.gender = pet.gender.toLowerCase();
+            petSelect.appendChild(option);
+        });
+    }
+
+    function updatePetDetails(pet) {
+        document.getElementById('pet_name').value = pet.name;
+        document.getElementById('pet_category').value = pet.category;
+        document.getElementById('pet_breed').value = pet.breed;
+        document.getElementById('pet_age').value = pet.age;
+        document.getElementById('pet_weight').value = pet.weight;
+        document.getElementById('pet_gender').value = pet.gender;
+        document.getElementById('age_unit').value = pet.age_unit || 'years';
+    }
+
+    function resetPetDetails() {
+        petAvatar.src = '/img/default-pet.png';
+        document.getElementById('pet_name').value = '';
+        document.getElementById('pet_category').value = '';
+        document.getElementById('pet_breed').value = '';
+        document.getElementById('pet_age').value = '';
+        document.getElementById('pet_weight').value = '';
+        document.getElementById('pet_gender').value = '';
+        document.getElementById('age_unit').value = 'years';
+    }
+
+    function resetForm() {
+        ownerAvatar.src = '/img/default-avatar.png';
+        ownerNameGroup.style.display = 'none';
+        petSelectionGroup.style.display = 'block';
+        walkinPetGroup.style.display = 'none';
+        registeredPetDetails.style.display = 'none';
+        petSelect.innerHTML = '<option value="">Select Pet</option>';
+        resetPetDetails();
+    }
+
+    function showNotification(type, message) {
+        // You can implement this using your preferred notification library
+        // For example, using SweetAlert2:
+        Swal.fire({
+            icon: type,
+            title: message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    }
+});
 </script>
 @endpush
 
@@ -1678,6 +2125,111 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         border-radius: 4px !important;
         margin-bottom: 0.25rem;
     }
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.input-group-text {
+    padding: 0.25rem;
+}
+
+.card {
+    margin-bottom: 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-group .form-control:not(:first-child) {
+    padding-left: 3rem;
+}
+
+.input-group .avatar {
+    margin-right: 0.5rem;
+}
+
+.avatar-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-lg {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.card {
+    border: 1px solid rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .avatar-lg {
+    border-color: rgba(255,255,255,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+[data-bs-theme="dark"] .card {
+    border-color: rgba(255,255,255,0.1);
+}
+
+#registered_pet_details {
+    transition: all 0.3s ease;
+}
+
+#registered_pet_details .card {
+    height: 300px; /* Fixed height */
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+#registered_pet_details .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+#registered_pet_details .row {
+    flex: 1;
+}
+
+/* Add these styles for the pet selection/owner name switch */
+#pet_select_container,
+#owner_name_group {
+    transition: opacity 0.3s ease;
+}
+
+.form-control[readonly] {
+    background-color: var(--tblr-bg-surface);
+    opacity: 0.8;
 }
 </style>
 @endpush

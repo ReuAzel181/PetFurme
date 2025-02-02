@@ -10,6 +10,8 @@
     use App\Http\Controllers\MessageController;
     use App\Http\Controllers\Dashboards\DashboardController;
     use App\Http\Controllers\AppointmentController;
+    use App\Http\Controllers\Api\OwnerApiController;
+    use App\Http\Controllers\Api\PetApiController;
 
     // For the login and logout routes
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('api.login');
@@ -64,6 +66,6 @@
         return response()->json($history);
     });
 
-    Route::get('/owners/{owner}/pets', function (User $owner) {
-        return $owner->pets;
-    });
+    Route::get('/owners/{owner}', [OwnerApiController::class, 'show']);
+    Route::get('/owners/{owner}/pets', [OwnerApiController::class, 'pets']);
+    Route::get('/pets/{pet}', [PetApiController::class, 'show']);

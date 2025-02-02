@@ -53,13 +53,10 @@ class AppointmentController extends Controller
 
     public function create(Request $request)
     {
+        $owners = User::where('role', 'pet_owner')->get();
         $pet = null;
         $owner = null;
-        
-        // Get all users with role 'pet_owner'
-        $owners = User::where('role', 'pet_owner')
-            ->orderBy('name')
-            ->get();
+        $ownerPets = collect();
 
         if ($request->pet_id) {
             $pet = Pet::with('owner')->findOrFail($request->pet_id);
@@ -73,13 +70,7 @@ class AppointmentController extends Controller
             if ($request->pet_id) {
                 $pet = $ownerPets->firstWhere('id', $request->pet_id);
             }
-        } else {
-            $ownerPets = collect();
         }
-
-        // Add these lines for debugging
-        \Log::info('Pet ID from request: ' . $request->pet_id);
-        \Log::info('Selected Pet:', ['pet' => $pet]);
 
         return view('appointment.create', compact('pet', 'owner', 'owners', 'ownerPets'));
     }
