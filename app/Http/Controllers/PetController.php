@@ -146,7 +146,8 @@ class PetController extends Controller
             if ($pet->photo) {
                 Storage::disk('public')->delete($pet->photo);
             }
-            $updateData['photo'] = $request->file('photo')->store('pet_photos', 'public');
+            $photoPath = $request->file('photo')->store('pet_photos', 'public');
+            $updateData['photo'] = $photoPath;
         }
 
         $pet->update($updateData);

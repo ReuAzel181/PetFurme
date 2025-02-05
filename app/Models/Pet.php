@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Pet extends Model
 {
@@ -56,10 +57,10 @@ class Pet extends Model
 
     public function getPhotoUrlAttribute()
     {
-        if ($this->photo && Storage::disk('public')->exists('pet_photos/' . $this->photo)) {
-            return asset('storage/pet_photos/' . $this->photo);
+        if ($this->photo && Storage::disk('public')->exists($this->photo)) {
+            return asset('storage/' . $this->photo);
         }
-        return asset('storage/defaults/default-pet.png');
+        return asset('images/default-pet.png');
     }
 
     /**

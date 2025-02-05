@@ -28,6 +28,9 @@
                             </div>
                         </div>
 
+                        <!-- Add this hidden input for type -->
+                        <input type="hidden" name="type" value="pet">
+
                         <div class="pet-details">
                             <div class="row">
                                 <div class="col-lg-4">

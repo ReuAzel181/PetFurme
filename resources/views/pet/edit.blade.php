@@ -45,9 +45,7 @@
                                                 <label for="photo" class="photo-upload-label cursor-pointer">
                                                     <div class="position-relative">
                                                         <img id="preview" 
-                                                             src="{{ $pet->photo && Storage::disk('public')->exists($pet->photo) 
-                                                                    ? asset('storage/' . $pet->photo) 
-                                                                    : asset('images/default-pet.png') }}" 
+                                                             src="{{ $pet->photo_url }}" 
                                                              class="rounded-circle shadow-sm" 
                                                              style="width: 300px; height: 300px; object-fit: cover; border: 3px solid #e4e6ef;">
                                                         <div class="upload-overlay rounded-circle">

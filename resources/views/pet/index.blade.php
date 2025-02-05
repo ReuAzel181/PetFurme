@@ -53,13 +53,7 @@
                         <tr class="cursor-pointer" onclick="showPetDetails({{ $pet->id }})">
                             <td style="width: 15%">
                                 <div class="d-flex align-items-center">
-                                    <span class="avatar avatar-md me-2" style="background-image: url({{ 
-                                        $pet->photo 
-                                            ? Storage::disk('public')->exists($pet->photo) 
-                                                ? asset('storage/' . $pet->photo)
-                                                : asset('images/default-pet.png')
-                                            : asset('images/default-pet.png') 
-                                    }})"></span>
+                                    <span class="avatar avatar-md me-2" style="background-image: url({{ $pet->photo_url }})"></span>
                                     <div class="font-weight-bold text-primary">{{ $pet->name }}</div>
                                 </div>
                             </td>
