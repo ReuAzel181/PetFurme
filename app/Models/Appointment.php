@@ -31,7 +31,9 @@ class Appointment extends Model
         'created_by_type',
         'created_by_id',
         'confirmed_by',
-        'confirmed_at'
+        'confirmed_at',
+        'actions',
+        'other_reason'
     ];
 
     protected $dates = [
@@ -131,5 +133,31 @@ class Appointment extends Model
     public function confirmer()
     {
         return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    // Add these relationships to your existing Appointment model
+    public function vaccinations()
+    {
+        return $this->hasMany(Vaccination::class);
+    }
+
+    public function checkups()
+    {
+        return $this->hasMany(Checkup::class);
+    }
+
+    public function groomingSessions()
+    {
+        return $this->hasMany(GroomingSession::class);
+    }
+
+    public function surgeries()
+    {
+        return $this->hasMany(Surgery::class);
+    }
+
+    public function laboratoryTests()
+    {
+        return $this->hasMany(LaboratoryTest::class);
     }
 }

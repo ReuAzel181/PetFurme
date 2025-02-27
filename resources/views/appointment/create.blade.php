@@ -28,8 +28,26 @@
     <div class="container-xl">
         <div class="row row-cards">
             <div class="col-12">
-                <form id="appointmentForm" action="{{ route('appointment.store') }}" method="POST" class="card">
+                <form id="appointmentForm" action="{{ route('appointment.store') }}" method="POST" class="card" enctype="multipart/form-data">
                     @csrf
+                    <!-- Add this for debugging -->
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    <!-- Add this near the top of your form for debugging -->
+                    @if(session('error_section'))
+                        <div class="alert alert-info">
+                            Error Section: {{ session('error_section') }}
+                        </div>
+                    @endif
+
                     <div class="card-body">
                         <div class="row g-3">
                             <!-- Owner and Pet Selection Row -->
@@ -499,12 +517,44 @@
                                     @endforeach
                                 </div>
 
-                                <!-- Add the checkup history table here -->
+                                <!-- Update the visit history table columns -->
                                 <div id="checkup-history-table" class="mt-4" style="display: none;">
                                     <div class="card">
                                         <div class="card-header">
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <h3 class="card-title">Check-up History</h3>
+                                                <h3 class="card-title">Visit History</h3>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span>Category:</span>
+                                                    <select class="form-select form-select-sm" style="width: auto;" id="visitTypeSelect">
+                                                        <option value="all">All Records</option>
+                                                        <optgroup label="Check-up">
+                                                            <option value="routine">Routine Check-up</option>
+                                                            <option value="emergency">Emergency</option>
+                                                            <option value="follow_up">Follow-up</option>
+                                                        </optgroup>
+                                                        <optgroup label="Vaccination">
+                                                            <option value="anti_rabies">Anti-rabies</option>
+                                                            <option value="dhpp">DHPP</option>
+                                                            <option value="fvrcp">FVRCP</option>
+                                                            <option value="deworming">Deworming</option>
+                                                        </optgroup>
+                                                        <optgroup label="Grooming">
+                                                            <option value="full_grooming">Full Service</option>
+                                                            <option value="nail_trim">Nail Trim</option>
+                                                            <option value="dental">Dental Care</option>
+                                                        </optgroup>
+                                                        <optgroup label="Surgery">
+                                                            <option value="spay_neuter">Spay/Neuter</option>
+                                                            <option value="minor_surgery">Minor Surgery</option>
+                                                            <option value="major_surgery">Major Surgery</option>
+                                                        </optgroup>
+                                                        <optgroup label="Laboratory">
+                                                            <option value="blood_test">Blood Test</option>
+                                                            <option value="urinalysis">Urinalysis</option>
+                                                            <option value="xray">X-ray</option>
+                                                        </optgroup>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="card-body p-0">
@@ -512,33 +562,27 @@
                                                 <table class="table table-vcenter card-table">
                                                     <thead>
                                                         <tr>
-                                                            <th>Previous Checkup Date</th>
-                                                            <th>
-                                                                <div class="d-flex align-items-center gap-2">
-                                                                    <span>Category</span>
-                                                                    <select class="form-select form-select-sm" style="width: auto;" id="checkupTypeSelect">
-                                                                        <option value="Hematology">Hematology</option>
-                                                                        <option value="Microbiology">Microbiology</option>
-                                                                        <option value="Microscopy">Microscopy</option>
-                                                                        <option value="Blood Chemistry">Blood Chemistry</option>
-                                                                        <option value="Ultrasound">Ultrasound</option>
-                                                                        <option value="Immunology">Immunology</option>
-                                                                        <option value="Culture & Sensitivity">Culture & Sensitivity</option>
-                                                                        <option value="Radiology">Radiology</option>
-                                                                        <option value="Parasitology">Parasitology</option>
-                                                                        <option value="Virology">Virology</option>
-                                                                    </select>
-                                                                </div>
-                                                            </th>
-                                                            <th>Existing Symptoms</th>
-                                                            <th>Current Medication & Dosage</th>
-                                                            <th>New Meds & Dosage</th>
+                                                            <th>Date</th>
+                                                            <th>Service Type</th>
+                                                            <th>Findings/Results</th>
+                                                            <th>Vital Signs</th>
+                                                            <th>Treatment/Procedure</th>
+                                                            <th>Medications</th>
+                                                            <!-- Additional columns for specific services -->
+                                                            <th class="vaccination-col" style="display: none;">Vaccine Details</th>
+                                                            <th class="vaccination-col" style="display: none;">Next Due Date</th>
+                                                            <th class="grooming-col" style="display: none;">Services Done</th>
+                                                            <th class="grooming-col" style="display: none;">Products Used</th>
+                                                            <th class="surgery-col" style="display: none;">Surgery Type</th>
+                                                            <th class="surgery-col" style="display: none;">Anesthesia Used</th>
+                                                            <th class="surgery-col" style="display: none;">Recovery Notes</th>
+                                                            <th>Next Visit</th>
                                                             <th>Notes</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody id="checkupHistoryBody">
+                                                    <tbody id="visitHistoryBody">
                                                         <tr class="text-center no-data-row">
-                                                            <td colspan="6">
+                                                            <td colspan="8">
                                                                 <div class="empty">
                                                                     <div class="empty-icon">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -546,9 +590,9 @@
                                                                             <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
                                                                         </svg>
                                                                     </div>
-                                                                    <p class="empty-title">No check-up history found</p>
+                                                                    <p class="empty-title">No visit history found</p>
                                                                     <p class="empty-subtitle text-muted">
-                                                                        This pet has no previous check-up records.
+                                                                        No previous records found for this category.
                                                                     </p>
                                                                 </div>
                                                             </td>
@@ -627,261 +671,50 @@
                                 </div>
                             </div>
 
-                            <div class="col-12">
-                                <label class="form-label">Additional Notes</label>
-                                <textarea name="notes" class="form-control" rows="3" 
-                                      placeholder="Any additional information about the visit...">{{ old('notes') }}</textarea>
-                            </div>
-
-                            <!-- Add the modal content here -->
-                            <div class="col-12 mt-4">
-                                <div class="card">
-                                    <div class="card-header bg-primary text-white">
-                                        <h3 class="card-title mb-0"><i class="fas fa-stethoscope me-2"></i>Medical Record</h3>
+                            <!-- Replace the existing service details and history sections -->
+                            <div class="row g-3">
+                                <!-- Service Details Column (Left side) -->
+                                <div class="col-lg-5">
+                                    <!-- Service Details Card -->
+                                    <div id="service-details-card" style="display: none;">
+                                        <!-- Dynamic content will be inserted here -->
                                     </div>
-                                    <div class="card-body">
-                                        <!-- Patient Information Card -->
-                                        <!-- Section Navigation -->
-                                        <div class="btn-group w-100 mb-3">
-                                            <button type="button" class="btn btn-outline-primary active" onclick="showSection('vital-signs')">
-                                                <i class="fas fa-heartbeat me-2"></i>Vital Signs
-                                            </button>
-                                            <button type="button" class="btn btn-outline-primary" onclick="showSection('diagnosis')">
-                                                <i class="fas fa-stethoscope me-2"></i>Diagnosis
-                                            </button>
-                                            <button type="button" class="btn btn-outline-primary" onclick="showSection('billing')">
-                                                <i class="fas fa-file-invoice-dollar me-2"></i>Billing
-                                            </button>
-                                        </div>
 
-                                        <!-- Form Sections -->
-                                        <div class="form-sections border rounded p-3">
-                                            <!-- Vital Signs Section -->
-                                            <div id="vital-signs-section" class="form-section">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h3 class="card-title">Vital Signs</h3>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="row g-2">
-                                                            <div class="col-md-3">
-                                                                <label class="form-label">Temperature (°C)</label>
-                                                                <input type="number" class="form-control" name="temperature" step="0.1">
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <label class="form-label">Weight (kg)</label>
-                                                                <input type="number" class="form-control" name="weight" step="0.01">
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <label class="form-label">Heart Rate (bpm)</label>
-                                                                <input type="number" class="form-control" name="heart_rate">
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <label class="form-label">Respiratory Rate (/min)</label>
-                                                                <input type="number" class="form-control" name="respiratory_rate">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <!-- Additional Notes -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Additional Notes</label>
+                                        <textarea class="form-control" name="notes" rows="3" placeholder="Any additional information about the visit..."></textarea>
+                                    </div>
+                                </div>
 
-                                            <!-- Diagnosis Section -->
-                                            <div id="diagnosis-section" class="form-section" style="display: none;">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h3 class="card-title">Diagnosis Information</h3>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="diagnosis-group">
-                                                            <div class="mb-3">
-                                                                <label class="form-label required">Existing Symptoms</label>
-                                                                <textarea class="form-control" name="existing_symptoms" rows="2" required></textarea>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Examination Findings</label>
-                                                                <textarea class="form-control" name="examination_findings" rows="2"></textarea>
-                                                            </div>
-                                                        </div>
-                                                        <div class="diagnosis-group">
-                                                            <div class="mb-3">
-                                                                <label class="form-label required">Diagnosis/Results</label>
-                                                                <textarea class="form-control" name="results" rows="2" required></textarea>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Treatment Plan</label>
-                                                                <textarea class="form-control" name="treatment_notes" rows="2"></textarea>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row g-2">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Follow-up Date</label>
-                                                                <input type="date" class="form-control" name="followup_date">
-                                                            </div>
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Follow-up Type</label>
-                                                                <select class="form-select" name="followup_type">
-                                                                    <option value="">Select type</option>
-                                                                    <option value="checkup">Check-up</option>
-                                                                    <option value="vaccination">Vaccination</option>
-                                                                    <option value="treatment">Treatment</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Billing Section -->
-                                            <div id="billing-section" class="form-section" style="display: none;">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h3 class="card-title">Billing Information</h3>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <!-- Services -->
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Services</label>
-                                                            <select class="form-select mb-2" name="service">
-                                                                <option value="">Select Service</option>
-                                                                <option value="consultation">Consultation</option>
-                                                                <option value="vaccination">Vaccination</option>
-                                                                <option value="treatment">Treatment</option>
-                                                            </select>
-                                                            <div class="input-group mb-2">
-                                                                <span class="input-group-text">₱</span>
-                                                                <input type="number" class="form-control" name="service_amount" step="0.01">
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Medications -->
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Medications</label>
-                                                            <input type="text" class="form-control mb-2" name="medication" placeholder="Medication name">
-                                                            <div class="row g-2">
-                                                                <div class="col-6">
-                                                                    <div class="input-group">
-                                                                        <input type="number" class="form-control" name="quantity" placeholder="Qty">
-                                                                        <span class="input-group-text">units</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-6">
-                                                                    <div class="input-group">
-                                                                        <span class="input-group-text">₱</span>
-                                                                        <input type="number" class="form-control" name="medication_amount" step="0.01">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Payment Summary -->
-                                                        <div class="card bg-light mt-4">
-                                                            <div class="card-body">
-                                                                <div class="row g-2">
-                                                                    <div class="col-12">
-                                                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                                                            <span>Subtotal:</span>
-                                                                            <span id="subtotal" class="fw-bold">₱0.00</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-12">
-                                                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                                                            <span>Discount:</span>
-                                                                            <div class="input-group" style="width: 150px">
-                                                                                <input type="number" class="form-control" id="discountAmount" min="0" step="0.01" onchange="updateTotals()">
-                                                                                <select class="form-select" id="discountType" style="width: 60px" onchange="updateTotals()">
-                                                                                    <option value="percent">%</option>
-                                                                                    <option value="fixed">₱</option>
-                                                                                </select>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-12">
-                                                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                                                            <span class="fw-bold">Total Amount:</span>
-                                                                            <span id="total" class="fw-bold text-primary">₱0.00</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-12">
-                                                                        <hr class="my-2">
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label class="form-label">Payment Method</label>
-                                                                        <select class="form-select" name="payment_method" id="paymentMethod">
-                                                                            <option value="cash">Cash</option>
-                                                                            <option value="card">Card</option>
-                                                                            <option value="gcash">GCash</option>
-                                                                            <option value="maya">Maya</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label class="form-label">Payment Status</label>
-                                                                        <select class="form-select" name="payment_status" id="paymentStatus" onchange="toggleAmountPaid()">
-                                                                            <option value="paid">Fully Paid</option>
-                                                                            <option value="partial">Partial Payment</option>
-                                                                            <option value="pending">Pending Payment</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-12" id="amountPaidSection">
-                                                                        <label class="form-label">Amount Tendered</label>
-                                                                        <div class="input-group">
-                                                                            <span class="input-group-text">₱</span>
-                                                                            <input type="number" class="form-control" name="amount_paid" id="amountPaid" step="0.01" onchange="calculateChange()">
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-12" id="changeSection">
-                                                                        <div class="d-flex justify-content-between align-items-center mt-2">
-                                                                            <span>Change:</span>
-                                                                            <span id="changeAmount" class="fw-bold text-success">₱0.00</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-12" id="remainingSection" style="display: none;">
-                                                                        <div class="d-flex justify-content-between align-items-center mt-2">
-                                                                            <span>Remaining Balance:</span>
-                                                                            <span id="remainingAmount" class="fw-bold text-danger">₱0.00</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <!-- Service History Column (Right side) -->
+                                <div class="col-lg-7">
+                                    <div id="service-histories-container">
+                                        <!-- Service histories will be dynamically added here -->
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer text-end">
-                        <a href="{{ route('appointment.index') }}" class="btn btn-outline-secondary me-1">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Schedule Appointment</button>
+                        <button type="submit" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M12.5 21h-6.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v5"></path>
+                                <path d="M16 3v4"></path>
+                                <path d="M8 3v4"></path>
+                                <path d="M4 11h16"></path>
+                                <path d="M16 19h6"></path>
+                                <path d="M19 16v6"></path>
+                            </svg>
+                            Schedule Appointment
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Add this JavaScript function right after the section navigation buttons -->
-<script>
-function showSection(sectionName) {
-    // Hide all sections first
-    document.querySelectorAll('.form-section').forEach(section => {
-        section.style.display = 'none';
-    });
-    
-    // Remove active class from all buttons
-    document.querySelectorAll('.btn-group .btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Show the selected section
-    document.getElementById(sectionName + '-section').style.display = 'block';
-    
-    // Add active class to the clicked button
-    document.querySelector(`button[onclick="showSection('${sectionName}')"]`).classList.add('active');
-}
-</script>
 
 @endsection
 
@@ -1341,41 +1174,633 @@ document.addEventListener('DOMContentLoaded', function() {
         return badge;
     }
 
-    // Handle reason button clicks
+    // Replace the existing updateServiceDetailsForm function with this updated version
+    function updateServiceDetailsForm(reasons) {
+        console.log('Updating service details form with reasons:', reasons);
+        const serviceDetailsCard = document.getElementById('service-details-card');
+        
+        if (!serviceDetailsCard) {
+            console.error('Service details card element not found!');
+            return;
+        }
+        
+        // If reasons is a string, convert it to an array
+        if (typeof reasons === 'string') {
+            reasons = [reasons];
+        }
+        
+        console.log('Clearing existing content');
+        serviceDetailsCard.innerHTML = '';
+        
+        // Create forms for each selected reason
+        reasons.forEach((reason, index) => {
+            console.log(`Creating form fields for ${reason} (index: ${index})`);
+            let formFields = '';
+            
+            switch(reason) {
+                case 'Vaccination':
+                    console.log('Generating Vaccination form fields');
+                    formFields = `
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-vaccine" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M17 3l4 4"></path>
+                                        <path d="M19 5l-4.5 4.5"></path>
+                                        <path d="M11.5 6.5l6 6"></path>
+                                        <path d="M16.5 11.5l-6.5 6.5h-4v-4l6.5 -6.5"></path>
+                                        <path d="M7.5 12.5l1.5 1.5"></path>
+                                        <path d="M10.5 9.5l1.5 1.5"></path>
+                                        <path d="M3 21l3 -3"></path>
+                                    </svg>
+                                    Vaccine Type
+                                </label>
+                                <select name="vaccine[${index}][type]" class="form-select" required>
+                                    <option value="">Select Vaccine</option>
+                                    <option value="anti_rabies">Anti-rabies</option>
+                                    <option value="dhpp">DHPP</option>
+                                    <option value="fvrcp">FVRCP</option>
+                                    <option value="deworming">Deworming</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-barcode" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M4 7v-1a2 2 0 0 1 2 -2h2"></path>
+                                        <path d="M4 17v1a2 2 0 0 0 2 2h2"></path>
+                                        <path d="M16 4h2a2 2 0 0 1 2 2v1"></path>
+                                        <path d="M16 20h2a2 2 0 0 0 2 -2v-1"></path>
+                                        <path d="M5 11h1v2h-1z"></path>
+                                        <path d="M10 11l0 2"></path>
+                                        <path d="M14 11h1v2h-1z"></path>
+                                        <path d="M19 11l0 2"></path>
+                                    </svg>
+                                    Batch Number
+                                </label>
+                                <input type="text" name="vaccine[${index}][batch_number]" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+                                        <path d="M16 3v4"></path>
+                                        <path d="M8 3v4"></path>
+                                        <path d="M4 11h16"></path>
+                                        <path d="M11 15h1"></path>
+                                        <path d="M12 15v3"></path>
+                                    </svg>
+                                    Next Due Date
+                                </label>
+                                <input type="date" name="vaccine[${index}][next_due_date]" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                        <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                                    </svg>
+                                    Administered By
+                                </label>
+                                <input type="text" name="vaccine[${index}][administered_by]" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-notes" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"></path>
+                                        <path d="M9 7l6 0"></path>
+                                        <path d="M9 11l6 0"></path>
+                                        <path d="M9 15l4 0"></path>
+                                    </svg>
+                                    Reactions
+                                </label>
+                                <textarea name="vaccine[${index}][reactions]" class="form-control" rows="2" placeholder="Enter any reactions or notes here..."></textarea>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'Check-up':
+                    console.log('Generating Check-up form fields');
+                    // Match fields with the check-up history table columns
+                    formFields = `
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required">Date</label>
+                                <input type="date" name="checkup[${index}][date]" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Service Type</label>
+                                <select name="checkup[${index}][service_type]" class="form-select" required>
+                                    <option value="routine">Routine Check-up</option>
+                                    <option value="follow_up">Follow-up</option>
+                                    <option value="emergency">Emergency</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Findings/Results</label>
+                                <textarea name="checkup[${index}][findings]" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Vital Signs</label>
+                                <textarea name="checkup[${index}][vital_signs]" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Treatment/Procedure</label>
+                                <textarea name="checkup[${index}][treatment]" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Medications</label>
+                                <textarea name="checkup[${index}][medications]" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Next Visit</label>
+                                <input type="date" name="checkup[${index}][next_visit]" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes</label>
+                                <textarea name="checkup[${index}][notes]" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'Grooming':
+                    console.log('Generating Grooming form fields');
+                    // Match fields with the grooming history table columns
+                    formFields = `
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required">Date</label>
+                                <input type="date" name="grooming[${index}][date]" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Services Done</label>
+                                <div class="form-selectgroup">
+                                    <label class="form-selectgroup-item">
+                                        <input type="checkbox" name="grooming[${index}][services][]" value="bath" class="form-selectgroup-input">
+                                        <span class="form-selectgroup-label">Bath & Blow Dry</span>
+                                    </label>
+                                    <label class="form-selectgroup-item">
+                                        <input type="checkbox" name="grooming[${index}][services][]" value="haircut" class="form-selectgroup-input">
+                                        <span class="form-selectgroup-label">Haircut</span>
+                                    </label>
+                                    <label class="form-selectgroup-item">
+                                        <input type="checkbox" name="grooming[${index}][services][]" value="nail_trim" class="form-selectgroup-input">
+                                        <span class="form-selectgroup-label">Nail Trimming</span>
+                                    </label>
+                                    <label class="form-selectgroup-item">
+                                        <input type="checkbox" name="grooming[${index}][services][]" value="teeth" class="form-selectgroup-input">
+                                        <span class="form-selectgroup-label">Teeth Brushing</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Products Used</label>
+                                <textarea name="grooming[${index}][products]" class="form-control" rows="2" required></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Notes</label>
+                                <textarea name="grooming[${index}][notes]" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'Surgery':
+                    console.log('Generating Surgery form fields');
+                    // Match fields with the surgery history table columns
+                    formFields = `
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required">Surgery Type</label>
+                                <select name="surgery[${index}][type]" class="form-select" required>
+                                    <option value="">Select Type</option>
+                                    <option value="spay">Spay</option>
+                                    <option value="neuter">Neuter</option>
+                                    <option value="dental">Dental Surgery</option>
+                                    <option value="tumor">Tumor Removal</option>
+                                    <option value="orthopedic">Orthopedic Surgery</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Anesthesia Used</label>
+                                <input type="text" name="surgery[${index}][anesthesia]" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Recovery Notes</label>
+                                <textarea name="surgery[${index}][recovery_notes]" class="form-control" rows="2" required></textarea>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'Laboratory':
+                    console.log('Generating Laboratory form fields');
+                    // Match fields with the laboratory history table columns
+                    formFields = `
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required">Test Type</label>
+                                <select name="laboratory[${index}][test_type]" class="form-select" required>
+                                    <option value="">Select Test</option>
+                                    <option value="blood_test">Blood Test</option>
+                                    <option value="urinalysis">Urinalysis</option>
+                                    <option value="xray">X-ray</option>
+                                    <option value="ultrasound">Ultrasound</option>
+                                    <option value="fecal">Fecal Analysis</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Results</label>
+                                <textarea name="laboratory[${index}][results]" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Reference Range</label>
+                                <textarea name="laboratory[${index}][reference_range]" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Interpretation</label>
+                                <textarea name="laboratory[${index}][interpretation]" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                
+                default:
+                    console.warn(`Unknown reason type: ${reason}`);
+            }
+            
+            if (formFields) {
+                console.log(`Creating card for ${reason}`);
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card mb-3';
+                cardDiv.innerHTML = `
+                    <div class="card-header bg-primary-soft d-flex align-items-center justify-content-between">
+                        <h3 class="card-title">${reason} Details</h3>
+                        <button type="button" class="btn-close" aria-label="Close"></button>
+                        </div>
+                        <div class="card-body">
+                            ${formFields}
+                    </div>
+                `;
+
+                // Add event listener to close button
+                cardDiv.querySelector('.btn-close').addEventListener('click', function() {
+                    console.log(`Removing ${reason} card`);
+                    cardDiv.remove();
+                    // Remove from selected reasons
+                    const reasonBtn = document.querySelector(`.reason-btn[data-reason="${reason}"]`);
+                    if (reasonBtn) {
+                        reasonBtn.classList.remove('active');
+                    }
+                    updateReasonInput();
+                });
+
+                console.log(`Appending ${reason} card to service details container`);
+                serviceDetailsCard.appendChild(cardDiv);
+            } else {
+                console.warn(`No form fields generated for ${reason}`);
+            }
+        });
+        
+        serviceDetailsCard.style.display = reasons.length > 0 ? 'block' : 'none';
+        console.log('Service details form update complete');
+    }
+
+    // Add these new functions
+    function showServiceHistoryModal(serviceType) {
+        console.log('Showing modal for service type:', serviceType);
+        
+        // Create modal if it doesn't exist
+        let modal = document.getElementById('serviceHistoryModal');
+        if (!modal) {
+            modal = createServiceHistoryModal();
+            document.body.appendChild(modal);
+        }
+
+        // Update table headers based on service type
+        updateServiceHistoryTable(serviceType);
+
+        // Show the modal
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+
+    function createServiceHistoryModal() {
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal modal-blur fade';
+        modalDiv.id = 'serviceHistoryModal';
+        modalDiv.setAttribute('tabindex', '-1');
+        modalDiv.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Service History</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-vcenter" id="serviceHistoryTable">
+                                <thead></thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="100%" class="text-center">No records found</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        return modalDiv;
+    }
+
+    function updateServiceHistoryTable(serviceType) {
+        console.log('Updating service history table for:', serviceType);
+        const historiesContainer = document.getElementById('service-histories-container');
+        
+        // Create or update history section for this service type
+        let historySection = document.getElementById(`history-section-${serviceType}`);
+        
+        if (!historySection) {
+            // Create new history section if it doesn't exist
+            historySection = document.createElement('div');
+            historySection.id = `history-section-${serviceType}`;
+            historySection.className = 'card mb-3';
+            
+            // Define headers and field mappings for each service type
+            const serviceConfig = {
+                'Vaccination': {
+                    headers: ['Date', 'Vaccine Type', 'Batch Number', 'Next Due Date', 'Administered By', 'Reactions'],
+                    fields: ['date', 'vaccine_type', 'batch_number', 'next_due_date', 'administered_by', 'reactions']
+                },
+                'Check-up': {
+                    headers: ['Date', 'Service Type', 'Findings', 'Vital Signs', 'Treatment', 'Medications', 'Next Visit'],
+                    fields: ['date', 'service_type', 'findings', 'vital_signs', 'treatment', 'medications', 'next_visit']
+                },
+                'Grooming': {
+                    headers: ['Date', 'Services Done', 'Products Used', 'Notes'],
+                    fields: ['date', 'services', 'products_used', 'notes']
+                },
+                'Surgery': {
+                    headers: ['Date', 'Surgery Type', 'Anesthesia', 'Recovery Notes'],
+                    fields: ['date', 'surgery_type', 'anesthesia', 'recovery_notes']
+                },
+                'Laboratory': {
+                    headers: ['Date', 'Test Type', 'Results', 'Reference Range', 'Interpretation'],
+                    fields: ['date', 'test_type', 'results', 'reference_range', 'interpretation']
+                }
+            };
+
+            const config = serviceConfig[serviceType];
+            if (config) {
+                historySection.innerHTML = `
+                    <div class="card-header bg-primary-soft d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">${serviceType} History</h3>
+                        <span class="badge bg-primary">${serviceType}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                            <table class="table table-vcenter card-table table-sm mb-0">
+                                <thead class="sticky-top bg-white">
+                                    <tr>
+                                        ${config.headers.map(header => `<th>${header}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="${config.headers.length}" class="text-center py-4">
+                                            <div class="empty">
+                                                <div class="empty-icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
+                                                    </svg>
+                                                </div>
+                                                <p class="empty-title h6">No records found</p>
+                                                <p class="empty-subtitle text-secondary small">No previous records found for this service type.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                historiesContainer.appendChild(historySection);
+            }
+        }
+
+        // Show all history sections
+        historiesContainer.style.display = 'block';
+    }
+
+    // Update the reason button click handler
     reasonButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             const reason = this.dataset.reason;
-            const checkupTable = document.getElementById('checkup-history-table');
+            const historySection = document.getElementById(`history-section-${reason}`);
             
-            // Toggle active state for the clicked button
-            this.classList.toggle('active');
-            
-            // Show/hide checkup history only for Check-up button
-            if (reason === 'Check-up') {
-                if (this.classList.contains('active')) {
-                    checkupTable.style.display = 'block';
-                    if (petSelect.value) {
-                        loadCheckupHistory(petSelect.value, checkupTypeSelect.value);
-                    }
-                } else {
-                    checkupTable.style.display = 'none';
-                }
-            }
-            
-            // Update selected reasons
             if (this.classList.contains('active')) {
-                selectedReasons.add(reason);
-            } else {
+                // Deactivating
+                this.classList.remove('active');
                 selectedReasons.delete(reason);
+                if (historySection) {
+                    historySection.remove();
+                }
+            } else {
+                // Activating
+                this.classList.add('active');
+                selectedReasons.add(reason);
+                updateServiceHistoryTable(reason);
             }
-            
-            // Update the hidden input
+
             updateReasonInput();
-            
-            // Update display of selected reasons
-            updateSelectedReasonsDisplay();
+            updateServiceDetailsForm(Array.from(selectedReasons));
         });
     });
+
+    // Add new function to update table columns
+    function updateTableColumns(serviceType) {
+        const thead = document.querySelector('#checkup-history-table thead tr');
+        const commonColumns = `
+            <th>Date</th>
+            <th>Service Type</th>
+            <th>Notes</th>
+        `;
+
+        let specificColumns = '';
+        switch(serviceType) {
+            case 'Check-up':
+                specificColumns = `
+                    <th>Findings/Results</th>
+                    <th>Vital Signs</th>
+                    <th>Treatment/Procedure</th>
+                    <th>Medications</th>
+                    <th>Next Visit</th>
+                `;
+                break;
+            case 'Vaccination':
+                specificColumns = `
+                    <th>Vaccine Type</th>
+                    <th>Batch Number</th>
+                    <th>Next Due Date</th>
+                    <th>Administered By</th>
+                    <th>Reactions</th>
+                `;
+                break;
+            case 'Grooming':
+                specificColumns = `
+                    <th>Services Done</th>
+                    <th>Products Used</th>
+                    <th>Groomer</th>
+                    <th>Special Instructions</th>
+                    <th>Before/After Photos</th>
+                `;
+                break;
+            case 'Surgery':
+                specificColumns = `
+                    <th>Surgery Type</th>
+                    <th>Anesthesia Used</th>
+                    <th>Surgeon</th>
+                    <th>Recovery Notes</th>
+                    <th>Follow-up Date</th>
+                `;
+                break;
+            case 'Laboratory':
+                specificColumns = `
+                    <th>Test Type</th>
+                    <th>Results</th>
+                    <th>Reference Range</th>
+                    <th>Interpretation</th>
+                    <th>Recommendations</th>
+                `;
+                break;
+        }
+
+        thead.innerHTML = commonColumns + specificColumns;
+    }
+
+    // Update the loadCheckupHistory function to handle all service types
+    function loadServiceHistory(petId, serviceType) {
+        const tbody = document.getElementById('visitHistoryBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        fetch(`/api/pets/${petId}/service-history/${serviceType}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr class="text-center no-data-row">
+                            <td colspan="8">
+                                <div class="empty">
+                                    <div class="empty-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="empty-title">No ${serviceType} records found</p>
+                                    <p class="empty-subtitle text-muted">
+                                        No previous records found for this category.
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                // Render the data based on service type
+                tbody.innerHTML = data.map(record => {
+                    let specificColumns = '';
+                    switch(serviceType) {
+                        case 'check-up':
+                            specificColumns = `
+                                <td>${record.findings || '-'}</td>
+                                <td>${record.vital_signs || '-'}</td>
+                                <td>${record.treatment || '-'}</td>
+                                <td>${record.medications || '-'}</td>
+                                <td>${record.next_visit || '-'}</td>
+                            `;
+                            break;
+                        case 'vaccination':
+                            specificColumns = `
+                                <td>${record.vaccine_type || '-'}</td>
+                                <td>${record.batch_number || '-'}</td>
+                                <td>${record.next_due_date || '-'}</td>
+                                <td>${record.administered_by || '-'}</td>
+                                <td>${record.reactions || '-'}</td>
+                            `;
+                            break;
+                        // Add similar cases for other service types
+                    }
+
+                    return `
+                        <tr>
+                            <td>${record.date || '-'}</td>
+                            <td>${record.service_type || '-'}</td>
+                            <td>${record.notes || '-'}</td>
+                            ${specificColumns}
+                        </tr>
+                    `;
+                }).join('');
+            })
+            .catch(error => {
+                console.error('Error loading service history:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-danger">
+                            Failed to load service history. Please try again.
+                        </td>
+                    </tr>`;
+            });
+    }
+
+    // Update the visit type select options
+    document.getElementById('visitTypeSelect').innerHTML = `
+        <option value="all">All Records</option>
+        <optgroup label="Check-up">
+            <option value="routine">Routine Check-up</option>
+            <option value="emergency">Emergency</option>
+            <option value="follow_up">Follow-up</option>
+        </optgroup>
+        <optgroup label="Vaccination">
+            <option value="anti_rabies">Anti-rabies</option>
+            <option value="dhpp">DHPP</option>
+            <option value="fvrcp">FVRCP</option>
+            <option value="deworming">Deworming</option>
+        </optgroup>
+        <optgroup label="Grooming">
+            <option value="full_grooming">Full Service</option>
+            <option value="nail_trim">Nail Trim</option>
+            <option value="dental">Dental Care</option>
+        </optgroup>
+        <optgroup label="Surgery">
+            <option value="spay_neuter">Spay/Neuter</option>
+            <option value="minor_surgery">Minor Surgery</option>
+            <option value="major_surgery">Major Surgery</option>
+        </optgroup>
+        <optgroup label="Laboratory">
+            <option value="blood_test">Blood Test</option>
+            <option value="urinalysis">Urinalysis</option>
+            <option value="xray">X-ray</option>
+        </optgroup>
+    `;
 
     // Add this function to update the display of selected reasons
     function updateSelectedReasonsDisplay() {
@@ -1642,63 +2067,20 @@ document.addEventListener('DOMContentLoaded', function() {
     checkupTypeSelect.addEventListener('change', function() {
         categoryHeader.textContent = this.value;
         if (petSelect.value) {
-            loadCheckupHistory(petSelect.value, this.value);
+            loadServiceHistory(petSelect.value, this.value);
         }
     });
 
     // Load history when pet changes
     petSelect.addEventListener('change', function() {
         if (this.value && isCheckupSelected()) {
-            loadCheckupHistory(this.value, checkupTypeSelect.value);
+            loadServiceHistory(this.value, checkupTypeSelect.value);
         }
     });
 
     function isCheckupSelected() {
         const activeReasonBtn = document.querySelector('.reason-btn[data-reason="Check-up"].active');
         return activeReasonBtn !== null;
-    }
-
-    function loadCheckupHistory(petId, category) {
-        console.log('Loading history for pet:', petId, 'category:', category);
-        fetch(`/api/pet/${petId}/checkup-history/${category}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log('Received data:', data);
-                const tbody = document.getElementById('checkupHistoryBody');
-                if (data.length === 0) {
-                    tbody.innerHTML = `
-                        <tr class="text-center no-data-row">
-                            <td colspan="6">
-                                <div class="empty">
-                                    <div class="empty-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                            <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
-                                        </svg>
-                                    </div>
-                                    <p class="empty-title">No ${category} records found</p>
-                                    <p class="empty-subtitle text-muted">
-                                        This pet has no previous ${category.toLowerCase()} check-up records.
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>`;
-                } else {
-                    tbody.innerHTML = data.map(record => `
-                        <tr>
-                            <td>${record.checkup_date}</td>
-                            <td>${record.results || '-'}</td>
-                            <td>${record.existing_symptoms || '-'}</td>
-                            <td>${record.current_medication || '-'}</td>
-                            <td>${record.new_medication || '-'}</td>
-                            <td>${record.notes || '-'}</td>
-                        </tr>
-                    `).join('');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading checkup history:', error);
-            });
     }
 
     // Get the button and modal elements
@@ -2080,6 +2462,498 @@ document.getElementById('pet_id').addEventListener('change', function(e) {
     
     updatePetDetails(selectedOption);
 });
+
+// Add this new function after the reason button click handler
+function updateServiceDetailsForm(reasons) {
+    console.log('Updating service details form with reasons:', reasons);
+    const serviceDetailsCard = document.getElementById('service-details-card');
+    
+    if (!serviceDetailsCard) {
+        console.error('Service details card element not found!');
+        return;
+    }
+    
+    // If reasons is a string, convert it to an array
+    if (typeof reasons === 'string') {
+        reasons = [reasons];
+    }
+    
+    console.log('Clearing existing content');
+    serviceDetailsCard.innerHTML = '';
+    
+    // Create forms for each selected reason
+    reasons.forEach((reason, index) => {
+        console.log(`Creating form fields for ${reason} (index: ${index})`);
+    let formFields = '';
+        
+        switch(reason) {
+            case 'Vaccination':
+                console.log('Generating Vaccination form fields');
+                formFields = `
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label required">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-vaccine" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M17 3l4 4"></path>
+                                    <path d="M19 5l-4.5 4.5"></path>
+                                    <path d="M11.5 6.5l6 6"></path>
+                                    <path d="M16.5 11.5l-6.5 6.5h-4v-4l6.5 -6.5"></path>
+                                    <path d="M7.5 12.5l1.5 1.5"></path>
+                                    <path d="M10.5 9.5l1.5 1.5"></path>
+                                    <path d="M3 21l3 -3"></path>
+                                </svg>
+                                Vaccine Type
+                            </label>
+                            <select name="vaccine[${index}][type]" class="form-select" required>
+                                <option value="">Select Vaccine</option>
+                                <option value="anti_rabies">Anti-rabies</option>
+                                <option value="dhpp">DHPP</option>
+                                <option value="fvrcp">FVRCP</option>
+                                <option value="deworming">Deworming</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-barcode" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M4 7v-1a2 2 0 0 1 2 -2h2"></path>
+                                    <path d="M4 17v1a2 2 0 0 0 2 2h2"></path>
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v1"></path>
+                                    <path d="M16 20h2a2 2 0 0 0 2 -2v-1"></path>
+                                    <path d="M5 11h1v2h-1z"></path>
+                                    <path d="M10 11l0 2"></path>
+                                    <path d="M14 11h1v2h-1z"></path>
+                                    <path d="M19 11l0 2"></path>
+                                </svg>
+                                Batch Number
+                            </label>
+                            <input type="text" name="vaccine[${index}][batch_number]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+                                    <path d="M16 3v4"></path>
+                                    <path d="M8 3v4"></path>
+                                    <path d="M4 11h16"></path>
+                                    <path d="M11 15h1"></path>
+                                    <path d="M12 15v3"></path>
+                                </svg>
+                                Next Due Date
+                            </label>
+                            <input type="date" name="vaccine[${index}][next_due_date]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                                </svg>
+                                Administered By
+                            </label>
+                            <input type="text" name="vaccine[${index}][administered_by]" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-notes" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M5 3m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"></path>
+                                    <path d="M9 7l6 0"></path>
+                                    <path d="M9 11l6 0"></path>
+                                    <path d="M9 15l4 0"></path>
+                                </svg>
+                                Reactions
+                            </label>
+                            <textarea name="vaccine[${index}][reactions]" class="form-control" rows="2" placeholder="Enter any reactions or notes here..."></textarea>
+                        </div>
+                    </div>
+                `;
+                break;
+            
+            case 'Check-up':
+                console.log('Generating Check-up form fields');
+                // Match fields with the check-up history table columns
+            formFields = `
+                <div class="row g-3">
+                    <div class="col-md-6">
+                            <label class="form-label required">Date</label>
+                            <input type="date" name="checkup[${index}][date]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">Service Type</label>
+                            <select name="checkup[${index}][service_type]" class="form-select" required>
+                                <option value="routine">Routine Check-up</option>
+                                <option value="follow_up">Follow-up</option>
+                                <option value="emergency">Emergency</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                            <label class="form-label required">Findings/Results</label>
+                            <textarea name="checkup[${index}][findings]" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="col-md-6">
+                            <label class="form-label required">Vital Signs</label>
+                            <textarea name="checkup[${index}][vital_signs]" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="col-md-6">
+                            <label class="form-label required">Treatment/Procedure</label>
+                            <textarea name="checkup[${index}][treatment]" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">Medications</label>
+                            <textarea name="checkup[${index}][medications]" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">Next Visit</label>
+                            <input type="date" name="checkup[${index}][next_visit]" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            <textarea name="checkup[${index}][notes]" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 'Grooming':
+                console.log('Generating Grooming form fields');
+                // Match fields with the grooming history table columns
+            formFields = `
+                <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label required">Date</label>
+                            <input type="date" name="grooming[${index}][date]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">Services Done</label>
+                        <div class="form-selectgroup">
+                            <label class="form-selectgroup-item">
+                                    <input type="checkbox" name="grooming[${index}][services][]" value="bath" class="form-selectgroup-input">
+                                <span class="form-selectgroup-label">Bath & Blow Dry</span>
+                            </label>
+                            <label class="form-selectgroup-item">
+                                    <input type="checkbox" name="grooming[${index}][services][]" value="haircut" class="form-selectgroup-input">
+                                <span class="form-selectgroup-label">Haircut</span>
+                            </label>
+                            <label class="form-selectgroup-item">
+                                    <input type="checkbox" name="grooming[${index}][services][]" value="nail_trim" class="form-selectgroup-input">
+                                <span class="form-selectgroup-label">Nail Trimming</span>
+                            </label>
+                            <label class="form-selectgroup-item">
+                                    <input type="checkbox" name="grooming[${index}][services][]" value="teeth" class="form-selectgroup-input">
+                                <span class="form-selectgroup-label">Teeth Brushing</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                            <label class="form-label required">Products Used</label>
+                            <textarea name="grooming[${index}][products]" class="form-control" rows="2" required></textarea>
+                    </div>
+                    <div class="col-md-6">
+                            <label class="form-label">Notes</label>
+                            <textarea name="grooming[${index}][notes]" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 'Surgery':
+                console.log('Generating Surgery form fields');
+                // Match fields with the surgery history table columns
+            formFields = `
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label required">Surgery Type</label>
+                            <select name="surgery[${index}][type]" class="form-select" required>
+                            <option value="">Select Type</option>
+                            <option value="spay">Spay</option>
+                            <option value="neuter">Neuter</option>
+                            <option value="dental">Dental Surgery</option>
+                            <option value="tumor">Tumor Removal</option>
+                            <option value="orthopedic">Orthopedic Surgery</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                            <label class="form-label required">Anesthesia Used</label>
+                            <input type="text" name="surgery[${index}][anesthesia]" class="form-control" required>
+                    </div>
+                        <div class="col-md-6">
+                            <label class="form-label required">Recovery Notes</label>
+                            <textarea name="surgery[${index}][recovery_notes]" class="form-control" rows="2" required></textarea>
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 'Laboratory':
+                console.log('Generating Laboratory form fields');
+                // Match fields with the laboratory history table columns
+            formFields = `
+                <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label required">Test Type</label>
+                            <select name="laboratory[${index}][test_type]" class="form-select" required>
+                                <option value="">Select Test</option>
+                                <option value="blood_test">Blood Test</option>
+                                <option value="urinalysis">Urinalysis</option>
+                                <option value="xray">X-ray</option>
+                                <option value="ultrasound">Ultrasound</option>
+                                <option value="fecal">Fecal Analysis</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Results</label>
+                            <textarea name="laboratory[${index}][results]" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                            <label class="form-label">Reference Range</label>
+                            <textarea name="laboratory[${index}][reference_range]" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                            <label class="form-label">Interpretation</label>
+                            <textarea name="laboratory[${index}][interpretation]" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+            `;
+            break;
+                
+            default:
+                console.warn(`Unknown reason type: ${reason}`);
+    }
+
+    if (formFields) {
+            console.log(`Creating card for ${reason}`);
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card mb-3';
+            cardDiv.innerHTML = `
+                <div class="card-header bg-primary-soft d-flex align-items-center justify-content-between">
+                    <h3 class="card-title">${reason} Details</h3>
+                    <button type="button" class="btn-close" aria-label="Close"></button>
+                </div>
+                <div class="card-body">
+                    ${formFields}
+            </div>
+        `;
+
+            // Add event listener to close button
+            cardDiv.querySelector('.btn-close').addEventListener('click', function() {
+                console.log(`Removing ${reason} card`);
+                cardDiv.remove();
+                // Remove from selected reasons
+                const reasonBtn = document.querySelector(`.reason-btn[data-reason="${reason}"]`);
+                if (reasonBtn) {
+                    reasonBtn.classList.remove('active');
+                }
+                updateReasonInput();
+            });
+
+            console.log(`Appending ${reason} card to service details container`);
+            serviceDetailsCard.appendChild(cardDiv);
+    } else {
+            console.warn(`No form fields generated for ${reason}`);
+    }
+    });
+    
+    serviceDetailsCard.style.display = reasons.length > 0 ? 'block' : 'none';
+    console.log('Service details form update complete');
+}
+
+// Update the reason button click handler to call the new function
+reasonButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        console.log('Reason button clicked');
+        const reason = this.dataset.reason;
+        console.log('Selected reason:', reason);
+
+        if (this.classList.contains('active')) {
+            console.log('Button is already active, deactivating');
+            this.classList.remove('active');
+            selectedReasons.delete(reason);
+        } else {
+            console.log('Button is inactive, activating');
+            this.classList.add('active');
+            selectedReasons.add(reason);
+        }
+
+        console.log('Current selected reasons:', Array.from(selectedReasons));
+        updateReasonInput();
+
+        // Update both service details form and history
+        const activeReasons = Array.from(selectedReasons);
+            if (activeReasons.length > 0) {
+            console.log('Updating form with active reasons:', activeReasons);
+            updateServiceDetailsForm(activeReasons);
+            // Show service history for the selected reason
+            updateServiceHistoryTable(reason);
+            document.getElementById('service-history-section').style.display = 'block';
+            } else {
+            console.log('No active reasons, hiding service details and history');
+                document.getElementById('service-details-card').style.display = 'none';
+            document.getElementById('service-history-section').style.display = 'none';
+        }
+    });
+});
+
+// Add function to update service history table
+function updateServiceHistoryTable(serviceType) {
+    console.log('Updating service history table for:', serviceType);
+    const historiesContainer = document.getElementById('service-histories-container');
+    
+    // Create or update history section for this service type
+    let historySection = document.getElementById(`history-section-${serviceType}`);
+    
+    if (!historySection) {
+        // Create new history section if it doesn't exist
+        historySection = document.createElement('div');
+        historySection.id = `history-section-${serviceType}`;
+        historySection.className = 'card mb-3';
+        
+        // Define headers and field mappings for each service type
+        const serviceConfig = {
+            'Vaccination': {
+                headers: ['Date', 'Vaccine Type', 'Batch Number', 'Next Due Date', 'Administered By', 'Reactions'],
+                fields: ['date', 'vaccine_type', 'batch_number', 'next_due_date', 'administered_by', 'reactions']
+            },
+            'Check-up': {
+                headers: ['Date', 'Service Type', 'Findings', 'Vital Signs', 'Treatment', 'Medications', 'Next Visit'],
+                fields: ['date', 'service_type', 'findings', 'vital_signs', 'treatment', 'medications', 'next_visit']
+            },
+            'Grooming': {
+                headers: ['Date', 'Services Done', 'Products Used', 'Notes'],
+                fields: ['date', 'services', 'products_used', 'notes']
+            },
+            'Surgery': {
+                headers: ['Date', 'Surgery Type', 'Anesthesia', 'Recovery Notes'],
+                fields: ['date', 'surgery_type', 'anesthesia', 'recovery_notes']
+            },
+            'Laboratory': {
+                headers: ['Date', 'Test Type', 'Results', 'Reference Range', 'Interpretation'],
+                fields: ['date', 'test_type', 'results', 'reference_range', 'interpretation']
+            }
+        };
+
+        const config = serviceConfig[serviceType];
+        if (config) {
+            historySection.innerHTML = `
+                <div class="card-header bg-primary-soft d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">${serviceType} History</h3>
+                    <span class="badge bg-primary">${serviceType}</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-vcenter card-table table-sm mb-0">
+                            <thead class="sticky-top bg-white">
+                                <tr>
+                                    ${config.headers.map(header => `<th>${header}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="${config.headers.length}" class="text-center py-4">
+                                        <div class="empty">
+                                            <div class="empty-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                    <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z"></path>
+                                                </svg>
+                                            </div>
+                                            <p class="empty-title h6">No records found</p>
+                                            <p class="empty-subtitle text-secondary small">No previous records found for this service type.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            historiesContainer.appendChild(historySection);
+        }
+    }
+
+    // Show all history sections
+    historiesContainer.style.display = 'block';
+}
+
+// Update the reason button click handler
+reasonButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const reason = this.dataset.reason;
+        const historySection = document.getElementById(`history-section-${reason}`);
+        
+        if (this.classList.contains('active')) {
+            // Deactivating
+            this.classList.remove('active');
+            selectedReasons.delete(reason);
+            if (historySection) {
+                historySection.remove();
+            }
+        } else {
+            // Activating
+            this.classList.add('active');
+            selectedReasons.add(reason);
+            updateServiceHistoryTable(reason);
+        }
+
+        updateReasonInput();
+        updateServiceDetailsForm(Array.from(selectedReasons));
+    });
+});
+
+// Add function to update service history table
+function updateServiceHistoryTable(serviceType) {
+    console.log('Updating service history table for:', serviceType);
+    const tableHeaders = document.getElementById('history-table-headers');
+    const tableBody = document.getElementById('service-history-table-body');
+    const serviceBadge = document.getElementById('service-type-badge');
+    
+    // Show the service history section
+    document.getElementById('service-history-section').style.display = 'block';
+    
+    // Update service type badge
+    serviceBadge.textContent = serviceType;
+    
+    // Define headers and field mappings for each service type
+    const serviceConfig = {
+        'Vaccination': {
+            headers: ['Date', 'Vaccine Type', 'Batch Number', 'Next Due Date', 'Administered By', 'Reactions'],
+            fields: ['date', 'vaccine_type', 'batch_number', 'next_due_date', 'administered_by', 'reactions']
+        },
+        'Check-up': {
+            headers: ['Date', 'Service Type', 'Findings', 'Vital Signs', 'Treatment', 'Medications', 'Next Visit'],
+            fields: ['date', 'service_type', 'findings', 'vital_signs', 'treatment', 'medications', 'next_visit']
+        },
+        'Grooming': {
+            headers: ['Date', 'Services Done', 'Products Used', 'Notes'],
+            fields: ['date', 'services', 'products_used', 'notes']
+        },
+        'Surgery': {
+            headers: ['Date', 'Surgery Type', 'Anesthesia', 'Recovery Notes'],
+            fields: ['date', 'surgery_type', 'anesthesia', 'recovery_notes']
+        },
+        'Laboratory': {
+            headers: ['Date', 'Test Type', 'Results', 'Reference Range', 'Interpretation'],
+            fields: ['date', 'test_type', 'results', 'reference_range', 'interpretation']
+        }
+    };
+
+    // Update table headers based on service type
+    if (serviceConfig[serviceType]) {
+        tableHeaders.innerHTML = serviceConfig[serviceType].headers
+            .map(header => `<th>${header}</th>`)
+            .join('');
+        
+        // Update colspan for empty state
+        const emptyStateRow = tableBody.querySelector('tr');
+        if (emptyStateRow) {
+            emptyStateRow.querySelector('td').setAttribute('colspan', serviceConfig[serviceType].headers.length);
+        }
+    }
+}
 </script>
 
 <!-- Add this script section after your existing scripts -->
@@ -2669,5 +3543,481 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-color: rgba(var(--primary-rgb), 0.2);
     color: rgba(255, 255, 255, 0.8);
 }
+
+.form-selectgroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.form-selectgroup-item {
+    margin: 0;
+}
+
+.form-selectgroup-input {
+    position: absolute;
+    opacity: 0;
+}
+
+.form-selectgroup-label {
+    display: block;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--tblr-border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-selectgroup-input:checked + .form-selectgroup-label {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.form-selectgroup-input:focus + .form-selectgroup-label {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
+}
+
+#service-details-card {
+    transition: all 0.3s ease;
+}
+
+#service-details-card .card {
+    margin-bottom: 0;
+}
+
+/* Add these new styles for multiple service cards */
+#service-details-card .card {
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+#service-details-card .card:last-child {
+    margin-bottom: 0;
+}
+
+.card-header .btn-action {
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.card-header .btn-action[aria-expanded="false"] {
+    transform: rotate(-90deg);
+}
+
+.collapse {
+    transition: all 0.3s ease;
+}
+
+/* Adjust spacing between multiple cards */
+#service-details-card .card + .card {
+    margin-top: 1rem;
+}
+
+/* Style for nested form groups */
+.service-form-group {
+    border-left: 3px solid var(--primary-color);
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.service-form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Add visual separation between different service types */
+.card-header {
+    border-bottom: 1px solid rgba(var(--primary-rgb), 0.1);
+}
+
+/* Improve form layout on mobile */
+@media (max-width: 768px) {
+    .row.g-3 > [class*="col-"] {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Add these styles to your existing CSS */
+.table-sm th, .table-sm td {
+    padding: 0.3rem;
+    font-size: 0.875rem;
+}
+
+.sticky-top {
+    z-index: 1020;
+}
+
+/* Make the service history table more compact */
+#service-history-section .card-header {
+    padding: 0.5rem 1rem;
+}
+
+#service-history-section .card-title {
+    font-size: 1rem;
+    margin: 0;
+}
+
+#service-history-section .empty {
+    padding: 1rem;
+}
+
+#service-history-section .empty-icon {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+#service-history-section .empty-title {
+    margin-bottom: 0.25rem;
+}
+
+#service-history-section .empty-subtitle {
+    font-size: 0.75rem;
+}
+
+/* Make service details cards more compact */
+#service-details-card .card {
+    margin-bottom: 1rem;
+}
+
+#service-details-card .card-header {
+    padding: 0.5rem 1rem;
+}
+
+#service-details-card .card-body {
+    padding: 1rem;
+}
+
+#service-details-card .form-label {
+    margin-bottom: 0.25rem;
+}
+
+#service-details-card .form-control,
+#service-details-card .form-select {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Adjust spacing in the grid */
+.row.g-3 {
+    --bs-gutter-y: 0.5rem;
+}
+
+/* Update the service history styles */
+#service-history-section {
+    height: calc(100vh - 300px); /* Adjust the height as needed */
+    display: flex;
+    flex-direction: column;
+}
+
+#service-history-section .card-body {
+    flex: 1;
+    overflow: hidden;
+}
+
+#service-history-section .table-responsive {
+    height: 100%;
+}
+
+#service-history-section table {
+    margin-bottom: 0;
+}
+
+#service-history-section th {
+    background: var(--tblr-bg-surface);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#service-type-badge {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Make the history section sticky */
+@media (min-width: 992px) {
+    #service-history-section {
+        position: sticky;
+        top: 1rem;
+    }
+}
+
+/* Update service histories container styles */
+#service-histories-container {
+    display: none;
+}
+
+#service-histories-container .card {
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#service-histories-container .card:last-child {
+    margin-bottom: 0;
+}
+
+#service-histories-container .card-header {
+    padding: 0.5rem 1rem;
+    background-color: var(--tblr-bg-surface);
+}
+
+#service-histories-container .table-responsive {
+    border-radius: 0 0 4px 4px;
+}
+
+#service-histories-container .empty {
+    padding: 1.5rem;
+}
+
+#service-histories-container .empty-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Adjust column widths for better layout */
+@media (min-width: 992px) {
+    .col-lg-5 {
+        width: 40%;
+    }
+    .col-lg-7 {
+        width: 60%;
+    }
+}
+
+#service-details-container {
+    position: relative;
+    margin-top: 1rem;
+}
+
+#vaccination-details {
+    margin-bottom: 1rem;
+}
+
+/* Maintain the two-column layout */
+@media (min-width: 992px) {
+    .col-lg-5 {
+        width: 40%;
+    }
+    .col-lg-7 {
+        width: 60%;
+    }
+}
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+        // Remove any existing error messages
+        document.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+        document.querySelectorAll('.invalid-feedback').forEach(el => {
+            el.remove();
+        });
+
+        // Basic form validation
+        let isValid = true;
+        
+        // Required fields validation
+        const requiredFields = this.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            if (!field.value) {
+                isValid = false;
+                field.classList.add('is-invalid');
+                const feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                feedback.textContent = 'This field is required';
+                field.parentNode.appendChild(feedback);
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            return false;
+        }
+    });
+</script>
+@endpush
+
+@push('scripts')
+<script>
+    // Get the reason for visit select element
+    const reasonSelect = document.querySelector('select[name="reason_for_visit"]');
+    const vaccinationDetails = document.getElementById('vaccination-details');
+    const serviceDetailsContainer = document.getElementById('service-details-container');
+    
+    // Move vaccination details to the service details container
+    serviceDetailsContainer.appendChild(vaccinationDetails);
+    
+    function toggleVaccinationDetails() {
+        const isVaccination = reasonSelect.value === 'Vaccination';
+        vaccinationDetails.style.display = isVaccination ? 'block' : 'none';
+        
+        // Toggle required attributes
+        const requiredFields = vaccinationDetails.querySelectorAll('input[required], select[required]');
+        requiredFields.forEach(field => {
+            if (isVaccination) {
+                field.setAttribute('required', 'required');
+            } else {
+                field.removeAttribute('required');
+            }
+        });
+    }
+    
+    // Initial setup
+    reasonSelect.addEventListener('change', toggleVaccinationDetails);
+    
+    // Show vaccination details if it was previously selected or there were errors
+    if (reasonSelect.value === 'Vaccination' || @json(session('error_section') === 'vaccination')) {
+        toggleVaccinationDetails();
+    }
+</script>
+@endpush
+
+<!-- Replace the vaccination details section with this updated version -->
+<div id="vaccination-details" style="display: none;">
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3 class="card-title">Vaccination Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label required">Vaccine Type</label>
+                        <select name="vaccine_type" class="form-select @error('vaccine_type') is-invalid @enderror">
+                            <option value="">Select Vaccine Type</option>
+                            <option value="anti_rabies">Anti-Rabies</option>
+                            <option value="dhpp">DHPP</option>
+                            <option value="fvrcp">FVRCP</option>
+                            <option value="deworming">Deworming</option>
+                        </select>
+                        @error('vaccine_type')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label required">Batch Number</label>
+                        <input type="text" name="batch_number" class="form-control @error('batch_number') is-invalid @enderror" 
+                               value="{{ old('batch_number') }}">
+                        @error('batch_number')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label required">Next Due Date</label>
+                        <input type="date" name="next_due_date" class="form-control @error('next_due_date') is-invalid @enderror" 
+                               value="{{ old('next_due_date') }}">
+                        @error('next_due_date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label required">Administered By</label>
+                        <input type="text" name="administered_by" class="form-control @error('administered_by') is-invalid @enderror" 
+                               value="{{ old('administered_by') }}">
+                        @error('administered_by')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Reactions/Notes</label>
+                <textarea name="reactions" class="form-control" rows="3">{{ old('reactions') }}</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    const appointmentForm = document.getElementById('appointmentForm');
+    const reasonSelect = document.querySelector('select[name="reason_for_visit"]');
+    const vaccinationDetails = document.getElementById('vaccination-details');
+
+    function toggleVaccinationDetails() {
+        const isVaccination = reasonSelect.value === 'Vaccination';
+        vaccinationDetails.style.display = isVaccination ? 'block' : 'none';
+        
+        // Get all the input and select elements in vaccination details
+        const vaccineFields = vaccinationDetails.querySelectorAll('input, select');
+        
+        vaccineFields.forEach(field => {
+            if (isVaccination) {
+                if (field.name === 'vaccine_type' || 
+                    field.name === 'batch_number' || 
+                    field.name === 'next_due_date') {
+                    field.setAttribute('required', '');
+                }
+            } else {
+                field.removeAttribute('required');
+                // Clear the field value when hiding
+                if (field.type === 'select-one') {
+                    field.selectedIndex = 0;
+                } else {
+                    field.value = '';
+                }
+            }
+        });
+    }
+
+    // Form validation
+    appointmentForm.addEventListener('submit', function(e) {
+        const isVaccination = reasonSelect.value === 'Vaccination';
+        
+        if (isVaccination) {
+            const vaccineType = this.querySelector('[name="vaccine_type"]').value;
+            const batchNumber = this.querySelector('[name="batch_number"]').value;
+            const nextDueDate = this.querySelector('[name="next_due_date"]').value;
+            const administeredBy = this.querySelector('[name="administered_by"]').value;
+            
+            console.log('Vaccination form submission:', {
+                vaccineType,
+                batchNumber,
+                nextDueDate,
+                administeredBy
+            });
+            
+            if (!vaccineType || !batchNumber || !nextDueDate || !administeredBy) {
+                e.preventDefault();
+                const missingFields = [];
+                if (!vaccineType) missingFields.push('Vaccine Type');
+                if (!batchNumber) missingFields.push('Batch Number');
+                if (!nextDueDate) missingFields.push('Next Due Date');
+                if (!administeredBy) missingFields.push('Administered By');
+                
+                alert(`Please fill in all required vaccination fields: ${missingFields.join(', ')}`);
+                return false;
+            }
+        }
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleVaccinationDetails();
+    });
+
+    // Add change event listener
+    reasonSelect.addEventListener('change', toggleVaccinationDetails);
+</script>
 @endpush

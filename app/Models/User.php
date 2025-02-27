@@ -33,7 +33,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'store_name',
         'store_address',
         'store_email',
-        'email_verified_at'
+        'email_verified_at',
+        'verified_by',
     ];
 
     // Hidden fields when the user is serialized
@@ -69,13 +70,13 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // A user can send many messages
-    public function sentMessages(): HasMany
+    public function sentMessages()
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
 
     // A user can receive many messages
-    public function receivedMessages(): HasMany
+    public function receivedMessages()
     {
         return $this->hasMany(Message::class, 'receiver_id');
     }
@@ -145,5 +146,34 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->photo ? 
             asset('storage/' . $this->photo) : 
             asset('storage/defaults/no-avatar.jpg');
+    }
+
+    public function lastMessage()
+    {
+        return $this->hasOne(Message::class, 'sender_id')
+            ->latest('sent_at')
+            ->withDefault();
+    }
+
+    public function allMessages()
+    {
+        return Message::where(function ($query) {
+            $query->where('sender_id', $this->id)
+                  ->orWhere('receiver_id', $this->id);
+        });
+    }
+
+    public function unreadMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id')
+            ->whereNull('read_at');
+    }
+
+    public function hasUnreadMessages()
+    {
+        return $this->receivedMessages()
+            ->whereNull('read_at')
+            ->where('receiver_id', auth()->id())
+            ->exists();
     }
 }

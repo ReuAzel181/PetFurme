@@ -187,4 +187,26 @@ class UserController extends Controller
             'message' => 'User restored successfully'
         ]);
     }
+
+    public function verify(User $user, Request $request)
+    {
+        if (!auth()->user()->role === 'admin' && !auth()->user()->role === 'sub_admin') {
+            return back()->with('error', 'Unauthorized action.');
+        }
+
+        if ($request->isMethod('DELETE')) {
+            // Deverify the user
+            $user->update([
+                'verified_by' => null
+            ]);
+            return back()->with('success', 'User verification has been removed.');
+        }
+
+        // Verify the user
+        $user->update([
+            'verified_by' => auth()->id()
+        ]);
+
+        return back()->with('success', 'User has been verified successfully.');
+    }
 }

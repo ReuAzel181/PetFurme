@@ -85,21 +85,43 @@
                                         <td class="text-center text-muted">{{ $product->created_at->format('M d, Y') }}</td>
                                         <td class="text-center text-muted">{{ $product->updated_at->format('M d, Y') }}</td>
                                         <td class="text-center">
-                                            <div class="btn-group">
-                                                <a href="{{ route('products.show', $product->uuid) }}" class="btn btn-icon btn-sm btn-outline-primary">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                        <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
-                                                        <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>
-                                                    </svg>
-                                                </a>
-                                                <a href="{{ route('products.edit', $product->uuid) }}" class="btn btn-icon btn-sm btn-outline-warning">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
-                                                        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
-                                                    </svg>
-                                                </a>
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-secondary dropdown-toggle align-text-top" data-bs-toggle="dropdown">
+                                                    Actions
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <a href="{{ route('products.show', $product->uuid) }}" class="dropdown-item">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon text-primary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
+                                                            <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>
+                                                        </svg>
+                                                        View Details
+                                                    </a>
+                                                    <a href="{{ route('products.edit', $product->uuid) }}" class="dropdown-item">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+                                                            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+                                                        </svg>
+                                                        Edit Supply
+                                                    </a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <form action="{{ route('products.destroy', $product->uuid) }}" method="POST" class="dropdown-item p-0">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this product?');">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                <path d="M4 7h16"/>
+                                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+                                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                                                                <path d="M10 12l4 4m0 -4l-4 4"/>
+                                                            </svg>
+                                                            Delete Supply
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -129,6 +151,18 @@
             </div>
         </div>
     </div>
+
+    @push('page-scripts')
+    <script>
+        // Initialize all dropdowns
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown-toggle');
+            dropdowns.forEach(function(dropdown) {
+                new bootstrap.Dropdown(dropdown);
+            });
+        });
+    </script>
+    @endpush
 
     @push('page-styles')
     <style>
@@ -196,6 +230,35 @@
             max-width: 100px;
             height: 30px;
             display: inline-block;
+        }
+
+        /* Dropdown styles */
+        .dropdown-menu {
+            padding: 0.5rem 0;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .dropdown-item-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.25rem;
+        }
+
+        .dropdown-divider {
+            margin: 0.25rem 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
         }
     </style>
     @endpush

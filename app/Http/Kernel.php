@@ -33,6 +33,7 @@ class Kernel extends HttpKernel
         'pet.owner' => \App\Http\Middleware\PetOwnerMiddleware::class,
         'staff' => \App\Http\Middleware\CheckStaffRole::class,
         'can:access-admin' => \App\Http\Middleware\AdminAccessMiddleware::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
     
 

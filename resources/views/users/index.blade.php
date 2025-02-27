@@ -349,6 +349,10 @@
 
     <div class="page-body">
         <div class="container-xl">
+            @if(request()->query('role') === 'pet_owner')
+                <!-- Remove the entire card with verification filter -->
+            @endif
+
             <div class="card">
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center w-100">
@@ -361,7 +365,19 @@
                                 </button>
                             @endforeach
                         </div>
-                        <div class="d-flex gap-2">
+                        
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="btn-group me-2">
+                                <button type="button" class="btn btn-outline-secondary active" data-credentials="all">
+                                    All Credentials
+                                </button>
+                                <button type="button" class="btn btn-outline-success" data-credentials="complete">
+                                    Complete
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" data-credentials="incomplete">
+                                    Incomplete
+                                </button>
+                            </div>
                             <button type="button" class="btn btn-primary" onclick="exportSelected()">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-download me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path>
@@ -448,6 +464,22 @@
                                         Pets
                                     </th>
                                     <th>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"></path>
+                                            <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"></path>
+                                            <path d="M9 14l2 2l4 -4"></path>
+                                        </svg>
+                                        Credentials
+                                    </th>
+                                    <th>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                            <path d="M6 21v-2a4 4 0 0 1 4 -4h4"></path>
+                                            <path d="M15 19l2 2l4 -4"></path>
+                                        </svg>
+                                        Verification
+                                    </th>
+                                    <th>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path>
                                             <path d="M16 3v4"></path>
@@ -530,6 +562,65 @@
                                                 </span>
                                             @endif
                                         </td>
+                                        <td onclick="showUserDetails({{ $user->id }})">
+                                            @if($user->complete_credentials)
+                                                <span class="badge bg-success text-white">Complete</span>
+                                            @else
+                                                <span class="badge bg-warning text-white">Incomplete</span>
+                                            @endif
+                                        </td>
+                                        <td onclick="event.stopPropagation()">
+                                            @if($user->verified_by)
+                                                <form action="{{ route('user-management.verify', $user->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <div class="d-flex align-items-center gap-2" role="button" 
+                                                         onclick="if(confirm('Are you sure you want to remove verification from this user?')) { this.closest('form').submit(); }">
+                                                        <span class="badge bg-azure-lt d-flex align-items-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                                <path d="M5 12l5 5l10 -10"></path>
+                                                            </svg>
+                                                            Verified
+                                                        </span>
+                                                        <span class="text-azure small d-flex align-items-center gap-1" title="Verified by">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-check" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4"></path>
+                                                                <path d="M15 19l2 2l4 -4"></path>
+                                                            </svg>
+                                                            {{ App\Models\User::find($user->verified_by)->name ?? 'Unknown' }}
+                                                        </span>
+                                                    </div>
+                                                </form>
+                                            @else
+                                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'sub_admin')
+                                                    <form action="{{ route('user-management.verify', $user->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" 
+                                                                class="btn btn-azure btn-pill btn-sm d-flex align-items-center gap-2 px-3" 
+                                                                onclick="return confirm('Are you sure you want to verify this user?')"
+                                                                style="background: linear-gradient(135deg, #0d6efd, #0dcaf0); border: none; box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-check" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                                                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4"></path>
+                                                                <path d="M15 19l2 2l4 -4"></path>
+                                                            </svg>
+                                                            Verify User
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <span class="badge bg-yellow d-flex align-items-center gap-1" style="width: fit-content;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                                                            <path d="M12 7v5l3 3"></path>
+                                                        </svg>
+                                                        Pending Verification
+                                                    </span>
+                                                @endif
+                                            @endif
+                                        </td>
                                         <td onclick="showUserDetails({{ $user->id }})">{{ $user->created_at ? $user->created_at->format('Y-m-d') : '—' }}</td>
                                         <td onclick="showUserDetails({{ $user->id }})">{{ $user->updated_at ? $user->updated_at->format('Y-m-d') : '—' }}</td>
                                         <td onclick="event.stopPropagation()">
@@ -548,7 +639,7 @@
                                                             <path d="M4 7l16 0"></path>
                                                             <path d="M10 11l0 6"></path>
                                                             <path d="M14 11l0 6"></path>
-                                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                                            <path d="M5 7l1 12a2 2 0 0 1 2 2h8a2 2 0 0 1 2 -2l1 -12"></path>
                                                             <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
                                                         </svg>
                                                     </button>
@@ -681,7 +772,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M11 5h2"></path>
                                                 <path d="M19 12c-.667 5.333-2.333 8-5 8h-4c-2.667 0-4.333-2.667-5-8"></path>
-                                                <path d="M11 16c0 .667.333 1 1 1s1-.333 1-1h-2z"></path>
+                                                <path d="M11 16c0 .667.333 1 1 1s1 -.333 1 -1h-2z"></path>
                                                 <path d="M12 18v2"></path>
                                                 <path d="M10 11v.01"></path>
                                                 <path d="M14 11v.01"></path>
@@ -1116,6 +1207,59 @@
                     // Remove loading state
                     tableBody.style.opacity = '1';
                 });
+            });
+        });
+    });
+
+    // Update the credentials filter code
+    document.addEventListener('DOMContentLoaded', function() {
+        const credentialsButtons = document.querySelectorAll('[data-credentials]');
+        
+        function updateTableVisibility() {
+            const activeCredentialsFilter = document.querySelector('[data-credentials].active').dataset.credentials;
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                // Look specifically for the credentials badge
+                const credentialsBadge = row.querySelector('td:nth-child(9) .badge')?.textContent.trim();
+                const hasCompleteCredentials = credentialsBadge === 'Complete';
+                let showRow = true;
+                
+                if (activeCredentialsFilter === 'complete') {
+                    showRow = hasCompleteCredentials;
+                } else if (activeCredentialsFilter === 'incomplete') {
+                    showRow = !hasCompleteCredentials;
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+        
+        credentialsButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class and reset button styles
+                credentialsButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('btn-success', 'btn-warning', 'btn-secondary');
+                    btn.classList.add('btn-outline-secondary');
+                });
+                
+                // Add active class and update button style
+                this.classList.add('active');
+                
+                // Update button styles based on type
+                if (this.dataset.credentials === 'all') {
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('btn-secondary');
+                } else if (this.dataset.credentials === 'complete') {
+                    this.classList.remove('btn-outline-success');
+                    this.classList.add('btn-success');
+                } else if (this.dataset.credentials === 'incomplete') {
+                    this.classList.remove('btn-outline-warning');
+                    this.classList.add('btn-warning');
+                }
+                
+                updateTableVisibility();
             });
         });
     });

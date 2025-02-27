@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Http\Controllers\BackupController;
 
 class Kernel extends ConsoleKernel
 {
@@ -19,6 +20,11 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('appointments:send-reminders')->everyMinute();
+        
+        // Run backup daily at midnight
+        $schedule->call(function () {
+            app(BackupController::class)->scheduleBackup();
+        })->daily();
     }
 
     /**

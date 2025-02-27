@@ -52,6 +52,7 @@ use App\Http\Controllers\PetOwner\PetOwnerProductController;
 use App\Http\Controllers\PetOwner\DashboardController as PetOwnerDashboardController;
 
 use App\Http\Controllers\CheckupHistoryController;
+use App\Http\Controllers\BackupController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -732,3 +733,26 @@ Route::get('/api/pets/{pet}/medical-history', [PetController::class, 'getMedical
 
 // Add this test route
 Route::get('/test/pet/{id}', [PetController::class, 'testPetData']);
+
+Route::match(['post', 'delete'], '/user-management/{user}/verify', [UserController::class, 'verify'])->name('user-management.verify');
+
+Route::post('/pets/{pet}/verify', [PetController::class, 'verify'])->name('pets.verify');
+
+Route::get('/backup/download/{type}', [BackupController::class, 'downloadArchiveBackup'])
+    ->name('backup.download')
+    ->middleware(['auth', 'admin']); // Ensure only admins can download backups
+
+// Update the backup routes
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/backup/download/{type}', [BackupController::class, 'downloadArchiveBackup'])
+        ->name('backup.download');
+    Route::post('/backup/auto', [BackupController::class, 'autoBackup'])
+        ->name('backup.auto');
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/backups', [BackupController::class, 'listBackups'])->name('backup.list');
+    Route::get('/backups/download/{filename}', [BackupController::class, 'downloadBackupFile'])->name('backup.download-file');
+});
+
+Route::post('/messages/mark-as-read/{userId}', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');

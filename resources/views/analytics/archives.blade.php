@@ -10,6 +10,46 @@
                 </h2>
                 <div class="text-muted mt-1">View and manage archived records</div>
             </div>
+            <div class="col-auto ms-auto">
+                <div class="btn-group">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-download" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                                <path d="M7 11l5 5l5 -5" />
+                                <path d="M12 4l0 12" />
+                            </svg>
+                            Download Backup
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('backup.download', 'users') }}">Users Backup</a></li>
+                            <li><a class="dropdown-item" href="{{ route('backup.download', 'pets') }}">Pets Backup</a></li>
+                            <li><a class="dropdown-item" href="{{ route('backup.download', 'orders') }}">Orders Backup</a></li>
+                            <li><a class="dropdown-item" href="{{ route('backup.download', 'appointments') }}">Appointments Backup</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('backup.download', 'all') }}">Full Backup (ZIP)</a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-success ms-2" onclick="triggerAutoBackup()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+                            <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+                        </svg>
+                        Auto Backup
+                    </button>
+                    <a href="{{ route('backup.list') }}" class="btn btn-info ms-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/>
+                            <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10"/>
+                            <path d="M10 12l4 0"/>
+                        </svg>
+                        View Backups
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -498,7 +538,7 @@
                                                title="View Appointment">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                                                    <path d="M10 12a2 2 0 1 0 4 0"></path>
                                                     <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
                                                 </svg>
                                             </a>
@@ -780,6 +820,29 @@ function restoreUser(userId) {
             alert('An error occurred while restoring the user.');
         });
     }
+}
+
+function triggerAutoBackup() {
+    fetch('{{ route("backup.auto") }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Backup created successfully!');
+        } else {
+            alert('Backup failed: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while creating the backup.');
+    });
 }
 </script>
 @endpush

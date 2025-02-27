@@ -12,17 +12,16 @@ class PetController extends Controller
     // Display a listing of the pets
     public function index()
     {
-        // Fetch all pets with their associated users
-        $pets = Pet::with(['appointments' => function($query) {
-            $query->orderBy('appointment_date', 'desc');
-        }, 'user'])->get();
+        $pendingPets = Pet::whereNull('verified_by')
+                          ->with(['user', 'creator'])
+                          ->latest()
+                          ->get();
+                          
+        $pets = Pet::whereNotNull('verified_by')
+                   ->with(['user', 'appointments', 'creator', 'verifier'])
+                   ->get();
 
-            // Use the static methods for counts
-        $totalPets = Pet::getTotalCount();
-        $todayPets = Pet::getTodayCount();
-
-        // Pass data to the view
-        return view('pet.index', compact('pets', 'totalPets', 'todayPets'));
+        return view('pet.index', compact('pets', 'pendingPets'));
     }
 
     public function edit(Pet $pet)
@@ -280,5 +279,17 @@ class PetController extends Controller
                 'gender' => $pet->gender
             ]
         ]);
+    }
+
+    public function verify(Request $request, Pet $pet)
+    {
+        if ($request->status === 'approved') {
+            $pet->update([
+                'verified_by' => auth()->id()
+            ]);
+            return response()->json(['success' => true]);
+        }
+        
+        return response()->json(['success' => false], 422);
     }
 }

@@ -31,37 +31,46 @@
                             </div>
                         </div>
                         <div class="chat-users flex-grow-1">
-                            @foreach ($users as $user)
-                                <a href="{{ route('messages.chat', $user->id) }}" class="chat-user-item d-flex align-items-center text-decoration-none text-dark p-4 border-bottom hover-bg-light">
+                            @foreach ($users->where('role', 'pet_owner') as $user)
+                                @php
+                                    $hasUnreadMessages = $user->receivedMessages->where('receiver_id', auth()->id())
+                                                                              ->whereNull('read_at')
+                                                                              ->count() > 0;
+                                @endphp
+                                <a href="{{ route('messages.chat', $user->id) }}" 
+                                   class="chat-user-item position-relative d-flex align-items-center text-decoration-none p-4 border-bottom
+                                          {{ $hasUnreadMessages ? 'unread-messages' : '' }}">
                                     <div class="me-3 position-relative">
                                         @if($user->photo)
-                                            <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm" width="64" height="64" style="object-fit: cover;">
+                                            <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}" 
+                                                 class="rounded-circle shadow-sm" width="64" height="64" style="object-fit: cover;">
                                         @else
-                                            <img src="{{ asset('assets/img/default-avatar.png') }}" alt="No Profile" class="rounded-circle shadow-sm" width="64" height="64">
-                                        @endif
-                                        @if($user->unread_count > 0)
-                                            <span class="position-absolute top-0 end-0 badge rounded-pill bg-danger shadow-sm" style="font-size: 1rem;">
-                                                {{ $user->unread_count }}
-                                            </span>
+                                            <img src="{{ asset('assets/img/default-avatar.png') }}" alt="No Profile" 
+                                                 class="rounded-circle shadow-sm" width="64" height="64">
                                         @endif
                                     </div>    
                                     <div class="flex-grow-1 min-width-0">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <div class="d-flex align-items-center">
-                                                <h5 class="mb-0 text-truncate fw-bold" style="font-size: 1.35rem;">{{ $user->name }}</h5>
-                                                @if($user->unread_count > 0)
-                                                    <span class="badge bg-secondary rounded-pill ms-2 shadow-sm" style="font-size: 1rem;">{{ $user->unread_count }}</span>
-                                                @endif
+                                                <h5 class="mb-0 text-truncate {{ $hasUnreadMessages ? 'fw-bold' : '' }}" 
+                                                    style="font-size: 1.35rem;">
+                                                    {{ $user->name }}
+                                                </h5>
                                             </div>
-                                            <small class="text-muted ms-2" style="font-size: 1.1rem;">
+                                            <small class="text-muted" style="font-size: 1.1rem;">
                                                 @if($user->lastMessage)
                                                     {{ \Carbon\Carbon::parse($user->lastMessage->sent_at)->format('h:i A') }}
                                                 @endif
                                             </small>
                                         </div>
-                                        <p class="text-muted mb-0 text-truncate" style="font-size: 1.15rem;">
+                                        <p class="mb-0 text-truncate {{ $hasUnreadMessages ? 'fw-semibold' : '' }}" 
+                                           style="font-size: 1.15rem;">
                                             @if($user->lastMessage)
-                                                {{ $user->lastMessage->message }}
+                                                @if($user->lastMessage->sender_id === auth()->id())
+                                                    You: {{ $user->lastMessage->message }}
+                                                @else
+                                                    {{ $user->lastMessage->message }}
+                                                @endif
                                             @else
                                                 No messages yet
                                             @endif
@@ -89,26 +98,32 @@
                         </div>
 
                         <!-- Chat Body -->
-                        <div class="chat-body flex-grow-1 d-flex align-items-center justify-content-center" style="background-color: #f8f9fa;">
-                            <div class="text-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages mb-4" width="120" height="120" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                    <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                                    <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-                                </svg>
-                                <h2 class="text-muted mb-3" style="font-size: 1.75rem;">Select a conversation</h2>
-                                <p class="text-muted" style="font-size: 1.25rem;">Choose a contact from the left to start messaging</p>
+                        <div class="chat-body flex-grow-1" style="background-color: #f8f9fa; overflow-y: auto;">
+                            <div id="messages-container" class="p-4">
+                                @foreach($messages ?? [] as $message)
+                                    <div class="message mb-3 {{ $message->sender_id == auth()->id() ? 'sent' : 'received' }}">
+                                        <div class="message-bubble p-3 rounded-3 {{ $message->sender_id == auth()->id() ? 'bg-primary text-white' : 'bg-white' }}">
+                                            <p class="mb-1">{{ $message->message }}</p>
+                                            <small class="text-{{ $message->sender_id == auth()->id() ? 'light' : 'muted' }}">
+                                                {{ \Carbon\Carbon::parse($message->sent_at)->format('h:i A') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
                         <!-- Chat Footer -->
                         <div class="chat-footer bg-white border-top p-3">
-                            <div class="input-group input-group-lg">
-                                <input type="text" class="form-control border-0" placeholder="Type your message..." disabled style="font-size: 1.2rem;">
-                                <button class="btn btn-primary" type="button" disabled>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                                </button>
-                            </div>
+                            <form id="message-form" class="message-form">
+                                @csrf
+                                <div class="input-group input-group-lg">
+                                    <input type="text" class="form-control border-0" id="message-input" name="message" placeholder="Type your message..." style="font-size: 1.2rem;">
+                                    <button class="btn btn-primary" type="submit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -116,6 +131,81 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+    .message {
+        max-width: 80%;
+    }
+    .message.sent {
+        margin-left: auto;
+    }
+    .message.received {
+        margin-right: auto;
+    }
+    .message-bubble {
+        display: inline-block;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .sent .message-bubble {
+        border-radius: 15px 15px 0 15px !important;
+    }
+    .received .message-bubble {
+        border-radius: 15px 15px 15px 0 !important;
+    }
+    #messages-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .chat-user-item {
+        transition: all 0.2s ease;
+        position: relative;
+        background-color: #ffffff;
+    }
+    .chat-user-item.unread-messages {
+        background-color: #e8f0fe !important;
+        border-left: 4px solid #206bc4;
+    }
+    .chat-user-item.unread-messages h5 {
+        color: #206bc4 !important;
+    }
+    .chat-user-item.unread-messages p {
+        color: #1a1a1a !important;
+    }
+    .chat-user-item:hover {
+        background-color: #f8f9fa;
+    }
+    .chat-user-item.unread-messages:hover {
+        background-color: #dae7fd !important;
+    }
+    .chat-user-item .position-absolute.bg-danger {
+        width: 12px;
+        height: 12px;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.3);
+    }
+    .chat-user-item.unread-messages .text-muted {
+        color: #2c3338 !important;
+        font-weight: 500;
+    }
+    .chat-user-item.unread-messages h5 {
+        color: #206bc4 !important;
+    }
+    .chat-user-item .badge.bg-danger {
+        font-size: 0.85rem;
+        padding: 0.35em 0.65em;
+        font-weight: 600;
+        background-color: #dc3545 !important;
+    }
+    .chat-user-item.active {
+        background-color: rgba(32, 107, 196, 0.1);
+    }
+    .chat-user-item:hover {
+        transform: translateX(4px);
+    }
+</style>
+@endpush
 
 @push('scripts')
 <script>
@@ -160,6 +250,109 @@
             if (item.getAttribute('href') === currentPath) {
                 item.classList.add('active');
             }
+        });
+
+        // Message form submission
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const messagesContainer = document.getElementById('messages-container');
+
+        if (messageForm) {
+            messageForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const message = messageInput.value.trim();
+                if (!message) return;
+
+                try {
+                    const response = await fetch('/messages/send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            receiver_id: currentChatUserId // You'll need to set this based on selected user
+                        })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Add message to chat
+                        appendMessage({
+                            message: message,
+                            sent_at: new Date(),
+                            sender_id: {{ auth()->id() }}
+                        });
+                        messageInput.value = '';
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                }
+            });
+        }
+
+        function appendMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message mb-3 ${message.sender_id == {{ auth()->id() }} ? 'sent' : 'received'}`;
+            
+            const time = new Date(message.sent_at).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            messageElement.innerHTML = `
+                <div class="message-bubble p-3 rounded-3 ${message.sender_id == {{ auth()->id() }} ? 'bg-primary text-white' : 'bg-white'}">
+                    <p class="mb-1">${message.message}</p>
+                    <small class="text-${message.sender_id == {{ auth()->id() }} ? 'light' : 'muted'}">${time}</small>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Auto-scroll to bottom of messages
+        if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Fetch messages periodically
+        setInterval(async function() {
+            if (currentChatUserId) {
+                try {
+                    const response = await fetch(`/messages/get/${currentChatUserId}`);
+                    const data = await response.json();
+                    updateMessages(data.messages);
+                } catch (error) {
+                    console.error('Error fetching messages:', error);
+                }
+            }
+        }, 5000); // Fetch every 5 seconds
+
+        // Add this function to mark messages as read
+        async function markMessagesAsRead(userId) {
+            try {
+                await fetch(`/messages/mark-as-read/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+            } catch (error) {
+                console.error('Error marking messages as read:', error);
+            }
+        }
+
+        // Add click event listener to chat items
+        chatUserItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const userId = this.getAttribute('href').split('/').pop();
+                markMessagesAsRead(userId);
+            });
         });
     });
 </script>
@@ -238,3 +431,4 @@
     }
 </style>
 @endsection
+

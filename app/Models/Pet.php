@@ -22,7 +22,8 @@ class Pet extends Model
         'weight',
         'allergies',
         'notes',
-        'photo'
+        'photo',
+        'verified_by'
     ];
 
     protected $casts = [
@@ -69,5 +70,15 @@ class Pet extends Model
     public function owner()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }
