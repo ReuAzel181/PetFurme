@@ -27,9 +27,15 @@
                                 </h3>
 
                                 
-                                <img src="{{ $product->product_image ? asset('storage/' . $product->product_image) : asset('assets/img/products/default.webp') }}" 
-                                alt="{{ $product->name }}" 
-                                style="width: 90px !important; height: 90px !important; object-fit: cover !important;">
+                                @if($product->product_image)
+                                    <img src="{{ $product->product_image ? asset('storage/' . $product->product_image) : asset('assets/img/products/default.webp') }}" 
+                                         alt="{{ $product->name }}" 
+                                         style="width: 90px !important; height: 90px !important; object-fit: cover !important;">
+                                @else
+                                    <img src="{{ asset('assets/img/products/default.webp') }}" 
+                                         alt="{{ $product->name }}" 
+                                         style="width: 90px !important; height: 90px !important; object-fit: cover !important;">
+                                @endif
 
 
                             </div>

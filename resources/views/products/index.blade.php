@@ -53,7 +53,9 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="avatar rounded" style="background-image: url({{ $product->product_image ? asset('storage/' . $product->product_image) : asset('assets/img/products/default.webp') }})"></span>
+                                                <img style="width: 90px;"
+                                                     src="{{ $product->product_image ? asset('storage/' . $product->product_image) : asset('assets/img/products/default.webp') }}"
+                                                     alt="{{ $product->name }}">
                                                 <div class="font-weight-medium">{{ $product->name }}</div>
                                             </div>
                                         </td>

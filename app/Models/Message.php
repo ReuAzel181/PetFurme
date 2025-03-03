@@ -12,23 +12,26 @@ class Message extends Model
     protected $fillable = [
         'conversation_id',
         'sender_id',
-        'receiver_id',
+        'receivers',
         'message',
-        'sent_at'
+        'sent_at',
+        'read_at',
+        'is_automated',
+        'bot_context'
     ];
 
     protected $casts = [
-        'sent_at' => 'datetime'
+        'sent_at' => 'datetime',
+        'read_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'receivers' => 'array',
+        'is_automated' => 'boolean'
     ];
 
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
-    }
-
-    public function receiver()
-    {
-        return $this->belongsTo(User::class, 'receiver_id');
     }
 
     public function conversation()
@@ -47,7 +50,7 @@ class Message extends Model
                     ],
                     [
                         'unique_key' => Conversation::generateUniqueKey(),
-                        'admin_id' => $message->receiver_id
+                        'admin_id' => $message->receivers[0]
                     ]
                 );
                 $message->conversation_id = $conversation->id;

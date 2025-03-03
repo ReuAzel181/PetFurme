@@ -33,9 +33,13 @@
                         <div class="chat-users flex-grow-1">
                             @foreach ($users->where('role', 'pet_owner') as $user)
                                 @php
-                                    $hasUnreadMessages = $user->receivedMessages->where('receiver_id', auth()->id())
-                                                                              ->whereNull('read_at')
-                                                                              ->count() > 0;
+                                    $hasUnreadMessages = $user->receivedMessages
+                                        ->filter(function($message) {
+                                            return is_array($message->receivers) && 
+                                                   collect($message->receivers)->contains('id', auth()->id()) &&
+                                                   is_null($message->read_at);
+                                        })
+                                        ->count() > 0;
                                 @endphp
                                 <a href="{{ route('messages.chat', $user->id) }}" 
                                    class="chat-user-item position-relative d-flex align-items-center text-decoration-none p-4 border-bottom
@@ -59,7 +63,9 @@
                                             </div>
                                             <small class="text-muted" style="font-size: 1.1rem;">
                                                 @if($user->lastMessage)
-                                                    {{ \Carbon\Carbon::parse($user->lastMessage->sent_at)->format('h:i A') }}
+                                                    {{ \Carbon\Carbon::parse($user->lastMessage->created_at)
+                                                        ->timezone(config('app.timezone'))
+                                                        ->format('h:i A') }}
                                                 @endif
                                             </small>
                                         </div>
@@ -105,7 +111,9 @@
                                         <div class="message-bubble p-3 rounded-3 {{ $message->sender_id == auth()->id() ? 'bg-primary text-white' : 'bg-white' }}">
                                             <p class="mb-1">{{ $message->message }}</p>
                                             <small class="text-{{ $message->sender_id == auth()->id() ? 'light' : 'muted' }}">
-                                                {{ \Carbon\Carbon::parse($message->sent_at)->format('h:i A') }}
+                                                {{ \Carbon\Carbon::parse($message->created_at)
+                                                    ->timezone(config('app.timezone'))
+                                                    ->format('h:i A') }}
                                             </small>
                                         </div>
                                     </div>

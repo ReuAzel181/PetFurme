@@ -165,20 +165,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-Route::get('php/', function () {
-    return phpinfo();
-});
-
 Route::get('/', function () {
+    // If already authenticated, redirect based on role
     if (auth()->check()) {
         if (auth()->user()->role === 'pet_owner') {
             return redirect()->route('pet-owner.dashboard');
         }
         return redirect()->route('dashboard');
     }
+    
     // Show login page for unauthenticated users
     return view('auth.login');
 })->name('home');
+
+// Keep the localhost development route
+Route::get('php/', function () {
+    if (request()->getHost() === 'localhost' || request()->getHost() === '127.0.0.1') {
+        return phpinfo();
+    }
+    return redirect('/');
+});
 
 // Apply cache.response middleware to specific asset routes
 Route::middleware('cache.response')->group(function () {
@@ -756,3 +762,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 Route::post('/messages/mark-as-read/{userId}', [MessageController::class, 'markAsRead'])->name('messages.markAsRead');
+
+Route::post('/appointments/delete-multiple', [AppointmentController::class, 'deleteMultiple'])->name('appointment.deleteMultiple');
+Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointment.updateStatus');

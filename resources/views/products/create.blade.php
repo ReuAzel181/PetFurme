@@ -30,6 +30,7 @@
                                     name="product_image"
                                     class="form-control @error('product_image') is-invalid @enderror"
                                     onchange="previewImage();"
+                                    data-binary-upload="true"
                                 >
 
                                 @error('product_image')
@@ -266,4 +267,27 @@
 
 @pushonce('page-scripts')
     <script src="{{ asset('assets/js/img-preview.js') }}"></script>
+    <script>
+    document.querySelector('input[data-binary-upload]').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Remove existing hidden input if any
+                const existingInput = document.querySelector('input[name="product_image_data"]');
+                if (existingInput) {
+                    existingInput.remove();
+                }
+                
+                // Create new hidden input with base64 data
+                const binaryInput = document.createElement('input');
+                binaryInput.type = 'hidden';
+                binaryInput.name = 'product_image_data';
+                binaryInput.value = e.target.result.split(',')[1]; // Get base64 part
+                document.querySelector('form').appendChild(binaryInput);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    </script>
 @endpushonce

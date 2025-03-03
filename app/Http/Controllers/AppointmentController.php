@@ -18,16 +18,8 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = Appointment::with(['pet', 'user', 'creator', 'confirmer'])
-            ->select(
-                'appointment.*',
-                DB::raw('CASE 
-                    WHEN users.id IS NOT NULL THEN users.name
-                    ELSE appointment.owner_name
-                END as display_name'),
-                DB::raw('DATE(appointment_date) as appointment_date_display')
-            )
-            ->leftJoin('users', 'appointment.user_id', '=', 'users.id')
+        $appointments = Appointment::with(['user', 'pet', 'creator', 'confirmer'])
+            ->latest()
             ->get();
     
         // Fetch only active products with stock
@@ -509,5 +501,72 @@ class AppointmentController extends Controller
     public function show(Appointment $appointment)
     {
         return view('appointments.show', compact('appointment'));
+    }
+
+    public function deleteMultiple(Request $request)
+    {
+        try {
+            $ids = $request->ids;
+            
+            DB::beginTransaction();
+            
+            Appointment::whereIn('id', $ids)->update([
+                'deleted_by' => auth()->id()
+            ]);
+            
+            Appointment::whereIn('id', $ids)->delete();
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointments deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting appointments: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateStatus(Request $request, Appointment $appointment)
+    {
+        try {
+            $validatedData = $request->validate([
+                'status' => 'required|in:confirmed,cancelled'
+            ]);
+
+            $updateData = [
+                'status' => $validatedData['status']
+            ];
+
+            // Store confirmation details in the actions column as JSON
+            if ($validatedData['status'] === 'confirmed') {
+                $updateData['actions'] = json_encode([
+                    'confirmed_by' => auth()->id(),
+                    'confirmed_at' => now()->format('Y-m-d H:i:s'),
+                    'confirmer_name' => auth()->user()->name
+                ]);
+            }
+
+            $appointment->update($updateData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment status updated successfully',
+                'appointment' => $appointment->fresh()
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error updating appointment status', [
+                'appointment_id' => $appointment->id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating appointment status: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

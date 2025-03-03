@@ -13,13 +13,12 @@
                     <div class="text-muted mt-1">Manage appointment schedules</div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
-                    <div class="d-flex">
+                    <div class="d-flex gap-2">
+                        <button id="deleteSelected" class="btn btn-danger d-none">
+                            <i class="fas fa-trash me-2"></i>Delete Selected
+                        </button>
                         <a href="{{ route('appointment.create') }}" class="btn btn-success">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 5l0 14"></path>
-                                <path d="M5 12l14 0"></path>
-                            </svg>
-                            Add Appointment
+                            <i class="fas fa-plus me-2"></i>Add Appointment
                         </a>
                     </div>
                 </div>
@@ -59,6 +58,9 @@
                         <table class="table table-vcenter card-table table-striped">
                             <thead>
                                 <tr>
+                                    <th width="3%">
+                                        <input type="checkbox" class="form-check-input" id="selectAll">
+                                    </th>
                                     <th width="5%">ID</th>
                                     <th width="12%">Owner Details</th>
                                     <th width="12%">Pet Details</th>
@@ -75,6 +77,9 @@
                                     <tr style="cursor: pointer" 
                                         onclick="showAppointmentDetails({{ json_encode($appointment) }})"
                                         class="appointment-row">
+                                        <td onclick="event.stopPropagation()">
+                                            <input type="checkbox" class="form-check-input appointment-checkbox" value="{{ $appointment->id }}">
+                                        </td>
                                         <td class="text-muted">
                                             #{{ str_pad($appointment->id, 5, '0', STR_PAD_LEFT) }}
                                         </td>
@@ -146,46 +151,63 @@
                                             </div>
                                         </td>
                                         <td>
-                                            @switch($appointment->status)
-                                                @case('pending')
-                                                    <span class="badge bg-yellow-lt">
-                                                        <i class="fas fa-clock me-1"></i>For Confirmation
-                                                    </span>
-                                                    @break
-                                                @case('confirmed')
-                                                    <div class="d-flex flex-column gap-1">
-                                                        <span class="badge bg-blue-lt">
-                                                            <i class="fas fa-check-circle me-1"></i>Confirmed
-                                                        </span>
-                                                        @if($appointment->confirmed_by)
-                                                            <small class="text-muted">
-                                                                Confirmed by: {{ $appointment->confirmer->name }}
-                                                                <br>
-                                                                <span class="text-muted-light">{{ $appointment->confirmed_at?->format('M d, Y g:i A') }}</span>
-                                                            </small>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm {{ 
+                                                    $appointment->status === 'pending' ? 'btn-warning' : 
+                                                    ($appointment->status === 'confirmed' ? 'btn-success' : 
+                                                    ($appointment->status === 'cancelled' ? 'btn-danger' : 'btn-secondary')) 
+                                                }} dropdown-toggle" 
+                                                        type="button" 
+                                                        data-bs-toggle="dropdown" 
+                                                        aria-expanded="false"
+                                                        onclick="event.stopPropagation()">
+                                                    {{ ucfirst($appointment->status) }}
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    @if($appointment->status !== 'confirmed')
+                                                        <li>
+                                                            <form action="{{ route('appointment.updateStatus', $appointment->id) }}" 
+                                                                  method="POST" 
+                                                                  class="status-update-form">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <input type="hidden" name="status" value="confirmed">
+                                                                <button type="submit" class="dropdown-item text-success">
+                                                                    <i class="fas fa-check me-2"></i>Confirm
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                    @if($appointment->status !== 'cancelled')
+                                                        <li>
+                                                            <form action="{{ route('appointment.updateStatus', $appointment->id) }}" 
+                                                                  method="POST" 
+                                                                  class="status-update-form">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <input type="hidden" name="status" value="cancelled">
+                                                                <button type="submit" class="dropdown-item text-danger">
+                                                                    <i class="fas fa-times me-2"></i>Cancel
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                </ul>
+                                            </div>
+                                            @if($appointment->status === 'confirmed' && $appointment->actions)
+                                                <div class="mt-1">
+                                                    <small class="text-muted">
+                                                        @php
+                                                            $actions = json_decode($appointment->actions, true);
+                                                        @endphp
+                                                        @if($actions && isset($actions['confirmer_name']))
+                                                            Confirmed by: {{ $actions['confirmer_name'] }}
+                                                            <br>
+                                                            <span class="text-muted">{{ \Carbon\Carbon::parse($actions['confirmed_at'])->format('M d, Y g:i A') }}</span>
                                                         @endif
-                                                    </div>
-                                                    @break
-                                                @case('completed')
-                                                    <span class="badge bg-green-lt">
-                                                        <i class="fas fa-check-double me-1"></i>Completed
-                                                    </span>
-                                                    @break
-                                                @case('cancelled')
-                                                    <span class="badge bg-red-lt">
-                                                        <i class="fas fa-times-circle me-1"></i>Cancelled
-                                                    </span>
-                                                    @break
-                                                @case('no_show')
-                                                    <span class="badge bg-gray-lt">
-                                                        <i class="fas fa-user-slash me-1"></i>No Show
-                                                    </span>
-                                                    @break
-                                                @default
-                                                    <span class="badge bg-secondary-lt">
-                                                        <i class="fas fa-question-circle me-1"></i>Unknown
-                                                    </span>
-                                            @endswitch
+                                                    </small>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column">
@@ -1095,8 +1117,7 @@
     }
 
     .input-group-sm > .form-control,
-    .input-group-sm > .form-select,
-    .input-group-sm > .input-group-text {
+    .input-group-sm > .form-select {
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
     }
@@ -1596,7 +1617,7 @@ function initializeMedicalRecord(appointment) {
 
 function generateInvoiceNumber() {
     // Generate a random 7-digit number
-    return String(Math.floor(Math.random() * 9000000) + 1000000).padStart(7, '0');
+    return String(Math.floor(Math.random() * 9000000) + 1000000).padStart(7, '0'));
 }
 
 function saveMedicalRecord() {
@@ -1811,5 +1832,211 @@ function printChargeSlip() {
     // Reinitialize any necessary event listeners
     initializeEventListeners();
 }
+
+// Add this to your existing scripts
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAll = document.getElementById('selectAll');
+    const deleteSelected = document.getElementById('deleteSelected');
+    const checkboxes = document.querySelectorAll('.appointment-checkbox');
+
+    // Handle "Select All" checkbox
+    selectAll.addEventListener('change', function() {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateDeleteButton();
+    });
+
+    // Handle individual checkboxes
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateDeleteButton();
+            // Update "Select All" checkbox state
+            selectAll.checked = [...checkboxes].every(c => c.checked);
+        });
+    });
+
+    // Update delete button visibility
+    function updateDeleteButton() {
+        const checkedCount = [...checkboxes].filter(c => c.checked).length;
+        if (checkedCount > 0) {
+            deleteSelected.classList.remove('d-none');
+            deleteSelected.textContent = `Delete Selected (${checkedCount})`;
+        } else {
+            deleteSelected.classList.add('d-none');
+        }
+    }
+
+    // Handle delete selected
+    deleteSelected.addEventListener('click', function() {
+        const selectedIds = [...checkboxes]
+            .filter(c => c.checked)
+            .map(c => c.value);
+
+        if (selectedIds.length === 0) return;
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to delete ${selectedIds.length} appointment(s).`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete them!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit delete request
+                fetch('{{ route("appointment.deleteMultiple") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ ids: selectedIds })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire(
+                            'Deleted!',
+                            'Selected appointments have been deleted.',
+                            'success'
+                        ).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .catch(error => {
+                    Swal.fire(
+                        'Error!',
+                        error.message || 'Something went wrong.',
+                        'error'
+                    );
+                });
+            }
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle status update forms
+    document.querySelectorAll('.status-update-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const appointment_id = this.action.split('/').pop();
+            const newStatus = formData.get('status');
+            const statusButton = this.closest('.dropdown').querySelector('.btn');
+            const dropdownContainer = this.closest('.dropdown');
+            
+            fetch(this.action, {
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: newStatus
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Update button appearance
+                    statusButton.className = `btn btn-sm ${
+                        newStatus === 'confirmed' ? 'btn-success' : 
+                        newStatus === 'cancelled' ? 'btn-danger' : 
+                        'btn-warning'
+                    } dropdown-toggle`;
+                    
+                    statusButton.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+                    // Add confirmation details if status is confirmed
+                    if (newStatus === 'confirmed') {
+                        const actions = JSON.parse(data.appointment.actions);
+                        const confirmationDetails = `
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    Confirmed by: ${actions.confirmer_name}
+                                    <br>
+                                    <span class="text-muted">${moment(actions.confirmed_at).format('MMM DD, YYYY h:mm A')}</span>
+                                </small>
+                            </div>
+                        `;
+                        // Find or create container for confirmation details
+                        let detailsContainer = dropdownContainer.nextElementSibling;
+                        if (!detailsContainer || !detailsContainer.classList.contains('mt-1')) {
+                            detailsContainer = document.createElement('div');
+                            dropdownContainer.parentNode.insertBefore(detailsContainer, dropdownContainer.nextSibling);
+                        }
+                        detailsContainer.outerHTML = confirmationDetails;
+                    }
+
+                    // Update dropdown options
+                    const dropdownMenu = this.closest('.dropdown-menu');
+                    dropdownMenu.innerHTML = '';
+                    
+                    if (newStatus !== 'confirmed') {
+                        dropdownMenu.innerHTML += `
+                            <li>
+                                <form action="/appointments/${appointment_id}/status" method="POST" class="status-update-form">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status" value="confirmed">
+                                    <button type="submit" class="dropdown-item text-success">
+                                        <i class="fas fa-check me-2"></i>Confirm
+                                    </button>
+                                </form>
+                            </li>
+                        `;
+                    }
+                    
+                    if (newStatus !== 'cancelled') {
+                        dropdownMenu.innerHTML += `
+                            <li>
+                                <form action="/appointments/${appointment_id}/status" method="POST" class="status-update-form">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status" value="cancelled">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-times me-2"></i>Cancel
+                                    </button>
+                                </form>
+                            </li>
+                        `;
+                    }
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Updated',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to update status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to update status'
+                });
+            });
+        });
+    });
+});
 </script>
 @endpush

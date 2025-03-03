@@ -12,6 +12,7 @@
     use App\Http\Controllers\AppointmentController;
     use App\Http\Controllers\Api\OwnerApiController;
     use App\Http\Controllers\Api\PetApiController;
+    use App\Http\Controllers\Api\ProductImageController;
 
     // For the login and logout routes
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('api.login');
@@ -69,3 +70,5 @@
     Route::get('/owners/{owner}', [OwnerApiController::class, 'show']);
     Route::get('/owners/{owner}/pets', [OwnerApiController::class, 'pets']);
     Route::get('/pets/{pet}', [PetApiController::class, 'show']);
+
+    Route::get('products/{product}/binary-image', [ProductImageController::class, 'getBinaryImage']);

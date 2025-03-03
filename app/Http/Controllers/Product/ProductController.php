@@ -58,8 +58,14 @@ class ProductController extends Controller
          * Handle image upload
          */
         $image = "";
+        $imageData = null;
         if ($request->hasFile('product_image')) {
-            $image = $request->file('product_image')->store('products', 'public');
+            // Store file path for web display
+            $file = $request->file('product_image');
+            $image = $file->store('products', 'public');
+            
+            // Store binary data for mobile app
+            $imageData = file_get_contents($file->getRealPath());
         }
 
         // Create a new product with the provided data
@@ -70,7 +76,8 @@ class ProductController extends Controller
                 'length' => 4,
                 'prefix' => 'PC'
             ]),
-            'product_image'     => $image,
+            'product_image'      => $image,
+            'product_image_data' => $imageData,
             'name'              => $request->name,
             'category_id'       => $request->category_id,
             'unit_id'           => $request->unit_id,
@@ -81,9 +88,9 @@ class ProductController extends Controller
             'tax'               => $request->tax,
             'tax_type'          => $request->tax_type,
             'notes'             => $request->notes,
-            "user_id" => auth()->id(),
-            "slug" => Str::slug($request->name, '-'),
-            "uuid" => Str::uuid()
+            "user_id"           => auth()->id(),
+            "slug"              => Str::slug($request->name, '-'),
+            "uuid"              => Str::uuid()
         ]);
 
         return redirect()
@@ -125,10 +132,12 @@ class ProductController extends Controller
     {
         $product = Product::where("uuid", $uuid)->firstOrFail();
 
-        // Update product with all fields except 'product_image'
-        $product->update($request->except('product_image'));
+        // Update product with all fields except image-related fields
+        $product->update($request->except(['product_image', 'product_image_data']));
 
         $image = $product->product_image;
+        $imageData = $product->product_image_data;
+        
         if ($request->hasFile('product_image')) {
             // Delete old image if exists
             if ($product->product_image) {
@@ -137,7 +146,10 @@ class ProductController extends Controller
                     unlink($oldImagePath);
                 }
             }
-            $image = $request->file('product_image')->store('products', 'public');
+            
+            $file = $request->file('product_image');
+            $image = $file->store('products', 'public');
+            $imageData = file_get_contents($file->getRealPath());
         }
 
         // Update remaining product fields
@@ -153,11 +165,12 @@ class ProductController extends Controller
         $product->tax_type = $request->tax_type;
         $product->notes = $request->notes;
         $product->product_image = $image;
+        $product->product_image_data = $imageData;
         $product->save();
 
         return redirect()
             ->route('products.index')
-            ->with('success', 'Product has been updated!');
+            ->with('success', 'Product updated successfully!');
     }
 
     public function destroy($uuid)

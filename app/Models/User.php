@@ -78,7 +78,10 @@ class User extends Authenticatable implements MustVerifyEmail
     // A user can receive many messages
     public function receivedMessages()
     {
-        return $this->hasMany(Message::class, 'receiver_id');
+        return $this->hasMany(Message::class, 'sender_id')
+            ->where(function($query) {
+                $query->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => $this->id])]);
+            });
     }
 
     public function customers()
@@ -151,7 +154,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function lastMessage()
     {
         return $this->hasOne(Message::class, 'sender_id')
-            ->latest('sent_at')
+            ->latest('created_at')
             ->withDefault();
     }
 
@@ -173,7 +176,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->receivedMessages()
             ->whereNull('read_at')
-            ->where('receiver_id', auth()->id())
+            ->where(function($query) {
+                $query->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => auth()->id()])]);
+            })
             ->exists();
     }
 }

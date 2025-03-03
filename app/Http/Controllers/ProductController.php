@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProductRequest;
 
 class ProductController extends Controller
 {
@@ -25,18 +26,31 @@ class ProductController extends Controller
     }
 
     // Store the newly created product
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        // Validate and store the product
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255',
-            // other validation rules
-        ]);
-
-        $product = Product::create($request->all());
-
-        return redirect()->route('products.index')->with('success', 'Product created successfully!');
+        $data = $request->validated();
+        
+        if ($request->hasFile('product_image')) {
+            $file = $request->file('product_image');
+            
+            // Store file path for web display
+            $data['product_image'] = $file->store('products', 'public');
+            
+            // Store binary data for mobile app
+            $data['product_image_data'] = file_get_contents($file->getRealPath());
+        }
+        
+        // Add user_id and generate uuid/slug
+        $data['user_id'] = auth()->id();
+        $data['uuid'] = \Str::uuid();
+        $data['slug'] = \Str::slug($data['name']);
+        
+        // Create product
+        Product::create($data);
+        
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Product created successfully.');
     }
 
     // Show the details of a specific product
