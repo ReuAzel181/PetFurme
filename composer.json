@@ -48,8 +48,12 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "App\\Http\\Controllers\\API\\": "app/Http/Controllers/API/"
         },
+        "exclude-files-from-classmap": [
+            "vendor/supabase/gotrue-php/src/Util/EnvSetup.php"
+        ],
         "files": [
             "app/helpers.php"
         ]
