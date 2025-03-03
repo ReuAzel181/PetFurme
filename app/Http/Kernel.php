@@ -34,6 +34,7 @@ class Kernel extends HttpKernel
         'staff' => \App\Http\Middleware\CheckStaffRole::class,
         'can:access-admin' => \App\Http\Middleware\AdminAccessMiddleware::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
     ];
     
 
