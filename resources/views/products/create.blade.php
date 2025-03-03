@@ -30,6 +30,7 @@
                                     name="product_image"
                                     class="form-control @error('product_image') is-invalid @enderror"
                                     onchange="previewImage();"
+                                    data-binary-upload="true"
                                 >
 
                                 @error('product_image')
@@ -61,9 +62,9 @@
                                     <div class="col-md-12">
 
                                         <x-input name="name"
-                                                 id="name"
-                                                 placeholder="Product name"
-                                                 value="{{ old('name') }}"
+                                                id="name"
+                                                placeholder="Product name"
+                                                value="{{ old('name') }}"
                                         />
                                     </div>
 
@@ -151,51 +152,51 @@
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input type="number"
-                                                 label="Buying Price"
-                                                 name="buying_price"
-                                                 id="buying_price"
-                                                 placeholder="0"
-                                                 value="{{ old('buying_price') }}"
+                                                label="Buying Price"
+                                                name="buying_price"
+                                                id="buying_price"
+                                                placeholder="0"
+                                                value="{{ old('buying_price') }}"
                                         />
                                     </div>
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input type="number"
-                                                 label="Selling Price"
-                                                 name="selling_price"
-                                                 id="selling_price"
-                                                 placeholder="0"
-                                                 value="{{ old('selling_price') }}"
+                                                label="Selling Price"
+                                                name="selling_price"
+                                                id="selling_price"
+                                                placeholder="0"
+                                                value="{{ old('selling_price') }}"
                                         />
                                     </div>
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input type="number"
-                                                 label="Quantity"
-                                                 name="quantity"
-                                                 id="quantity"
-                                                 placeholder="0"
-                                                 value="{{ old('quantity') }}"
+                                                label="Quantity"
+                                                name="quantity"
+                                                id="quantity"
+                                                placeholder="0"
+                                                value="{{ old('quantity') }}"
                                         />
                                     </div>
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input type="number"
-                                                 label="Quantity Alert"
-                                                 name="quantity_alert"
-                                                 id="quantity_alert"
-                                                 placeholder="0"
-                                                 value="{{ old('quantity_alert') }}"
+                                                label="Quantity Alert"
+                                                name="quantity_alert"
+                                                id="quantity_alert"
+                                                placeholder="0"
+                                                value="{{ old('quantity_alert') }}"
                                         />
                                     </div>
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input type="number"
-                                                 label="Tax"
-                                                 name="tax"
-                                                 id="tax"
-                                                 placeholder="0"
-                                                 value="{{ old('tax') }}"
+                                                label="Tax"
+                                                name="tax"
+                                                id="tax"
+                                                placeholder="0"
+                                                value="{{ old('tax') }}"
                                         />
                                     </div>
 
@@ -230,10 +231,10 @@
                                             </label>
 
                                             <textarea name="notes"
-                                                      id="notes"
-                                                      rows="5"
-                                                      class="form-control @error('notes') is-invalid @enderror"
-                                                      placeholder="Product notes"
+                                                    id="notes"
+                                                    rows="5"
+                                                    class="form-control @error('notes') is-invalid @enderror"
+                                                    placeholder="Product notes"
                                             ></textarea>
 
                                             @error('notes')
@@ -266,4 +267,27 @@
 
 @pushonce('page-scripts')
     <script src="{{ asset('assets/js/img-preview.js') }}"></script>
+    <script>
+    document.querySelector('input[data-binary-upload]').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Remove existing hidden input if any
+                const existingInput = document.querySelector('input[name="product_image_data"]');
+                if (existingInput) {
+                    existingInput.remove();
+                }
+                
+                // Create new hidden input with base64 data
+                const binaryInput = document.createElement('input');
+                binaryInput.type = 'hidden';
+                binaryInput.name = 'product_image_data';
+                binaryInput.value = e.target.result.split(',')[1]; // Get base64 part
+                document.querySelector('form').appendChild(binaryInput);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    </script>
 @endpushonce

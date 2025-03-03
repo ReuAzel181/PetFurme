@@ -24,11 +24,12 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-        });
+        $this->configureRateLimiting();
 
         $this->routes(function () {
+            // Determine if we're on the production domain
+            $isProduction = request()->getHost() === 'petfurme.shop';
+            
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
@@ -36,5 +37,30 @@ class RouteServiceProvider extends ServiceProvider
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });
+    }
+
+    /**
+     * Configure the rate limiters for the application.
+     */
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('global', function (Request $request) {
+            return Limit::perMinute(500)->by($request->ip());
+        });
+    }
+
+    public static function redirectTo()
+    {
+        if (auth()->check()) {
+            if (auth()->user()->isPetOwner()) {
+                return route('pet-owner.dashboard');
+            }
+            return route('dashboard');
+        }
+        return '/';
     }
 }

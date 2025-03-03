@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Order;
 
-use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\OrderStoreRequest;
 use App\Models\Customer;
@@ -20,83 +19,114 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
-
 class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::where('user_id', auth()->id())->count();
+        $orders = Order::with('user')
+            ->latest()
+            ->paginate(10);
 
-        return view('orders.index', [
-            'orders' => $orders
-        ]);
+        return view('orders.index', compact('orders'));
     }
 
     public function create()
     {
-        $products = Product::where('user_id', auth()->id())->with(['category', 'unit'])->get();
+        // Get products
+        $products = Product::where('user_id', auth()->id())
+                          ->with(['category', 'unit'])
+                          ->get();
 
-        $customers = Customer::where('user_id', auth()->id())->get(['id', 'name']);
+        // Get users who are pet owners
+        $customers = DB::table('users')
+                      ->where('users.role', 'pet_owner')
+                      ->leftJoin('customers', 'users.id', '=', 'customers.user_id')
+                      ->select(
+                          'users.id',
+                          'users.name',
+                          'users.email',
+                          'users.phone'
+                      )
+                      ->get();
+
+        // Generate unique reference
+        $reference = 'ORD-' . strtoupper(uniqid());
 
         $carts = Cart::content();
 
         return view('orders.create', [
             'products' => $products,
-            'customers' => $customers,
+            'petOwners' => $customers,
+            'reference' => $reference,
             'carts' => $carts,
         ]);
     }
 
-    public function store(OrderStoreRequest $request)
+    public function store(Request $request)
     {
-        $order = Order::create([
-            'customer_id' => $request->customer_id,
-            'payment_type' => $request->payment_type,
-            'pay' => $request->pay,
-            'order_date' => Carbon::now()->format('Y-m-d'),
-            'order_status' => OrderStatus::PENDING->value,
-            'total_products' => Cart::count(),
-            'sub_total' => Cart::subtotal(),
-            'vat' => Cart::tax(),
-            'total' => Cart::total(),
-            'invoice_no' => IdGenerator::generate([
-                'table' => 'orders',
-                'field' => 'invoice_no',
-                'length' => 10,
-                'prefix' => 'INV-'
-            ]),
-            'due' => (Cart::total() - $request->pay),
-            'user_id' => auth()->id(),
-            'uuid' => Str::uuid(),
+        \Log::info('Order store request:', $request->all());
+
+        $validatedData = $request->validate([
+            'id' => 'required|exists:users,id',
+            'order_date' => 'required|date',
+            'reference' => 'required|string',
+            'total_products' => 'required|numeric',
+            'sub_total' => 'required|numeric',
+            'vat' => 'required|numeric',
+            'total' => 'required|numeric',
         ]);
 
-        // Create Order Details
-        $contents = Cart::content();
-        $oDetails = [];
+        try {
+            DB::beginTransaction();
 
-        foreach ($contents as $content) {
-            $oDetails['order_id'] = $order['id'];
-            $oDetails['product_id'] = $content->id;
-            $oDetails['quantity'] = $content->qty;
-            $oDetails['unitcost'] = $content->price;
-            $oDetails['total'] = $content->subtotal;
-            $oDetails['created_at'] = Carbon::now();
+            $order = Order::create([
+                'uuid' => Str::uuid(),
+                'user_id' => $request->id,
+                'order_date' => $request->order_date,
+                'reference' => $request->reference,
+                'total_products' => $request->total_products,
+                'sub_total' => $request->sub_total,
+                'vat' => $request->vat,
+                'total' => $request->total,
+                'invoice_no' => $request->invoice_no,
+            ]);
 
-            OrderDetails::insert($oDetails);
+            // Create Order Details
+            $contents = Cart::content();
+            foreach ($contents as $content) {
+                OrderDetails::create([
+                    'order_id' => $order->id,
+                    'product_id' => $content->id,
+                    'quantity' => $content->qty,
+                    'unitcost' => $content->price,
+                    'total' => $content->subtotal,
+                ]);
+            }
+
+            Cart::destroy();
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order created successfully',
+                'redirect' => route('orders.show', $order->uuid)
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Order creation failed: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Order creation failed: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Delete Cart Sopping History
-        Cart::destroy();
-
-        return redirect()
-            ->route('orders.index')
-            ->with('success', 'Order has been created!');
     }
 
     public function show($uuid)
     {
         $order = Order::where('uuid', $uuid)->firstOrFail();
-        $order->loadMissing(['customer', 'details'])->get();
+        $order->loadMissing(['details'])->get();
         return view('orders.show', [
             'order' => $order
         ]);
@@ -105,7 +135,6 @@ class OrderController extends Controller
     public function update($uuid, Request $request)
     {
         $order = Order::where('uuid', $uuid)->firstOrFail();
-        // TODO refactoring
 
         // Reduce the stock
         $products = OrderDetails::where('order_id', $order->id)->get();
@@ -128,15 +157,10 @@ class OrderController extends Controller
             }
             Mail::to($listAdmin)->send(new StockAlert($stockAlertProducts));
         }
-        $order->update([
-            'order_status' => OrderStatus::COMPLETE,
-            'due' => '0',
-            'pay' => $order->total
-        ]);
 
         return redirect()
-            ->route('orders.complete')
-            ->with('success', 'Order has been completed!');
+            ->route('orders.index')
+            ->with('success', 'Order has been updated!');
     }
 
     public function destroy($uuid)
@@ -147,31 +171,52 @@ class OrderController extends Controller
 
     public function downloadInvoice($uuid)
     {
-        $order = Order::with(['customer', 'details'])->where('uuid', $uuid)->firstOrFail();
-        // TODO: Need refactor
-        //dd($order);
-
-        //$order = Order::with('customer')->where('id', $order_id)->first();
-        // $order = Order::
-        //     ->where('id', $order)
-        //     ->first();
-
+        $order = Order::with('details')->where('uuid', $uuid)->firstOrFail();
         return view('orders.print-invoice', [
             'order' => $order,
         ]);
     }
 
-    public function cancel(Order $order)
+    public function revertStatus($uuid)
     {
-        $order->update([
-            'order_status' => 2
-        ]);
-        $orders = Order::where('user_id',auth()->id())->count();
+        try {
+            $order = Order::where('uuid', $uuid)->firstOrFail();
+            
+            if ($order->is_paid) {
+                return redirect()->back()->with('error', 'Cannot revert a paid order.');
+            }
 
-        return redirect()
-            ->route('orders.index', [
-                'orders' => $orders
-            ])
-            ->with('success', 'Order has been canceled!');
+            $order->markAsIncomplete();
+
+            return redirect()->back()->with('success', 'Order status reverted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error reverting order status: ' . $e->getMessage());
+        }
+    }
+
+    public function markAsPaid(Request $request, Order $order)
+    {
+        try {
+            DB::beginTransaction();
+
+            $order->update([
+                'is_paid' => true,
+                'paid_at' => now(),
+                'amount_received' => $request->amount_received,
+                'change_amount' => $request->amount_received - $order->total,
+                'payment_note' => $request->payment_note
+            ]);
+
+            DB::commit();
+            
+            return redirect()
+                ->back()
+                ->with('success', 'Payment recorded successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()
+                ->back()
+                ->with('error', 'Error recording payment: ' . $e->getMessage());
+        }
     }
 }

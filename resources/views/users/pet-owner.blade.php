@@ -1,63 +1,32 @@
-@extends('layouts.tabler')
+@extends('users.user-management-overview')
 
-@section('title', 'Pet Owners')
-
-@section('content')
-    <div class="page-header d-print-none">
-        <div class="container-xl">
-            <div class="row g-2 align-items-center mb-3">
-                <div class="col">
-                    <h1 class="page-title">
-                        Pet Owners
-                    </h1>
-                </div>
-                <div class="col-auto ms-auto d-print-none">
-                    <a href="{{ route('user-management.create') }}" class="btn btn-primary">
-                        {{ __('Create Pet Owner') }}
-                    </a>
-                </div>
-            </div>
-
-            @include('partials._breadcrumbs')
-        </div>
-    </div>
-
-    <div class="page-body">
-        <div class="container-xl">
-            @if($users->isEmpty())
-                <p>No pet owners found.</p>
-            @else
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Photo</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Pet Name</th>
-                            <th>Pet Type</th>
-                            <th>Address</th>
-                            <!-- Add other columns as needed -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($users as $user)
-                            <tr>
-                                <td>{{ $user->id }}</td>
-                                <td>{{ $user->photo }}</td>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ $user->phone ?? 'N/A' }}</td>
-                                <td>{{ $user->pet_name ?? 'N/A' }}</td>
-                                <td>{{ $user->pet_type ?? 'N/A' }}</td>
-                                <td>{{ $user->store_address ?? 'N/A' }}</td>
-                                <!-- Add other columns as needed -->
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endif
-        </div>
-    </div>
+@section('list-content')
+<div>
+    @if($users->isEmpty())
+        <p>No pet owners found.</p>
+    @else
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($users as $user)
+                    <tr>
+                        <td>{{ $user->id }}</td>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->phone ?? 'N/A' }}</td>
+                        <td>{{ ucfirst($user->role) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+</div>
 @endsection

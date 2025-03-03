@@ -19,9 +19,13 @@ class OrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => 'required',
-            'payment_type' => 'required',
-            'pay' => 'required|numeric'
+            'id' => 'required|exists:users,id',
+            'order_date' => 'required|date',
+            'reference' => 'required|string',
+            'total_products' => 'required|numeric',
+            'sub_total' => 'required|numeric',
+            'vat' => 'required|numeric',
+            'total' => 'required|numeric',
         ];
     }
 

@@ -2,64 +2,155 @@
 
 namespace App\Models;
 
-use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Order extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = [
         'id',
     ];
 
     protected $fillable = [
-        'customer_id',
+        'uuid',
+        'user_id',
         'order_date',
-        'order_status',
         'total_products',
         'sub_total',
         'vat',
         'total',
         'invoice_no',
-        'payment_type',
-        'pay',
-        'due',
-        "user_id",
-        "uuid"
+        'reference',
+        'note',
+        'order_status',
+        'is_paid',
+        'amount_received',
+        'change_amount',
+        'paid_at',
+        'deleted_at',
+        'deletion_reason',
+        'deleted_by'
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
     protected $casts = [
-        'order_date'    => 'date',
-        'created_at'    => 'datetime',
-        'updated_at'    => 'datetime',
-        'order_status'  => OrderStatus::class
+        'order_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'is_paid' => 'boolean',
+        'paid_at' => 'datetime',
+        'amount_received' => 'decimal:2',
+        'change_amount' => 'decimal:2',
+        'completed_at' => 'datetime',
+        'deleted_at' => 'datetime',
+        'uuid' => 'string',
     ];
 
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class);
-    }
+    protected $with = ['details', 'details.product'];
 
-    public function details(): HasMany
+    public function details()
     {
-        return $this->hasMany(OrderDetails::class);
+        return $this->hasMany(OrderDetail::class);
     }
 
     public function scopeSearch($query, $value): void
     {
-        $query->where('invoice_no', 'like', "%{$value}%")
-            ->orWhere('order_status', 'like', "%{$value}%")
-            ->orWhere('payment_type', 'like', "%{$value}%");
+        $query->where('invoice_no', 'like', "%{$value}%");
     }
 
-     /**
+    /**
      * Get the user that owns the Category
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
+
+    public function getPaymentStatusAttribute()
+    {
+        if ($this->is_paid) {
+            return 'paid';
+        }
+        if ($this->order_status === 'completed') {
+            return 'completed';
+        }
+        return 'pending';
+    }
+
+    public function getPaymentStatusColorAttribute()
+    {
+        return [
+            'paid' => 'success',
+            'completed' => 'success',
+            'pending' => 'warning'
+        ][$this->payment_status];
+    }
+
+    public function markAsIncomplete()
+    {
+        $this->update([
+            'order_status' => 'pending',
+            'completed_at' => null
+        ]);
+    }
+
+    public function markAsComplete()
+    {
+        $this->update([
+            'order_status' => 'completed',
+            'completed_at' => now()
+        ]);
+    }
+
+    public const STATUSES = [
+        'pending' => 'pending',
+        'completed' => 'completed',
+        'cancelled' => 'cancelled'
+    ];
+
+    public function getStatusAttribute()
+    {
+        if ($this->deleted_at) {
+            return 'deleted';
+        }
+        return $this->order_status;
+    }
+
+    public function getOrderStatusColorAttribute()
+    {
+        if ($this->deleted_at) {
+            return 'danger';
+        }
+        
+        return match($this->order_status) {
+            'completed' => 'success',
+            'pending' => 'warning',
+            'cancelled' => 'danger',
+            default => 'secondary'
+        };
+    }
+
+    /**
+     * Get the user who deleted the order
+     */
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 }

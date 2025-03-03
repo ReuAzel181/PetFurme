@@ -21,12 +21,20 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\CacheControl::class,
+        \App\Http\Middleware\ResponseCache::class,
     ];
     
     /*For Message*/
     protected $routeMiddleware = [
         // Other middleware
         'checkConversationAccess' => \App\Http\Middleware\CheckConversationAccess::class,
+        'role' => \App\Http\Middleware\CheckRole::class,
+        'pet.owner' => \App\Http\Middleware\PetOwnerMiddleware::class,
+        'staff' => \App\Http\Middleware\CheckStaffRole::class,
+        'can:access-admin' => \App\Http\Middleware\AdminAccessMiddleware::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
     ];
     
 
@@ -43,6 +51,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\ResponseCache::class,
         ],
 
         'api' => [

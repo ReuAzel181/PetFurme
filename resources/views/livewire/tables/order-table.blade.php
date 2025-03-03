@@ -63,21 +63,15 @@
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('payment_type')" href="#" role="button">
-                            {{ __('Paymet') }}
-                            @include('inclues._sort-icon', ['field' => 'payment_type'])
-                        </a>
-                    </th>
-                    <th scope="col" class="align-middle text-center">
                         <a wire:click.prevent="sortBy('total')" href="#" role="button">
                             {{ __('Total') }}
                             @include('inclues._sort-icon', ['field' => 'total'])
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('order_status')" href="#" role="button">
+                        <a wire:click.prevent="sortBy('status')" href="#" role="button">
                             {{ __('Status') }}
-                            @include('inclues._sort-icon', ['field' => 'order_status'])
+                            @include('inclues._sort-icon', ['field' => 'status'])
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
@@ -101,26 +95,30 @@
                             {{ $order->order_date->format('d-m-Y') }}
                         </td>
                         <td class="align-middle text-center">
-                            {{ $order->payment_type }}
-                        </td>
-                        <td class="align-middle text-center">
                             {{ Number::currency($order->total, 'EUR') }}
                         </td>
                         <td class="align-middle text-center">
-                            <x-status dot
-                                color="{{ $order->order_status === \App\Enums\OrderStatus::COMPLETE ? 'green' : ($order->order_status === \App\Enums\OrderStatus::PENDING ? 'orange' : '') }}"
-                                class="text-uppercase">
-                                {{ $order->order_status->label() }}
+                            <x-status dot color="{{ $order->status_color }}">
+                                {{ $order->status_label }}
                             </x-status>
                         </td>
-                        <td class="align-middle text-center">
-                            <x-button.show class="btn-icon" route="{{ route('orders.show', $order->uuid) }}" />
-                            <x-button.print class="btn-icon"
-                                route="{{ route('order.downloadInvoice', $order->uuid) }}" />
-                            @if ($order->order_status === \App\Enums\OrderStatus::PENDING)
-                                <x-button.delete class="btn-icon" route="{{ route('orders.cancel', $order) }}"
-                                    onclick="return confirm('Are you sure to cancel invoice no. {{ $order->invoice_no }} ?')" />
-                            @endif
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a href="{{ route('orders.show', $order) }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                
+                                <form action="{{ route('orders.destroy', $order) }}" 
+                                      method="POST" 
+                                      class="d-inline" 
+                                      onsubmit="return confirm('Are you sure you want to delete this order?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty

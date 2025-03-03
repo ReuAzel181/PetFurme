@@ -26,12 +26,14 @@ class Product extends Model
         'tax_type',
         'notes',
         'product_image',
+        'product_image_data',
         'category_id',
         'unit_id',
         'created_at',
         'updated_at',
         "user_id",
-        "uuid"
+        "uuid",
+        'expiry_date'
     ];
 
     protected $casts = [
@@ -42,7 +44,7 @@ class Product extends Model
 
     public function getRouteKeyName(): string
     {
-        return 'slug';
+        return 'uuid';
     }
 
     public function category(): BelongsTo

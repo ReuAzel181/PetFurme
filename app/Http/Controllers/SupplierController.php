@@ -12,11 +12,11 @@ class SupplierController extends Controller
 {
     public function index()
     {
-        $suppliers = Supplier::where("user_id", auth()->id())->count();
+        $suppliers = Supplier::where('user_id', auth()->id())
+            ->latest()
+            ->paginate(10);
 
-        return view('suppliers.index', [
-            'suppliers' => $suppliers
-        ]);
+        return view('suppliers.index', compact('suppliers'));
     }
 
     public function create()
@@ -53,12 +53,11 @@ class SupplierController extends Controller
 
     public function show($uuid)
     {
-        $supplier = Supplier::where("uuid", $uuid)->firstOrFail();
-        $supplier->loadMissing('purchases')->get();
+        $supplier = Supplier::where('uuid', $uuid)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
-        return view('suppliers.show', [
-            'supplier' => $supplier
-        ]);
+        return view('suppliers.show', compact('supplier'));
     }
 
     public function edit($uuid)

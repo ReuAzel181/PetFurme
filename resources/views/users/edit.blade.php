@@ -1,116 +1,147 @@
 @extends('layouts.tabler')
 
 @section('content')
-<div class="page-header d-print-none">
+<div class="page-wrapper">
     <div class="container-xl">
-        <div class="row g-2 align-items-center mb-3">
+        <!-- Page Header -->
+        <div class="row mb-4">
             <div class="col">
-                <h2 class="page-title">
-                    {{ __('Edit User') }}
-                </h2>
+                @include('partials._page_header', [
+                    'title' => __('Edit User'),
+                    'section' => 'USER MANAGEMENT'
+                ])
             </div>
         </div>
 
-        @include('partials._breadcrumbs', ['model' => $user])
-    </div>
-</div>
+        <!-- Form Card -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Validation Errors -->
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
 
-<div class="page-body">
-    <div class="container-xl">
-        <div class="row row-cards">
+                        <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
 
-            <div class="col-lg-4">
-                <div class="row row-cards">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h3 class="card-title">
-                                    {{ __('Product Image') }}
-                                </h3>
-
-                                <img class="img-account-profile rounded-circle mb-2" src="{{ $user->photo ? asset('storage/profile/'.$user->photo) : asset('assets/img/demo/user-placeholder.svg') }}" alt="" id="image-preview" />
-
-                                <div class="small font-italic text-muted mb-2">JPG or PNG no larger than 1 MB</div>
-
-                                <input class="form-control form-control-solid mb-2 @error('photo') is-invalid @enderror" type="file"  id="image" name="photo" accept="image/*" onchange="previewImage();">
-
-                                @error('photo')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
+                            <!-- Role Selection -->
+                            <div class="mb-4">
+                                <label class="form-label required">Role</label>
+                                <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
+                                    <option value="">Select Role</option>
+                                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="sub_admin" {{ $user->role === 'sub_admin' ? 'selected' : '' }}>Sub Admin</option>
+                                    <option value="pet_owner" {{ $user->role === 'pet_owner' ? 'selected' : '' }}>Pet Owner</option>
+                                </select>
+                                @error('role')
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="col-lg-8">
-                <div class="row row-cards">
-
-                    <div class="col-12">
-                        <form action="{{ route('users.update', $user) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('put')
-
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="card-title">
-                                        {{ __('User Details') }}
-                                    </h3>
-                                    <div class="row row-cards">
-                                        <div class="col-md-12">
-                                            <x-input name="name" :value="old('name', $user->name)" required="true"/>
-
-                                            <x-input name="email" :value="old('name', $user->email)" label="Email address" required="true"/>
-                                        </div>
-                                    </div>
+                            <div class="row">
+                                <!-- Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Name</label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                           id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <div class="card-footer text-end">
-                                    <button type="submit" class="btn btn-primary">
-                                        {{ __('Save') }}
-                                    </button>
-
-                                    <a class="btn btn-outline-warning" href="{{ route('users.index') }}">
-                                        {{ __('Cancel') }}
-                                    </a>
+                                
+                                <!-- Username -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Username</label>
+                                    <input type="text" class="form-control @error('username') is-invalid @enderror" 
+                                           id="username" name="username" value="{{ old('username', $user->username) }}" required>
+                                    @error('username')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
-                        </form>
-                    </div>
 
-                    <div class="col-12">
-                        <form action="{{ route('users.updatePassword', $user) }}" method="POST">
-                            @csrf
-                            @method('put')
+                            <div class="row">
+                                <!-- Email -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Email</label>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                           id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="card-title">
-                                        {{ __('Change Password') }}
-                                    </h3>
+                                <!-- Phone -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Phone</label>
+                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                                           id="phone" name="phone" value="{{ old('phone', $user->phone) }}" required>
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
 
-                                    <div class="row row-cards">
-                                        <div class="col-sm-6 col-md-6">
-                                            <x-input type="password" name="password"/>
-                                        </div>
+                            <div class="row">
+                                <!-- Password -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                                           id="password" name="password" 
+                                           placeholder="Leave blank to keep current password">
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                                        <div class="col-sm-6 col-md-6">
-                                            <x-input type="password" name="password_confirmation" label="Password Confirmation"/>
-                                        </div>
+                                <!-- Confirm Password -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" 
+                                           id="password_confirmation" name="password_confirmation"
+                                           placeholder="Leave blank to keep current password">
+                                </div>
+                            </div>
+
+                            <!-- Profile Photo -->
+                            <div class="mb-4">
+                                <label class="form-label">Profile Photo</label>
+                                @if($user->photo)
+                                    <div class="mb-3">
+                                        <img src="{{ asset('storage/' . $user->photo) }}" 
+                                             alt="Current Profile Photo" 
+                                             class="avatar avatar-xl mb-3">
                                     </div>
-                                </div>
+                                @endif
+                                <input type="file" class="form-control @error('photo') is-invalid @enderror" 
+                                       id="photo" name="photo" accept="image/*">
+                                <small class="form-text text-muted">Leave blank to keep current photo</small>
+                                @error('photo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                                <div class="card-footer text-end">
-                                    {{--- onclick="return confirm('Do you want to change the password?')" ---}}
-                                    <button type="submit" class="btn btn-primary">
-                                        {{ __('Save') }}
-                                    </button>
-
-                                    <a class="btn btn-outline-warning" href="{{ route('users.index') }}">
-                                        {{ __('Cancel') }}
-                                    </a>
-                                </div>
+                            <!-- Submit Button -->
+                            <div class="form-footer">
+                                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary ms-auto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+                                        <path d="M16 5l3 3" />
+                                    </svg>
+                                    Update User
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -119,8 +150,17 @@
         </div>
     </div>
 </div>
-@endsection
 
-@pushonce('page-scripts')
-<script src="{{ asset('assets/js/img-preview.js') }}"></script>
-@endpushonce
+<style>
+    .required:after {
+        content: ' *';
+        color: red;
+    }
+    .form-footer {
+        display: flex;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e6e7e9;
+    }
+</style>
+@endsection

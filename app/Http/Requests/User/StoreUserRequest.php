@@ -25,8 +25,15 @@ class StoreUserRequest extends FormRequest
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024', // Adjusted to allow specific image types
             'name' => 'required|string|max:255', // Extended the max length to 255
             'email' => 'required|email|max:255|unique:users,email', // Extended the max length to 255
-            'password' => 'required|string|min:6|confirmed', // Added 'confirmed' rule
-            'password_confirmation' => 'required_with:password|string|min:6', // Ensured it's required if password is present
+            'password' => [
+                'required',
+                'string',
+                'min:8', // Minimum length of 8 characters
+                'regex:/[0-9]/', // Must contain at least one number
+                'regex:/[!@#$%^&*(),.?":{}|<>]/', // Must contain at least one special character
+                'confirmed',
+            ],
+            'password_confirmation' => 'required_with:password|string|min:8', // Ensured it's required if password is present
         ];
     }
 }

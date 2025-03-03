@@ -21,7 +21,13 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                $user = Auth::guard($guard)->user();
+                
+                if ($user->isPetOwner()) {
+                    return redirect()->route('pet-owner.dashboard');
+                }
+                
+                return redirect()->route('dashboard');
             }
         }
 

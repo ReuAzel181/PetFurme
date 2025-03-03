@@ -17,6 +17,8 @@ class Supplier extends Model
     ];
 
     protected $fillable = [
+        'user_id',
+        'uuid',
         'name',
         'email',
         'phone',
@@ -26,9 +28,7 @@ class Supplier extends Model
         'photo',
         'account_holder',
         'account_number',
-        'bank_name',
-        "user_id",
-        "uuid"
+        'bank_name'
     ];
 
     protected $casts = [
@@ -36,11 +36,6 @@ class Supplier extends Model
         'updated_at' => 'datetime',
         'type' => SupplierType::class
     ];
-
-    public function purchases(): HasMany
-    {
-        return $this->hasMany(Purchase::class);
-    }
 
     public function scopeSearch($query, $value): void
     {
@@ -59,5 +54,11 @@ class Supplier extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // If you need the purchases relationship later
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -13,38 +12,51 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Handle an incoming authentication request.
+     * Display the login view.
+     *
+     * @return \Illuminate\View\View
      */
-    public function store(Request $request)
+    public function create(): View
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        return view('auth.login');
+    }
 
-        // Attempt to authenticate the user
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            // Generate a token using Sanctum
-            $token = $user->createToken('YourAppName')->plainTextToken;
+    /**
+     * Handle an incoming authentication request.
+     *
+     * @param  \App\Http\Requests\Auth\LoginRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(LoginRequest $request)
+    {
+        $request->authenticate();
+        $request->session()->regenerate();
 
-            return response()->json(['token' => $token], 200);
+        // Redirect based on user role
+        $user = auth()->user();
+        
+        if ($user->role === 'pet_owner') {
+            return redirect()->route('pet-owner.dashboard');
         }
-
-        // Return unauthorized response if authentication fails
-        return response()->json(['message' => 'Unauthorized'], 401);
+        
+        // All other roles (admin and sub_admin) go to main dashboard
+        return redirect()->route('dashboard');
     }
 
     /**
      * Destroy an authenticated session.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
+
         $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Successfully logged out.']);
+        return redirect('/');
     }
 }

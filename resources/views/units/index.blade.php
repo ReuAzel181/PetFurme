@@ -19,6 +19,12 @@
                     <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
                 </div>
             @endif
+            <div class="col">
+                @include('partials._page_header', [
+                    'title' => __('Units'),
+                    'section' => 'OVERVIEW'
+                ])
+            </div>
             @livewire('tables.unit-table')
         </div>
     @endif

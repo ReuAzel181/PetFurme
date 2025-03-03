@@ -266,6 +266,7 @@ body {
 }
 
 .nav-link-title{
+    font-size: 1.3rem;
     z-index: 1;
 }
 
@@ -858,7 +859,10 @@ progress {
     .container-sm,
     .container-xl,
     .container-xxl {
-        max-width: 1320px
+        max-width: 1320px;
+        margin-left: 0px;
+        margin-right: 0px;
+        display: contents;
     }
 }
 
@@ -3164,6 +3168,10 @@ progress {
     margin-bottom: .5rem;
     font-size: .875rem;
     font-weight: var(--tblr-font-weight-medium)
+}
+.font-weight-medium {
+    font-size: large;
+    font-weight: bold;
 }
 
 .col-form-label {
@@ -10715,7 +10723,7 @@ body[data-bs-theme=dark] [data-bs-theme=light] .btn-close {
 
 .flex-column {
     flex-direction: column !important;
-    background-color: #99b9ff;
+    background-color: #fcfcfc;
 }
 
 .flex-row-reverse {
@@ -18423,8 +18431,9 @@ body {
 
 .navbar .navbar-nav {
     font-size: 20px;
-    gap: 15px;
+    gap: 5px;
     min-height: 3rem;
+    padding-top: 40px;
     margin-left: auto;
     margin-right: auto;
     flex-direction: column;
@@ -18432,7 +18441,7 @@ body {
 
 .navbar .navbar-nav .nav-link {
     position: relative;
-    left: 30px;
+    left: 0px;
     color: white;
     min-width: 2rem;
     min-height: 2rem;
@@ -20167,7 +20176,7 @@ body {
 
 .page-title {
     margin: 0;
-    font-size: var(--tblr-font-size-h2);
+    font-size: var(--tblr-font-size-h1);
     line-height: var(--tblr-line-height-h4);
     font-weight: var(--tblr-font-weight-headings);
     color: inherit;
@@ -20573,7 +20582,7 @@ body[data-bs-theme=dark] [data-bs-theme=light] {
 }
 
 .avatar {
-    --tblr-avatar-size: 2.5rem;
+    --tblr-avatar-size: 4rem;
     --tblr-avatar-status-size: 0.75rem;
     --tblr-avatar-bg: var(--tblr-bg-surface-secondary);
     --tblr-avatar-box-shadow: var(--tblr-box-shadow-border);
@@ -23253,7 +23262,7 @@ a.card-title:hover {
 }
 
 .card-sm>.card-body {
-    padding: 1rem;
+    padding: 2rem;
     display: flex;
     overflow: hidden;
 }
@@ -27778,7 +27787,8 @@ img {
 .bg-muted-lt {
     --tblr-bg-opacity: 1;
     --tblr-text-opacity: 1;
-    color: rgba(var(--tblr-muted-rgb), var(--tblr-text-opacity)) !important;
+    color: rgb(193 193 193) !important;
+    font-size: small;
     background-color: rgba(var(--tblr-muted-lt-rgb), var(--tblr-bg-opacity)) !important
 }
 
@@ -28329,7 +28339,8 @@ img {
 
 .text-muted {
     --tblr-text-opacity: 1;
-    color: rgba(var(--tblr-muted-rgb), var(--tblr-text-opacity)) !important
+    color: rgb(197 197 197) !important;
+    font-size: x-small;
 }
 
 .text-muted-fg {
