@@ -1,8 +1,8 @@
 <?php
-$host = env('PROD_DB_HOST', '127.0.0.1');
-$db   = env('PROD_DB_DATABASE', 'u211529883_pet_management');
-$user = env('PROD_DB_USERNAME', 'u211529883_petfurme');
-$pass = env('PROD_DB_PASSWORD', 'petfurMe234');
+$host = $_ENV['PROD_DB_HOST'] ?? '127.0.0.1';
+$db   = $_ENV['PROD_DB_DATABASE'] ?? 'u211529883_pet_management';
+$user = $_ENV['PROD_DB_USERNAME'] ?? 'u211529883_petfurme';
+$pass = $_ENV['PROD_DB_PASSWORD'] ?? 'petfurMe234';
 $charset = 'utf8mb4';
 
 try {
