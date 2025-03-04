@@ -19,26 +19,25 @@ class MessageService
     public function getConversations()
     {
         try {
-            // Check if there are conversations
-            $response = $this->supabase
-                ->from('conversations')
-                ->select('*') // Select all columns
-                ->execute();
+            $response = $this->supabase->from('conversations')->select('*')->execute();
 
-            // Log the response for debugging
+            // Log the entire response for debugging
             \Log::info('Supabase getConversations response:', (array) $response);
 
-            // Return data if the query is successful
-            if ($response->status === 200) {
-                return $response->data ?? [];
+            // Check if the response has an error
+            if (isset($response->error)) {
+                // Log the error details
+                \Log::error('Supabase getConversations error:', (array) $response->error);
+                throw new \Exception($response->error->message ?? 'Unknown error');
             }
 
-            // Return an empty array if no data
-            return [];
+            return $response->data; // Return the conversations data
         } catch (\Exception $e) {
-            // Log the error and throw it
-            \Log::error('Error in getConversations: ' . $e->getMessage());
-            throw $e;
+            // Log the exception message and stack trace
+            \Log::error('Error in getConversations: ' . $e->getMessage(), [
+                'stack' => $e->getTraceAsString(),
+            ]);
+            return ['error' => $e->getMessage()];
         }
     }
 
@@ -68,7 +67,6 @@ class MessageService
     public function sendMessage($sender_id, $receiver_id, $message)
     {
         try {
-            // Attempt to insert the message
             $response = $this->supabase
                 ->from('messages')
                 ->insert([
@@ -79,20 +77,23 @@ class MessageService
                 ])
                 ->execute();
 
-            // Log the response for debugging
+            // Log the entire response for debugging
             \Log::info('Supabase sendMessage response:', (array) $response);
 
             // Check if the response has an error
             if (isset($response->error)) {
-                \Log::error('Supabase Insert Error: ' . json_encode($response->error));
-                throw new \Exception('Supabase Insert Error: ' . $response->error['message']);
+                // Log the error details
+                \Log::error('Supabase sendMessage error:', (array) $response->error);
+                throw new \Exception('Supabase Insert Error: ' . ($response->error->message ?? 'Unknown error'));
             }
 
             return $response->data;
         } catch (\Exception $e) {
-            // Log the error and throw it
-            \Log::error('Error in sendMessage: ' . $e->getMessage());
-            throw $e;
+            // Log the exception message and stack trace
+            \Log::error('Error in sendMessage: ' . $e->getMessage(), [
+                'stack' => $e->getTraceAsString(),
+            ]);
+            throw $e; // Rethrow the exception for further handling
         }
     }
 }

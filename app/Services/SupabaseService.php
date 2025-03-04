@@ -19,8 +19,9 @@ class SupabaseService
                 'sent_at' => now(),
             ]);
 
-            if ($response->error) {
-                throw new \Exception($response->error->message);
+            // Check if the response has an error
+            if (isset($response->error)) {
+                throw new \Exception($response->error->message ?? 'Unknown error');
             }
 
             return $response->data; // Return the data or success response
@@ -40,7 +41,8 @@ class SupabaseService
                 ->order('sent_at', 'asc')
                 ->execute();
 
-            if ($response->error) {
+            // Check if the response has an error
+            if (isset($response->error)) {
                 throw new \Exception($response->error->message);
             }
 

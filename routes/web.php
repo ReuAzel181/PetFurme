@@ -65,18 +65,21 @@ Route::resource('messages', MessageController::class);
 
 
 Route::get('/test-supabase', function () {
-    $supabase = new \Supabase\CreateClient(
-        config('supabase.url'),
-        config('supabase.key')
+    // Create a new Supabase client
+    $supabase = new CreateClient(
+        config('supabase.url'),  // Supabase URL from config
+        config('supabase.key')   // Supabase API key from config
     );
 
-    $response = $supabase->from('messages')->select('*')->execute();
+    // Attempt to fetch data from a specific table
+    $response = $supabase->from('your_table_name')->select('*')->execute();
 
-    if (isset($response->error)) {
-        return response()->json(['error' => $response->error], 500);
+    // Check for errors and return the response
+    if ($response->error) {
+        return response()->json(['error' => $response->error->message], 500);
     }
 
-    return response()->json(['data' => $response->data], 200);
+    return response()->json($response->data);
 });
 
 
