@@ -4,6 +4,11 @@
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/ReuAzel181/PetFurme.git"
+            
+        }
     ],
     "license": "MIT",
     "require": {
