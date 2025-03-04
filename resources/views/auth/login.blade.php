@@ -33,7 +33,7 @@
                         <div class="carousel-inner">
                             <div class="carousel-item active">
                                 <?php
-                                    $imagePath1 = asset('storage/carousel/Carousel1.jpg');
+                                    $imagePath1 = url('storage/carousel/Carousel1.jpg');
                                     Logger::log("Loading image: $imagePath1");
                                 ?>
                                 <img src="{{ $imagePath1 }}" class="carousel-image" alt="Welcome" onerror="Logger::log('Image failed to load: {{ $imagePath1 }}');">
@@ -41,7 +41,7 @@
                             </div>
                             <div class="carousel-item">
                                 <?php
-                                    $imagePath2 = asset('storage/carousel/Carousel2.jpg');
+                                    $imagePath2 = url('storage/carousel/Carousel2.jpg');
                                     Logger::log("Loading image: $imagePath2");
                                 ?>
                                 <img src="{{ $imagePath2 }}" class="carousel-image" alt="Services" onerror="Logger::log('Image failed to load: {{ $imagePath2 }}');">
@@ -49,7 +49,7 @@
                             </div>
                             <div class="carousel-item">
                                 <?php
-                                    $imagePath3 = asset('storage/carousel/Carousel3.jpg');
+                                    $imagePath3 = url('storage/carousel/Carousel3.jpg');
                                     Logger::log("Loading image: $imagePath3");
                                 ?>
                                 <img src="{{ $imagePath3 }}" class="carousel-image" alt="Health" onerror="Logger::log('Image failed to load: {{ $imagePath3 }}');">
@@ -70,7 +70,7 @@
             <div class="col-lg-6">
                     <div class="login-section">
                         <div class="form-header text-center">
-                            <img src="{{ asset('storage/defaults/vc_logo.png') }}" alt="VetCare Logo" height="66" class="navbar-brand-image">
+                            <img src="{{ url('storage/defaults/vc_logo.png') }}" alt="VetCare Logo" height="66" class="navbar-brand-image">
                             <div id="headerText">
                                 <h2 class="text-primary fw-bold">Welcome Back!</h2>
                                 <p class="text-muted">Please sign in to continue</p>
@@ -264,8 +264,6 @@
 @endsection
 
 @push('styles')
-<link href="{{ asset('dist/css/tabler.min.css') }}" rel="stylesheet" />
-<link href="{{ asset('dist/css/demo.min.css') }}" rel="stylesheet" />
 <style>
     :root {
         --mint-blue: #a8e6cf;
@@ -1186,8 +1184,6 @@
 @endpush
 
 @push('scripts')
-    <script src="{{ asset('dist/js/tabler.min.js') }}" defer></script>
-    <script src="{{ asset('dist/js/demo.min.js') }}" defer></script>
 <script>
     // Initialize tooltips
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltip => {
