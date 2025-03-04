@@ -34,7 +34,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\MessageController;
 use App\Services\MessageService;
 
-use Supabase\CreateClient;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Auth\PasswordResetController;
@@ -61,32 +60,6 @@ Route::post('/messages/send/{id}', [MessageController::class, 'sendMessage'])->n
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::resource('messages', MessageController::class);
-
-
-
-Route::get('/test-supabase', function () {
-    // Create a new Supabase client
-    $supabase = new CreateClient(
-        config('supabase.url'),  // Supabase URL from config
-        config('supabase.key')   // Supabase API key from config
-    );
-
-    // Attempt to fetch data from a specific table
-    $response = $supabase->from('your_table_name')->select('*')->execute();
-
-    // Check for errors and return the response
-    if ($response->error) {
-        return response()->json(['error' => $response->error->message], 500);
-    }
-
-    return response()->json($response->data);
-});
-
-
-Route::get('/test-supabase', function (MessageService $messageService) {
-    $conversations = $messageService->getConversations();
-    return response()->json($conversations);
-});
 
 /*
 |--------------------------------------------------------------------------
