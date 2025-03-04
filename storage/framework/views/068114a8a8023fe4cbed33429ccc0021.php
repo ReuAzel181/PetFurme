@@ -1,0 +1,448 @@
+<?php $__env->startSection('content'); ?>
+    <div class="page-body">
+        <div class="container-xl">
+            <?php if(session('success')): ?>
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M5 12l5 5l10 -10"/>
+                            </svg>
+                        </div>
+                        <div class="ms-2">
+                            <h4 class="alert-title mb-1"><?php echo e(session('success')); ?></h4>
+                            <?php if(session('saleDetails')): ?>
+                                <div class="text-muted">
+                                    <strong>Amount Received:</strong> ₱<?php echo e(session('saleDetails.received')); ?><br>
+                                    <strong>Total Amount:</strong> ₱<?php echo e(session('saleDetails.total')); ?><br>
+                                    <strong>Change:</strong> ₱<?php echo e(session('saleDetails.change')); ?>
+
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+            <?php endif; ?>
+
+            <?php if(session('error')): ?>
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-circle" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <circle cx="12" cy="12" r="9"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                        </div>
+                        <div class="ms-2"><?php echo e(session('error')); ?></div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+            <?php endif; ?>
+
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title"><?php echo e(__('Orders')); ?></h3>
+                    </div>
+                    <div class="card-actions">
+                        <a href="<?php echo e(route('orders.create')); ?>" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 5l0 14"/>
+                                <path d="M5 12l14 0"/>
+                            </svg>
+                            <?php echo e(__('Create Order')); ?>
+
+                        </a>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Pet Owner</th>
+                                <th>Date & Time</th>
+                                <th>Notes</th>
+                                <th class="text-end">Total</th>
+                                <th class="text-center">Status</th>
+                                <th class="w-1">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $__empty_1 = true; $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                <tr class="cursor-pointer" 
+                                    data-order-row 
+                                    data-order-id="<?php echo e($order->id); ?>"
+                                    data-is-paid="<?php echo e($order->is_paid ? '1' : '0'); ?>">
+                                    <td>
+                                        <span class="text-blue fw-bold"><?php echo e($order->invoice_no); ?></span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <?php if($order->user->photo): ?>
+                                                <span class="avatar avatar-xs me-2" style="background-image: url('<?php echo e(asset('storage/' . $order->user->photo)); ?>')"></span>
+                                            <?php else: ?>
+                                                <span class="avatar avatar-xs me-2">
+                                                    <?php echo e(strtoupper(substr($order->user->name, 0, 1))); ?>
+
+                                                </span>
+                                            <?php endif; ?>
+                                            <?php echo e($order->user->name); ?>
+
+                                        </div>
+                                    </td>
+                                    <td><?php echo e($order->order_date->format('M d, Y g:i A')); ?></td>
+                                    <td class="text-muted"><?php echo e(Str::limit($order->note, 30) ?? 'None'); ?></td>
+                                    <td class="text-end fw-bold">₱<?php echo e(number_format($order->total, 2)); ?></td>
+                                    <td class="text-center">
+                                        <?php if($order->order_status === 'completed'): ?>
+                                            <span class="badge bg-success-lt">Completed</span>
+                                        <?php elseif($order->order_status === 'cancelled'): ?>
+                                            <span class="badge bg-danger-lt">Cancelled</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-warning-lt">Pending</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="<?php echo e(route('orders.show', $order->uuid)); ?>" 
+                                               class="btn btn-icon btn-ghost-primary"
+                                               title="View Order">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
+                                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>
+                                                </svg>
+                                            </a>
+
+                                            <button type="button" 
+                                                    class="btn btn-icon btn-ghost-danger" 
+                                                    title="Delete Order"
+                                                    onclick="event.stopPropagation(); confirmDelete('<?php echo e($order->id); ?>', '<?php echo e($order->invoice_no); ?>')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                    <path d="M4 7l16 0"/>
+                                                    <path d="M10 11l0 6"/>
+                                                    <path d="M14 11l0 6"/>
+                                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                                                </svg>
+                                            </button>
+
+                                            <form id="deleteForm<?php echo e($order->id); ?>" 
+                                                  action="<?php echo e(route('orders.destroy', $order->uuid)); ?>" 
+                                                  method="POST" 
+                                                  style="display: none;">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('DELETE'); ?>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty">
+                                            <div class="empty-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-cart-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                    <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                                    <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                                    <path d="M17 17h-11v-14h-2"></path>
+                                                    <path d="M6 5l8 .571m5.43 4.43l-.429 3h-13"></path>
+                                                    <path d="M17 3l4 4"></path>
+                                                    <path d="M21 3l-4 4"></path>
+                                                </svg>
+                                            </div>
+                                            <p class="empty-title">No orders found</p>
+                                            <p class="empty-subtitle text-muted">Try creating a new order using the button above.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <?php if($orders->hasPages()): ?>
+                    <div class="card-footer pb-0">
+                        <?php echo e($orders->links()); ?>
+
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <?php $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div class="modal fade" id="paymentModal<?php echo e($order->id); ?>" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Process Payment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="<?php echo e(route('orders.mark-as-paid', $order->uuid)); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PATCH'); ?>
+                        <div class="modal-body p-3">
+                            <div class="mb-3">
+                                <div class="alert alert-info mb-3">
+                                    <div class="d-flex">
+                                        <div>
+                                            <h4 class="alert-title mb-1">Order #<?php echo e($order->invoice_no); ?></h4>
+                                            <div class="text-secondary"><?php echo e($order->user->name); ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-label fw-bold">Total Amount Due</div>
+                                <div class="display-6 mb-3">₱<?php echo e(number_format($order->total, 2)); ?></div>
+                                
+                                <label class="form-label required">Amount Received</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">₱</span>
+                                    <input type="number" 
+                                           class="form-control form-control-lg" 
+                                           name="amount_received" 
+                                           step="0.01" 
+                                           min="<?php echo e($order->total); ?>"
+                                           onchange="calculateChange(this.value, <?php echo e($order->total); ?>, <?php echo e($order->id); ?>)"
+                                           required>
+                                </div>
+                                
+                                <label class="form-label">Change</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="change<?php echo e($order->id); ?>" 
+                                       readonly>
+                                
+                                <label class="form-label mt-3">Payment Note</label>
+                                <textarea class="form-control" 
+                                          name="payment_note" 
+                                          rows="2" 
+                                          placeholder="Optional payment notes..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" 
+                                    class="btn btn-primary" 
+                                    id="submitPayment<?php echo e($order->id); ?>" 
+                                    disabled>
+                                Process Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+    <!-- Cancel Order Modal -->
+    <?php $__currentLoopData = $orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div class="modal modal-blur fade" id="cancelOrderModal<?php echo e($order->id); ?>" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cancel Order #<?php echo e($order->invoice_no); ?></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="<?php echo e(route('orders.cancel', $order)); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PATCH'); ?>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label required">Reason for Cancellation</label>
+                                <textarea class="form-control" 
+                                          name="cancellation_reason" 
+                                          rows="3" 
+                                          placeholder="Please provide a reason for cancelling this order..."
+                                          required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Yes, Cancel Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+<?php $__env->startPush('page-scripts'); ?>
+<style>
+/* Update modal styles */
+.modal {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.modal-backdrop {
+    display: none !important;
+}
+
+.modal-content {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+.modal-sm {
+    max-width: 400px;
+}
+
+.form-control-lg {
+    height: 48px;
+    font-size: 1.1rem;
+}
+
+.display-6 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-pointer:hover {
+    background-color: rgba(32, 107, 196, 0.03);
+}
+
+.table td, .table th {
+    padding: 0.75rem;
+}
+
+.empty {
+    padding: 2rem 0;
+}
+
+.empty-icon {
+    margin-bottom: 1rem;
+}
+
+.empty-icon svg {
+    width: 48px;
+    height: 48px;
+    stroke: #929dab;
+}
+
+.empty-title {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.empty-subtitle {
+    font-size: 0.875rem;
+    line-height: 1.4285714;
+    color: #929dab;
+}
+
+.avatar {
+    --tblr-avatar-size: 40px;
+    --tblr-avatar-bg: #929dab;
+    position: relative;
+    width: var(--tblr-avatar-size);
+    height: var(--tblr-avatar-size);
+    font-size: calc(var(--tblr-avatar-size) * 0.4);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: var(--tblr-avatar-bg) no-repeat center/cover;
+    border-radius: 50%;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+}
+
+.avatar.avatar-xs,
+.avatar.avatar-sm {
+    --tblr-avatar-size: 40px;
+    font-size: 1rem;
+}
+
+.list-group-item {
+    padding: 1rem;
+    border-color: rgba(98, 105, 118, 0.16);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 0;
+}
+
+.modal-body .card {
+    margin: 0;
+    border: none;
+}
+
+.modal-body .card:last-child {
+    margin-bottom: 0;
+}
+
+.badge {
+    padding: 0.5em 1em;
+}
+
+/* Remove extra padding */
+.card-footer {
+    padding: 0.5rem 1rem;
+}
+</style>
+
+<script>
+function calculateChange(amountReceived, total, orderId) {
+    const change = parseFloat(amountReceived) - parseFloat(total);
+    const changeInput = document.getElementById(`change${orderId}`);
+    const submitBtn = document.getElementById(`submitPayment${orderId}`);
+    
+    if (change >= 0) {
+        changeInput.value = '₱' + change.toFixed(2);
+        changeInput.classList.remove('text-danger');
+        changeInput.classList.add('text-success');
+        submitBtn.disabled = false;
+    } else {
+        changeInput.value = 'Insufficient amount';
+        changeInput.classList.remove('text-success');
+        changeInput.classList.add('text-danger');
+        submitBtn.disabled = true;
+    }
+}
+
+function confirmDelete(orderId, invoiceNo) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (confirm(`Are you sure you want to delete Order #${invoiceNo}? It will be moved to the archive.`)) {
+        document.getElementById('deleteForm' + orderId).submit();
+    }
+}
+
+// Add click handler to rows, excluding buttons
+document.querySelectorAll('[data-order-row]').forEach(row => {
+    row.addEventListener('click', (e) => {
+        // Don't trigger if clicking a button or form
+        if (!e.target.closest('button') && !e.target.closest('form')) {
+            const uuid = row.querySelector('a[href*="orders/show"]').getAttribute('href').split('/').pop();
+            window.location.href = `/orders/${uuid}`;
+        }
+    });
+});
+</script>
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.tabler', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\XAMPP\htdocs\PetFurme\resources\views/orders/index.blade.php ENDPATH**/ ?>
