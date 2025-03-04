@@ -264,6 +264,8 @@
 @endsection
 
 @push('styles')
+<link href="{{ asset('dist/css/tabler.min.css') }}" rel="stylesheet" />
+<link href="{{ asset('dist/css/demo.min.css') }}" rel="stylesheet" />
 <style>
     :root {
         --mint-blue: #a8e6cf;
@@ -1184,6 +1186,8 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset('dist/js/tabler.min.js') }}" defer></script>
+    <script src="{{ asset('dist/js/demo.min.js') }}" defer></script>
 <script>
     // Initialize tooltips
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltip => {
