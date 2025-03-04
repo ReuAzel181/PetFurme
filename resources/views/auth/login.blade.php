@@ -80,7 +80,7 @@
                         <div class="form-container">
                             <!-- Login Form -->
                             <div class="login-form-container" id="loginForm" style="margin-bottom: 70px;">
-                                <form action="{{ url('/index.php/login') }}" method="POST" autocomplete="off">
+                                <form action="{{ route('login') }}" method="POST" autocomplete="off">
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">Email address</label>
