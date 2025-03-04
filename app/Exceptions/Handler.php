@@ -27,4 +27,11 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function report(Throwable $exception)
+    {
+        // Log the exception
+        \Log::error($exception);
+        parent::report($exception);
+    }
 }
