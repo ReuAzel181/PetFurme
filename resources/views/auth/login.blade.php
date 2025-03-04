@@ -7,6 +7,10 @@
         </div>
     @endif
 
+    <?php
+        use App\Helpers\Logger; // Import the Logger class
+    ?>
+
 <div class="page page-center">
     <div class="background-shapes">
         <div class="circle-1"></div>
@@ -28,15 +32,27 @@
                     <div id="authCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
                         <div class="carousel-inner">
                             <div class="carousel-item active">
-                                <img src="{{ asset('storage/carousel/Carousel1.jpg') }}" class="carousel-image" alt="Welcome">
+                                <?php
+                                    $imagePath1 = asset('storage/carousel/Carousel1.jpg');
+                                    Logger::log("Loading image: $imagePath1");
+                                ?>
+                                <img src="{{ $imagePath1 }}" class="carousel-image" alt="Welcome" onerror="Logger::log('Image failed to load: {{ $imagePath1 }}');">
                                 <div class="carousel-overlay"></div>
                             </div>
                             <div class="carousel-item">
-                                <img src="{{ asset('storage/carousel/Carousel2.jpg') }}" class="carousel-image" alt="Services">
+                                <?php
+                                    $imagePath2 = asset('storage/carousel/Carousel2.jpg');
+                                    Logger::log("Loading image: $imagePath2");
+                                ?>
+                                <img src="{{ $imagePath2 }}" class="carousel-image" alt="Services" onerror="Logger::log('Image failed to load: {{ $imagePath2 }}');">
                                 <div class="carousel-overlay"></div>
-                        </div>
+                            </div>
                             <div class="carousel-item">
-                                <img src="{{ asset('storage/carousel/Carousel3.jpg') }}" class="carousel-image" alt="Health">
+                                <?php
+                                    $imagePath3 = asset('storage/carousel/Carousel3.jpg');
+                                    Logger::log("Loading image: $imagePath3");
+                                ?>
+                                <img src="{{ $imagePath3 }}" class="carousel-image" alt="Health" onerror="Logger::log('Image failed to load: {{ $imagePath3 }}');">
                                 <div class="carousel-overlay"></div>
                             </div>
                         </div>
@@ -56,7 +72,7 @@
                         <div class="form-header text-center">
                             <img src="{{ asset('storage/defaults/vc_logo.png') }}" alt="VetCare Logo" height="66" class="navbar-brand-image">
                             <div id="headerText">
-                                <h2 class="text-primary fw-bold">Welcome Back!</h>
+                                <h2 class="text-primary fw-bold">Welcome Back!</h2>
                                 <p class="text-muted">Please sign in to continue</p>
                     </div>
                                 </div>
@@ -64,7 +80,7 @@
                         <div class="form-container">
                             <!-- Login Form -->
                             <div class="login-form-container" id="loginForm" style="margin-bottom: 70px;">
-                                <form action="{{ url('/index.php/login') }}" method="POST" autocomplete="off">
+                                <form action="{{ route('login') }}" method="POST" autocomplete="off">
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">Email address</label>
