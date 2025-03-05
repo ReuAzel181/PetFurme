@@ -491,13 +491,13 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => 'D:\\XAMPP\\htdocs\\PetFurme\\storage\\app',
+        'root' => BASE_PATH . '/storage/app',
         'throw' => false,
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => 'D:\\XAMPP\\htdocs\\PetFurme\\storage\\app/public',
+        'root' => BASE_PATH . '/storage/app/public',
         'url' => 'https://petfurme.shop/storage',
         'visibility' => 'public',
         'throw' => false,
@@ -517,7 +517,7 @@
     ),
     'links' => 
     array (
-      'D:\\XAMPP\\htdocs\\PetFurme\\public\\storage' => 'D:\\XAMPP\\htdocs\\PetFurme\\storage\\app/public',
+      'D:\\XAMPP\\htdocs\\PetFurme\\public\\storage' => BASE_PATH . '/storage/app/public',
     ),
   ),
   'hashing' => 
@@ -591,8 +591,8 @@
       'rtl' => false,
       'fonts' => 
       array (
-        0 => 'D:\\XAMPP\\htdocs\\PetFurme\\config\\laravolt/../fonts/OpenSans-Bold.ttf',
-        1 => 'D:\\XAMPP\\htdocs\\PetFurme\\config\\laravolt/../fonts/rockwell.ttf',
+        0 => BASE_PATH . '/config/laravolt/../fonts/OpenSans-Bold.ttf',
+        1 => BASE_PATH . '/config/laravolt/../fonts/rockwell.ttf',
       ),
       'foregrounds' => 
       array (
@@ -709,7 +709,7 @@
   'livewire' => 
   array (
     'class_namespace' => 'App\\Livewire',
-    'view_path' => 'D:\\XAMPP\\htdocs\\PetFurme\\resources\\views/livewire',
+    'view_path' => BASE_PATH . '/resources/views/livewire',
     'layout' => 'components.layouts.app',
     'lazy_placeholder' => NULL,
     'temporary_file_upload' => 
@@ -810,7 +810,7 @@
     ),
     'auto_discover_models_paths' => 
     array (
-      0 => 'D:\\XAMPP\\htdocs\\PetFurme\\app\\Models',
+      0 => BASE_PATH . '/app/Models',
     ),
   ),
   'livewire-tables' => 
@@ -922,14 +922,14 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => 'D:\\XAMPP\\htdocs\\PetFurme\\storage\\logs/laravel.log',
+        'path' => BASE_PATH . '/storage/logs/laravel.log',
         'level' => 'debug',
         'replace_placeholders' => true,
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => 'D:\\XAMPP\\htdocs\\PetFurme\\storage\\logs/laravel.log',
+        'path' => BASE_PATH . '/storage/logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
         'replace_placeholders' => true,
@@ -994,7 +994,7 @@
       ),
       'emergency' => 
       array (
-        'path' => 'D:\\XAMPP\\htdocs\\PetFurme\\storage\\logs/laravel.log',
+        'path' => BASE_PATH . '/storage/logs/laravel.log',
       ),
     ),
   ),
@@ -1060,7 +1060,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => 'D:\\XAMPP\\htdocs\\PetFurme\\resources\\views/vendor/mail',
+        0 => BASE_PATH . '/resources/views/vendor/mail',
       ),
     ),
   ),
@@ -1215,7 +1215,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => 'D:\\XAMPP\\htdocs\\PetFurme\\storage\\framework/sessions',
+    'files' => storage_path('framework/sessions'),
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -1233,11 +1233,9 @@
   ),
   'view' => 
   array (
-    'paths' => 
-    array (
-      0 => 'D:\\XAMPP\\htdocs\\PetFurme\\resources\\views',
+    'paths' => array (0 => resource_path('views')
     ),
-    'compiled' => 'D:\\XAMPP\\htdocs\\PetFurme\\storage\\framework\\views',
+    'compiled' => storage_path('framework/views'),
   ),
   'blade-heroicons' => 
   array (
@@ -1352,7 +1350,7 @@
     array (
     ),
     'enable_runnable_solutions' => NULL,
-    'remote_sites_path' => 'D:\\XAMPP\\htdocs\\PetFurme',
+    'remote_sites_path' => BASE_PATH,
     'local_sites_path' => '',
     'housekeeping_endpoint_prefix' => '_ignition',
     'settings_file_path' => '',
