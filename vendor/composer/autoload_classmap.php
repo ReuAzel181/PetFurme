@@ -64,6 +64,7 @@ return array(
     'App\\Http\\Controllers\\Order\\OrderPendingController' => $baseDir . '/app/Http/Controllers/Order/OrderPendingController.php',
     'App\\Http\\Controllers\\PagesController' => $baseDir . '/app/Http/Controllers/PagesController.php',
     'App\\Http\\Controllers\\PetController' => $baseDir . '/app/Http/Controllers/PetController.php',
+    'App\\Http\\Controllers\\PetOwner\\AppointmentController' => $baseDir . '/app/Http/Controllers/PetOwner/AppointmentController.php',
     'App\\Http\\Controllers\\PetOwner\\DashboardController' => $baseDir . '/app/Http/Controllers/PetOwner/DashboardController.php',
     'App\\Http\\Controllers\\PetOwner\\MessagesController' => $baseDir . '/app/Http/Controllers/PetOwner/MessagesController.php',
     'App\\Http\\Controllers\\PetOwner\\PetController' => $baseDir . '/app/Http/Controllers/PetOwner/PetController.php',

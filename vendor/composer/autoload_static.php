@@ -752,6 +752,7 @@ class ComposerStaticInitf7066d96bcb345db78945dfcc16a357c
         'App\\Http\\Controllers\\Order\\OrderPendingController' => __DIR__ . '/../..' . '/app/Http/Controllers/Order/OrderPendingController.php',
         'App\\Http\\Controllers\\PagesController' => __DIR__ . '/../..' . '/app/Http/Controllers/PagesController.php',
         'App\\Http\\Controllers\\PetController' => __DIR__ . '/../..' . '/app/Http/Controllers/PetController.php',
+        'App\\Http\\Controllers\\PetOwner\\AppointmentController' => __DIR__ . '/../..' . '/app/Http/Controllers/PetOwner/AppointmentController.php',
         'App\\Http\\Controllers\\PetOwner\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/PetOwner/DashboardController.php',
         'App\\Http\\Controllers\\PetOwner\\MessagesController' => __DIR__ . '/../..' . '/app/Http/Controllers/PetOwner/MessagesController.php',
         'App\\Http\\Controllers\\PetOwner\\PetController' => __DIR__ . '/../..' . '/app/Http/Controllers/PetOwner/PetController.php',
