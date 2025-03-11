@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -146,9 +147,16 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getPhotoUrlAttribute()
     {
-        return $this->photo ? 
-            asset('storage/' . $this->photo) : 
-            asset('storage/defaults/no-avatar.jpg');
+        if ($this->photo && is_string($this->photo) && (str_starts_with($this->photo, 'user_photos/') || str_starts_with($this->photo, 'storage/'))) {
+            // It's a file path
+            return asset('storage/' . $this->photo);
+        } elseif ($this->photo) {
+            // It's binary data
+            return route('user.photo', $this->id);
+        }
+        
+        // No photo found
+        return asset('storage/defaults/no-avatar.jpg');
     }
 
     public function lastMessage()
@@ -180,5 +188,26 @@ class User extends Authenticatable implements MustVerifyEmail
                 $query->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => auth()->id()])]);
             })
             ->exists();
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if (auth()->check() && auth()->user()->isAdmin()) {
+                Notification::create([
+                    'id' => Str::uuid(),
+                    'type' => 'new_user',
+                    'notifiable_type' => 'App\\Models\\User',
+                    'notifiable_id' => $user->id,
+                    'data' => [
+                        'message' => "New user registered: {$user->name}",
+                        'user_id' => $user->id
+                    ],
+                    'user_id' => auth()->id(),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+        });
     }
 }

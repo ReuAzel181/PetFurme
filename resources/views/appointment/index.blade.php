@@ -87,7 +87,7 @@
                                             <div class="d-flex flex-column gap-1">
                                                 <div class="d-flex align-items-center gap-2">
                                                     @if($appointment->user && $appointment->user->photo)
-                                                        <img src="{{ asset('storage/' . $appointment->user->photo) }}" 
+                                                        <img src="data:image/jpeg;base64,{{ base64_encode($appointment->user->photo) }}" 
                                                              alt="{{ $appointment->display_name }}" 
                                                              class="avatar avatar-sm rounded-circle"
                                                              style="width: 32px; height: 32px; object-fit: cover;">
@@ -112,16 +112,35 @@
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <div class="d-flex align-items-center gap-2">
-                                                    @if($appointment->pet && $appointment->pet->photo)
-                                                        <img src="{{ asset('storage/' . $appointment->pet->photo) }}" 
-                                                             alt="{{ $appointment->pet_name }}" 
-                                                             class="avatar avatar-sm rounded-circle"
-                                                             style="width: 32px; height: 32px; object-fit: cover;">
+                                                    @if($appointment->pet)
+                                                        @php
+                                                            $photoData = null;
+                                                            // Try to get photo from photo_data first
+                                                            if ($appointment->pet->photo_data) {
+                                                                $photoData = $appointment->pet->photo_data;
+                                                            }
+                                                            // If no photo_data, try to get from photo if it contains binary data
+                                                            elseif ($appointment->pet->photo && strpos($appointment->pet->photo, 'data:image') === 0) {
+                                                                $photoData = $appointment->pet->photo;
+                                                            }
+                                                        @endphp
+
+                                                        @if($photoData)
+                                                            <span class="avatar avatar-sm rounded-circle" 
+                                                                  style="background-image: url('{{ $photoData }}');
+                                                                         width: 32px; height: 32px; background-size: cover;">
+                                                            </span>
+                                                        @else
+                                                            <span class="avatar avatar-sm rounded-circle" 
+                                                                  style="background-image: url('{{ asset('images/default-pet.png') }}');
+                                                                         width: 32px; height: 32px; background-size: cover;">
+                                                            </span>
+                                                        @endif
                                                     @else
-                                                        <img src="{{ asset('images/default-pet.png') }}" 
-                                                             alt="Default Pet" 
-                                                             class="avatar avatar-sm rounded-circle"
-                                                             style="width: 32px; height: 32px; object-fit: cover;">
+                                                        <span class="avatar avatar-sm rounded-circle" 
+                                                              style="background-image: url('{{ asset('images/default-pet.png') }}');
+                                                                     width: 32px; height: 32px; background-size: cover;">
+                                                        </span>
                                                     @endif
                                                     <div class="text-dark">{{ $appointment->pet_name }}</div>
                                                 </div>
@@ -1118,8 +1137,7 @@
 
     .input-group-sm > .form-control,
     .input-group-sm > .form-select {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
+        padding: 0.4rem 0.5rem;
     }
 
     .service-amount,
@@ -1401,7 +1419,7 @@ function showAppointmentDetails(appointment) {
             <span class="fw-bold">${appointment.pet_name}</span>
             <div class="mt-1">
                 <span class="badge bg-blue-lt">${appointment.pet_type}</span>
-                <span class="badge bg-green-lt ms-1">${appointment.age_display}</span>
+                <span class="ms-2 badge bg-green-lt">${appointment.age_display}</span>
             </div>
         </div>
     `;

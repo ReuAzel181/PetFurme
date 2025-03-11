@@ -18,8 +18,8 @@
     <div class="page-body">
         <div class="container-xl">
             <!-- Analytics Widgets -->
-            <div class="row g-2 mb-3">
-                        <div class="col-sm-6 col-lg-3">
+            <div class="row g-3 mb-4">
+                <div class="col-lg-3 col-md-6">
                     <x-dashboard.modern-analytics-widget
                         title="Total Pets"
                         :value="$totalPets"
@@ -30,8 +30,8 @@
                         color="primary"
                         route="{{ route('pets.index') }}"
                     />
-                                        </div>
-                <div class="col-sm-6 col-lg-3">
+                </div>
+                <div class="col-lg-3 col-md-6">
                     <x-dashboard.modern-analytics-widget
                         title="Appointments"
                         :value="$appointments"
@@ -42,8 +42,8 @@
                         color="info"
                         route="{{ route('appointment.index') }}"
                     />
-                                            </div>
-                <div class="col-sm-6 col-lg-3">
+                </div>
+                <div class="col-lg-3 col-md-6">
                     <x-dashboard.modern-analytics-widget
                         title="Pet Owners"
                         :value="$totalPetOwners"
@@ -54,8 +54,8 @@
                         color="success"
                         route="{{ url('user-management?role=pet_owner') }}"
                     />
-                        </div>
-                        <div class="col-sm-6 col-lg-3">
+                </div>
+                <div class="col-lg-3 col-md-6">
                     <x-dashboard.modern-analytics-widget
                         title="Today's Orders"
                         :value="$todayOrders"
@@ -66,8 +66,8 @@
                         color="warning"
                         route="{{ url('orders') }}"
                     />
-                            </div>
-                        </div>
+                </div>
+            </div>
 
             <div class="row g-2">
                 <!-- Calendar -->
@@ -107,193 +107,194 @@
 
             <div class="row mt-3">
                 <div class="col-12">
-                <div class="card">
-                    <div class="card-header sticky-top bg-white d-flex align-items-center justify-content-between">
-                        <div>
-                            <h3 class="card-title mb-0">Recent Activities</h3>
-                            <small class="text-muted">Track all system activities</small>
-                        </div>
-                        <div class="ms-auto">
-                            <form method="GET" class="d-flex gap-2">
-                                <div class="date-range-inputs">
-                                    <div class="input-group">
-                                        <span class="input-group-text">From</span>
-                                        <input type="date" class="form-control" name="from_date" value="{{ $fromDate }}">
+                    <div class="card">
+                        <div class="card-header sticky-top bg-white d-flex align-items-center justify-content-between">
+                            <div>
+                                <h3 class="card-title mb-0">Recent Activities</h3>
+                                <small class="text-muted">Track all system activities</small>
+                            </div>
+                            <div class="ms-auto">
+                                <form method="GET" class="d-flex gap-2">
+                                    <div class="date-range-inputs">
+                                        <div class="input-group">
+                                            <span class="input-group-text">From</span>
+                                            <input type="date" class="form-control" name="from_date" value="{{ $fromDate }}">
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-text">to</span>
+                                            <input type="date" class="form-control" name="to_date" value="{{ $toDate }}">
+                                        </div>
                                     </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text">to</span>
-                                        <input type="date" class="form-control" name="to_date" value="{{ $toDate }}">
+                                    <div class="filter-controls">
+                                        <select name="sort_by" class="form-select" style="width: auto;">
+                                            <option value="date" {{ $sortBy === 'date' ? 'selected' : '' }}>Latest First</option>
+                                            <option value="type" {{ $sortBy === 'type' ? 'selected' : '' }}>By Activity Type</option>
+                                            <option value="description" {{ $sortBy === 'description' ? 'selected' : '' }}>By Description</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-filter me-2"></i>
+                                            Filter
+                                        </button>
                                     </div>
-                                </div>
-                                <div class="filter-controls">
-                                    <select name="sort_by" class="form-select" style="width: auto;">
-                                        <option value="date" {{ $sortBy === 'date' ? 'selected' : '' }}>Latest First</option>
-                                        <option value="type" {{ $sortBy === 'type' ? 'selected' : '' }}>By Activity Type</option>
-                                        <option value="description" {{ $sortBy === 'description' ? 'selected' : '' }}>By Description</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-filter me-2"></i>
-                                        Filter
-                                    </button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="activities-container">
-                            <div class="table-responsive">
-                                <table class="table table-vcenter table-hover table-sticky mb-0">
-                                    <thead class="sticky-top bg-white">
-                                        <tr>
-                                            <th class="w-1">Time</th>
-                                            <th class="w-1">Type</th>
-                                            <th>Details</th>
-                                            <th class="w-1">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($recentEvents as $event)
+                        <div class="card-body p-0">
+                            <div class="activities-container">
+                                <div class="table-responsive">
+                                    <table class="table table-vcenter table-hover table-sticky mb-0">
+                                        <thead class="sticky-top bg-white">
                                             <tr>
-                                                <td class="text-muted">
-                                                    <span data-bs-toggle="tooltip" 
-                                                          title="{{ Carbon\Carbon::parse($event->created_at)->format('M d, Y h:i A') }}">
-                                                        {{ Carbon\Carbon::parse($event->date)->format('M d') }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    @php
-                                                        $typeInfo = match($event->type) {
-                                                            'appointment' => [
-                                                                'color' => 'blue',
-                                                                'icon' => 'calendar',
-                                                                'label' => 'Appointment',
-                                                                'status' => 'Upcoming'
-                                                            ],
-                                                            'low_stock' => [
-                                                                'color' => 'yellow',
-                                                                'icon' => 'alert-triangle',
-                                                                'label' => 'Low Stock',
-                                                                'status' => 'Warning'
-                                                            ],
-                                                            'out_of_stock' => [
-                                                                'color' => 'red',
-                                                                'icon' => 'x-circle',
-                                                                'label' => 'Out of Stock',
-                                                                'status' => 'Critical'
-                                                            ],
-                                                            'new_product' => [
-                                                                'color' => 'azure',
-                                                                'icon' => 'package',
-                                                                'label' => 'New Product',
-                                                                'status' => 'Added'
-                                                            ],
-                                                            'new_pet' => [
-                                                                'color' => 'green',
-                                                                'icon' => 'paw',
-                                                                'label' => 'New Pet',
-                                                                'status' => 'Registered'
-                                                            ],
-                                                            'new_pet_owner' => [
-                                                                'color' => 'purple',
-                                                                'icon' => 'user-plus',
-                                                                'label' => 'New Owner',
-                                                                'status' => 'Registered'
-                                                            ],
-                                                            'new_order' => [
-                                                                'color' => 'indigo',
-                                                                'icon' => 'shopping-cart',
-                                                                'label' => 'New Order',
-                                                                'status' => 'Placed'
-                                                            ],
-                                                            default => [
-                                                                'color' => 'gray',
-                                                                'icon' => 'info-circle',
-                                                                'label' => 'Activity',
-                                                                'status' => 'Info'
-                                                            ]
-                                                        };
-                                                    @endphp
-                                                    <span class="badge bg-{{ $typeInfo['color'] }}-lt" 
-                                                          style="font-size: 0.9em; padding: 0.5em 0.8em;">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" 
-                                                             class="icon icon-{{ $typeInfo['icon'] }}" 
-                                                             width="24" height="24" viewBox="0 0 24 24" 
-                                                             stroke-width="2" stroke="currentColor" 
-                                                             fill="none" stroke-linecap="round" 
-                                                             stroke-linejoin="round">
-                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                            <!-- Add appropriate icon path here -->
-                                                        </svg>
-                                                        {{ $typeInfo['label'] }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div>
-                                                            <div class="font-weight-medium">{{ $event->description }}</div>
-                                                            <div class="text-muted small">
-                                                                @switch($event->type)
-                                                                    @case('appointment')
-                                                                        Scheduled appointment
-                                                                        @break
-                                                                    @case('new_pet')
-                                                                        New pet registered in the system
-                                                                        @break
-                                                                    @case('new_pet_owner')
-                                                                        New pet owner account created
-                                                                        @break
-                                                                @endswitch
+                                                <th class="w-1">Time</th>
+                                                <th class="w-1">Type</th>
+                                                <th>Details</th>
+                                                <th class="w-1">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($recentEvents as $event)
+                                                <tr>
+                                                    <td class="text-muted">
+                                                        <span data-bs-toggle="tooltip" 
+                                                              title="{{ Carbon\Carbon::parse($event->created_at)->format('M d, Y h:i A') }}">
+                                                            {{ Carbon\Carbon::parse($event->date)->format('M d') }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        @php
+                                                            $typeInfo = match($event->type) {
+                                                                'appointment' => [
+                                                                    'color' => 'blue',
+                                                                    'icon' => 'calendar',
+                                                                    'label' => 'Appointment',
+                                                                    'status' => 'Upcoming'
+                                                                ],
+                                                                'low_stock' => [
+                                                                    'color' => 'yellow',
+                                                                    'icon' => 'alert-triangle',
+                                                                    'label' => 'Low Stock',
+                                                                    'status' => 'Warning'
+                                                                ],
+                                                                'out_of_stock' => [
+                                                                    'color' => 'red',
+                                                                    'icon' => 'x-circle',
+                                                                    'label' => 'Out of Stock',
+                                                                    'status' => 'Critical'
+                                                                ],
+                                                                'new_product' => [
+                                                                    'color' => 'azure',
+                                                                    'icon' => 'package',
+                                                                    'label' => 'New Product',
+                                                                    'status' => 'Added'
+                                                                ],
+                                                                'new_pet' => [
+                                                                    'color' => 'green',
+                                                                    'icon' => 'paw',
+                                                                    'label' => 'New Pet',
+                                                                    'status' => 'Registered'
+                                                                ],
+                                                                'new_pet_owner' => [
+                                                                    'color' => 'purple',
+                                                                    'icon' => 'user-plus',
+                                                                    'label' => 'New Owner',
+                                                                    'status' => 'Registered'
+                                                                ],
+                                                                'new_order' => [
+                                                                    'color' => 'indigo',
+                                                                    'icon' => 'shopping-cart',
+                                                                    'label' => 'New Order',
+                                                                    'status' => 'Placed'
+                                                                ],
+                                                                default => [
+                                                                    'color' => 'gray',
+                                                                    'icon' => 'info-circle',
+                                                                    'label' => 'Activity',
+                                                                    'status' => 'Info'
+                                                                ]
+                                                            };
+                                                        @endphp
+                                                        <span class="badge bg-{{ $typeInfo['color'] }}-lt" 
+                                                              style="font-size: 0.9em; padding: 0.5em 0.8em;">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" 
+                                                                 class="icon icon-{{ $typeInfo['icon'] }}" 
+                                                                 width="24" height="24" viewBox="0 0 24 24" 
+                                                                 stroke-width="2" stroke="currentColor" 
+                                                                 fill="none" stroke-linecap="round" 
+                                                                 stroke-linejoin="round">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                <!-- Add appropriate icon path here -->
+                                                            </svg>
+                                                            {{ $typeInfo['label'] }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div>
+                                                                <div class="font-weight-medium">{{ $event->description }}</div>
+                                                                <div class="text-muted small">
+                                                                    @switch($event->type)
+                                                                        @case('appointment')
+                                                                            Scheduled appointment
+                                                                            @break
+                                                                        @case('new_pet')
+                                                                            New pet registered in the system
+                                                                            @break
+                                                                        @case('new_pet_owner')
+                                                                            New pet owner account created
+                                                                            @break
+                                                                    @endswitch
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    @switch($event->type)
-                                                        @case('appointment')
-                                                            <span class="status status-blue">
-                                                                Scheduled
-                                                            </span>
-                                                            @break
-                                                        @case('new_pet')
-                                                            <span class="status status-green">
-                                                                Active
-                                                            </span>
-                                                            @break
-                                                        @case('new_pet_owner')
-                                                            <span class="status status-purple">
-                                                                Registered
-                                                            </span>
-                                                            @break
-                                                    @endswitch
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="text-center py-4">
-                                                    <div class="empty">
-                                                        <div class="empty-icon">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                <circle cx="12" cy="12" r="9" />
-                                                                <line x1="9" y1="10" x2="9.01" y2="10" />
-                                                                <line x1="15" y1="10" x2="15.01" y2="10" />
-                                                                <path d="M9.5 15.25a3.5 3.5 0 0 1 5 0" />
-                                                            </svg>
+                                                    </td>
+                                                    <td>
+                                                        @switch($event->type)
+                                                            @case('appointment')
+                                                                <span class="status status-blue">
+                                                                    Scheduled
+                                                                </span>
+                                                                @break
+                                                            @case('new_pet')
+                                                                <span class="status status-green">
+                                                                    Active
+                                                                </span>
+                                                                @break
+                                                            @case('new_pet_owner')
+                                                                <span class="status status-purple">
+                                                                    Registered
+                                                                </span>
+                                                                @break
+                                                        @endswitch
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="4" class="text-center py-4">
+                                                        <div class="empty">
+                                                            <div class="empty-icon">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                    <circle cx="12" cy="12" r="9" />
+                                                                    <line x1="9" y1="10" x2="9.01" y2="10" />
+                                                                    <line x1="15" y1="10" x2="15.01" y2="10" />
+                                                                    <path d="M9.5 15.25a3.5 3.5 0 0 1 5 0" />
+                                                                </svg>
+                                                            </div>
+                                                            <p class="empty-title">No activities found</p>
+                                                            <p class="empty-subtitle text-muted">
+                                                                Try adjusting your search or date range to find what you're looking for.
+                                                            </p>
                                                         </div>
-                                                        <p class="empty-title">No activities found</p>
-                                                        <p class="empty-subtitle text-muted">
-                                                            Try adjusting your search or date range to find what you're looking for.
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="scroll-to-bottom" id="scrollToBottom" title="Scroll to bottom">
+                                    <i class="fas fa-arrow-down"></i>
+                                </button>
                             </div>
-                            <button class="scroll-to-bottom" id="scrollToBottom" title="Scroll to bottom">
-                                <i class="fas fa-arrow-down"></i>
-                            </button>
                         </div>
                     </div>
                 </div>

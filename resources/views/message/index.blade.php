@@ -2,35 +2,38 @@
 
 @section('content')
 <div class="page-wrapper" style="min-height: 100vh;">
-    <div class="container-xl">
-        <div class="row">
-            <div class="col">
-                @include('partials._page_header', [
-                    'title' => __('Messages'),
-                    'section' => 'OVERVIEW'
-                ])
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    @include('partials._page_header', [
+                        'title' => __('Messages'),
+                        'section' => 'OVERVIEW'
+                    ])
+                </div>
             </div>
+            @include('partials._breadcrumbs')
         </div>
     </div>
 
-    <div class="page-body" style="flex: 1;">
-        <div class="container-fluid p-4">
-            <div class="card shadow-sm" style="height: calc(100vh - 11rem);">
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="card">
                 <div class="row g-0 h-100">
                     <!-- Message List -->
-                    <div class="col-12 col-md-6 col-lg-4 bg-white border-end d-flex flex-column" style="height: 100%; overflow: hidden;">
+                    <div class="col-12 col-md-6 col-lg-4 bg-white border-end" style="height: calc(100vh - 13rem);">
                         <div class="p-3 border-bottom" style="background-color: #f8f9fa;">
-                            <div class="input-group input-group-lg">
-                                <input type="text" class="form-control border shadow-none" id="messageSearch" placeholder="Search messages..." style="font-size: 1.2rem;">
-                                <button class="btn btn-primary" type="button">
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" id="messageSearch" placeholder="Search messages...">
+                                <button class="btn btn-primary btn-sm" type="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7" /><line x1="21" y1="21" x2="15" y2="15" /></svg>
                                 </button>
                             </div>
-                            <div id="searchFeedback" class="mt-2 text-muted d-none" style="font-size: 1.1rem;">
+                            <div id="searchFeedback" class="mt-2 text-muted d-none">
                                 Searching messages from: <span id="searchUser"></span>
                             </div>
                         </div>
-                        <div class="chat-users flex-grow-1">
+                        <div class="chat-users">
                             @foreach ($users->where('role', 'pet_owner') as $user)
                                 @php
                                     $hasUnreadMessages = $user->receivedMessages
@@ -42,26 +45,31 @@
                                         ->count() > 0;
                                 @endphp
                                 <a href="{{ route('messages.chat', $user->id) }}" 
-                                   class="chat-user-item position-relative d-flex align-items-center text-decoration-none p-4 border-bottom
+                                   class="chat-user-item position-relative d-flex align-items-center text-decoration-none border-bottom
                                           {{ $hasUnreadMessages ? 'unread-messages' : '' }}">
                                     <div class="me-3 position-relative">
                                         @if($user->photo)
-                                            <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}" 
-                                                 class="rounded-circle shadow-sm" width="64" height="64" style="object-fit: cover;">
+                                            <img src="data:image/jpeg;base64,{{ base64_encode($user->photo) }}" 
+                                                 alt="{{ $user->name }}" 
+                                                 class="rounded-circle shadow-sm"
+                                                 width="40" height="40"
+                                                 style="object-fit: cover;">
                                         @else
-                                            <img src="{{ asset('assets/img/default-avatar.png') }}" alt="No Profile" 
-                                                 class="rounded-circle shadow-sm" width="64" height="64">
+                                            <img src="{{ asset('assets/img/default-avatar.png') }}" 
+                                                 alt="No Profile" 
+                                                 class="rounded-circle shadow-sm"
+                                                 width="40" height="40">
                                         @endif
                                     </div>    
                                     <div class="flex-grow-1 min-width-0">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
                                             <div class="d-flex align-items-center">
                                                 <h5 class="mb-0 text-truncate {{ $hasUnreadMessages ? 'fw-bold' : '' }}" 
-                                                    style="font-size: 1.35rem;">
+                                                    style="font-size: 0.95rem;">
                                                     {{ $user->name }}
                                                 </h5>
                                             </div>
-                                            <small class="text-muted" style="font-size: 1.1rem;">
+                                            <small class="text-muted" style="font-size: 0.8rem;">
                                                 @if($user->lastMessage)
                                                     {{ \Carbon\Carbon::parse($user->lastMessage->created_at)
                                                         ->timezone(config('app.timezone'))
@@ -70,7 +78,7 @@
                                             </small>
                                         </div>
                                         <p class="mb-0 text-truncate {{ $hasUnreadMessages ? 'fw-semibold' : '' }}" 
-                                           style="font-size: 1.15rem;">
+                                           style="font-size: 0.85rem;">
                                             @if($user->lastMessage)
                                                 @if($user->lastMessage->sender_id === auth()->id())
                                                     You: {{ $user->lastMessage->message }}
@@ -88,7 +96,7 @@
                     </div>
                     
                     <!-- Empty State for Chat Window -->
-                    <div class="col-md-6 col-lg-8 d-none d-md-flex flex-column" style="height: 100%; overflow: hidden;">
+                    <div class="col-md-6 col-lg-8 d-none d-md-flex flex-column bg-light">
                         <!-- Chat Header -->
                         <div class="chat-header bg-white border-bottom p-3 d-flex align-items-center">
                             <div class="d-flex align-items-center">
@@ -103,35 +111,29 @@
                             </div>
                         </div>
 
-                        <!-- Chat Body -->
-                        <div class="chat-body flex-grow-1" style="background-color: #f8f9fa; overflow-y: auto;">
-                            <div id="messages-container" class="p-4">
-                                @foreach($messages ?? [] as $message)
-                                    <div class="message mb-3 {{ $message->sender_id == auth()->id() ? 'sent' : 'received' }}">
-                                        <div class="message-bubble p-3 rounded-3 {{ $message->sender_id == auth()->id() ? 'bg-primary text-white' : 'bg-white' }}">
-                                            <p class="mb-1">{{ $message->message }}</p>
-                                            <small class="text-{{ $message->sender_id == auth()->id() ? 'light' : 'muted' }}">
-                                                {{ \Carbon\Carbon::parse($message->created_at)
-                                                    ->timezone(config('app.timezone'))
-                                                    ->format('h:i A') }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                @endforeach
+                        <!-- Empty State Body -->
+                        <div class="flex-grow-1 d-flex align-items-center justify-content-center p-4">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="100" height="100" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+                                        <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-muted">Select a conversation</h3>
+                                <p class="text-muted">Choose a contact from the left to start messaging</p>
                             </div>
                         </div>
 
                         <!-- Chat Footer -->
-                        <div class="chat-footer bg-white border-top p-3">
-                            <form id="message-form" class="message-form">
-                                @csrf
-                                <div class="input-group input-group-lg">
-                                    <input type="text" class="form-control border-0" id="message-input" name="message" placeholder="Type your message..." style="font-size: 1.2rem;">
-                                    <button class="btn btn-primary" type="submit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                                    </button>
-                                </div>
-                            </form>
+                        <div class="p-3 bg-white border-top">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Type your message..." disabled>
+                                <button class="btn btn-primary" type="button" disabled>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -142,75 +144,135 @@
 
 @push('styles')
 <style>
-    .message {
-        max-width: 80%;
-    }
-    .message.sent {
-        margin-left: auto;
-    }
-    .message.received {
-        margin-right: auto;
-    }
-    .message-bubble {
-        display: inline-block;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    .sent .message-bubble {
-        border-radius: 15px 15px 0 15px !important;
-    }
-    .received .message-bubble {
-        border-radius: 15px 15px 15px 0 !important;
-    }
-    #messages-container {
+    .page-wrapper {
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        overflow: hidden;
     }
+
+    .page-body {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .container-xl {
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .card {
+        height: calc(100vh - 13rem);
+        overflow: hidden !important;
+        border-radius: 0;
+    }
+
+    .chat-users {
+        height: calc(100% - 60px);
+        overflow-y: auto;
+    }
+
+    .chat-users::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .chat-users::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-users::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 4px;
+    }
+
     .chat-user-item {
         transition: all 0.2s ease;
-        position: relative;
-        background-color: #ffffff;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-    .chat-user-item.unread-messages {
-        background-color: #e8f0fe !important;
-        border-left: 4px solid #206bc4;
+
+    .chat-user-item img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
     }
-    .chat-user-item.unread-messages h5 {
-        color: #206bc4 !important;
-    }
-    .chat-user-item.unread-messages p {
-        color: #1a1a1a !important;
-    }
+
     .chat-user-item:hover {
-        background-color: #f8f9fa;
+        background-color: rgba(32, 107, 196, 0.03);
     }
-    .chat-user-item.unread-messages:hover {
-        background-color: #dae7fd !important;
+
+    .chat-user-item.active {
+        background-color: rgba(32, 107, 196, 0.06);
     }
-    .chat-user-item .position-absolute.bg-danger {
-        width: 12px;
-        height: 12px;
-        border: 2px solid #fff;
-        box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.3);
+
+    .icon-tabler-messages {
+        width: 80px;
+        height: 80px;
     }
-    .chat-user-item.unread-messages .text-muted {
-        color: #2c3338 !important;
+
+    h3.text-muted {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    p.text-muted {
+        font-size: 0.9rem;
+    }
+
+    .input-group {
+        font-size: 0.875rem;
+    }
+
+    .input-group .form-control {
+        height: 32px;
+    }
+
+    .input-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .row {
+        margin: 0;
+    }
+
+    .col-12, .col-md-6, .col-lg-4, .col-lg-8 {
+        padding: 0;
+    }
+
+    .page-header {
+        margin: 0;
+        padding: 1rem 0;
+    }
+
+    .page-body {
+        padding: 0;
+    }
+
+    .container-xl > .card {
+        margin: 0;
+    }
+
+    .chat-user-item.unread-messages h5 {
+        color: #206bc4;
+    }
+
+    .chat-user-item.unread-messages p {
+        color: #1a1a1a;
         font-weight: 500;
     }
-    .chat-user-item.unread-messages h5 {
-        color: #206bc4 !important;
+
+    .chat-user-item:not(.unread-messages) h5 {
+        color: #1a1a1a;
     }
-    .chat-user-item .badge.bg-danger {
-        font-size: 0.85rem;
-        padding: 0.35em 0.65em;
-        font-weight: 600;
-        background-color: #dc3545 !important;
+
+    .chat-user-item:not(.unread-messages) p {
+        color: #6c757d;
     }
-    .chat-user-item.active {
-        background-color: rgba(32, 107, 196, 0.1);
-    }
-    .chat-user-item:hover {
-        transform: translateX(4px);
+
+    /* Add shadow to images */
+    .rounded-circle.shadow-sm {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
 </style>
 @endpush

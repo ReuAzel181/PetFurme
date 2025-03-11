@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -40,7 +41,9 @@ class UserController extends Controller
             'admin' => 'Admins',
         ];
     
-        return view('users.index', compact('users', 'roles', 'role'));
+        $products = Product::select('id', 'name', 'selling_price')->get();
+    
+        return view('users.index', compact('users', 'roles', 'role', 'products'));
     }
 
     // Display pet owners
@@ -77,43 +80,50 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20',
-            'pet_name' => 'nullable|string|max:255',
-            'pet_type' => 'nullable|string|max:255',
             'store_name' => 'nullable|string|max:255',
             'store_address' => 'nullable|string|max:255',
             'store_email' => 'nullable|string|email|max:255',
             'password' => 'required|string|min:8',
             'role' => 'required|string|in:admin,sub_admin,pet_owner',
-            'photo' => 'nullable|image|max:2048', // Max size: 2MB
+            'photo_binary' => 'required|string', // Base64 encoded image
         ]);
-    
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-    
-        // Handle file upload
-        $photoPath = null;
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('user_photos', 'public');
+
+        try {
+            // Convert base64 to binary
+            $photoBinary = null;
+            if ($request->photo_binary) {
+                // Remove the "data:image/jpeg;base64," part
+                $base64Image = preg_replace('/^data:image\/\w+;base64,/', '', $request->photo_binary);
+                $photoBinary = base64_decode($base64Image);
+            }
+
+            // Create the user
+            $user = User::create([
+                'username' => $request->username,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone ?? null,
+                'store_name' => $request->store_name ?? null,
+                'store_address' => $request->store_address ?? null,
+                'store_email' => $request->store_email ?? null,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+            ]);
+
+            // Update photo separately to handle binary data
+            if ($photoBinary) {
+                $user->update(['photo' => $photoBinary]);
+            }
+
+            return redirect()->route('users.index')->with('success', 'User created successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error creating user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error creating user. Please try again.');
         }
-    
-        // Create the user
-        User::create([
-            'username' => $request->username,
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone ?? 'N/A',
-            'pet_name' => $request->pet_name ?? 'N/A',
-            'pet_type' => $request->pet_type ?? 'N/A',
-            'store_name' => $request->store_name ?? 'N/A',
-            'store_address' => $request->store_address ?? 'N/A',
-            'store_email' => $request->store_email ?? 'N/A',
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'photo' => $photoPath,
-        ]);
-    
-        return redirect()->route('user-management.index')->with('success', 'User created successfully.');
     }
     
 
@@ -136,36 +146,41 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
+            'photo_binary' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
-            return redirect()
-                ->back()
-                ->withErrors($validator)
-                ->withInput();
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Handle photo upload if a new photo is provided
-        if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($user->photo) {
-                Storage::disk('public')->delete($user->photo);
+        try {
+            // Handle binary photo upload
+            if ($request->photo_binary) {
+                $base64Image = preg_replace('/^data:image\/\w+;base64,/', '', $request->photo_binary);
+                $photoBinary = base64_decode($base64Image);
+                $user->photo = $photoBinary;
             }
-            
-            // Store new photo
-            $user->photo = $request->file('photo')->store('user_photos', 'public');
+            // Handle traditional file upload
+            elseif ($request->hasFile('photo')) {
+                if ($user->photo && is_string($user->photo)) {
+                    Storage::disk('public')->delete($user->photo);
+                }
+                $user->photo = $request->file('photo')->store('user_photos', 'public');
+            }
+
+            $user->username = $request->username;
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->save();
+
+            return redirect()
+                ->route('users.index')
+                ->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error updating user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error updating user. Please try again.');
         }
-
-        // Update user fields
-        $user->username = $request->username;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->phone;
-        $user->save();
-
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'User updated successfully.');
     }
 
     // Delete a user
@@ -208,5 +223,32 @@ class UserController extends Controller
         ]);
 
         return back()->with('success', 'User has been verified successfully.');
+    }
+
+    public function getPhoto($id)
+    {
+        $user = User::findOrFail($id);
+        
+        if (!$user->photo) {
+            abort(404);
+        }
+        
+        // If it's a file path, redirect to the file
+        if (is_string($user->photo) && (str_starts_with($user->photo, 'user_photos/') || str_starts_with($user->photo, 'storage/'))) {
+            return redirect(asset('storage/' . $user->photo));
+        }
+        
+        // Otherwise, serve the binary data
+        try {
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $contentType = $finfo->buffer($user->photo) ?: 'image/jpeg';
+            
+            return response($user->photo)
+                ->header('Content-Type', $contentType)
+                ->header('Cache-Control', 'public, max-age=3600');
+        } catch (\Exception $e) {
+            \Log::error('Error serving photo: ' . $e->getMessage());
+            abort(404);
+        }
     }
 }

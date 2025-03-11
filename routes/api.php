@@ -33,9 +33,36 @@
 
     Route::get('products/', [ProductController::class, 'index'])->name('api.product.index');
 
-    Route::get('/users/{user}/pets', function (App\Models\User $user) {
-        return $user->pets;
-    })->name('api.user.pets');
+    Route::middleware(['auth', 'verified'])->group(function () {
+        // Only keep this route for pets
+        Route::get('/users/{user}/pets', function($user) {
+            try {
+                $pets = \App\Models\Pet::where('user_id', $user)
+                    ->select('id', 'name', 'category', 'breed', 'age', 'weight', 'gender', 'photo')
+                    ->get()
+                    ->map(function($pet) {
+                        return [
+                            'id' => $pet->id,
+                            'name' => $pet->name,
+                            'category' => $pet->category,
+                            'breed' => $pet->breed,
+                            'age' => $pet->age,
+                            'weight' => $pet->weight,
+                            'gender' => $pet->gender,
+                            'photo_url' => $pet->photo ? asset('storage/' . $pet->photo) : asset('storage/defaults/paw.png')
+                        ];
+                    });
+                
+                return response()->json(['pets' => $pets]);
+            } catch (\Exception $e) {
+                \Log::error('Error fetching pets', [
+                    'user_id' => $user,
+                    'error' => $e->getMessage()
+                ]);
+                return response()->json(['error' => 'Failed to load pets'], 500);
+            }
+        })->name('api.user.pets');
+    });
 
     Route::get('/statistics', [DashboardController::class, 'getStatistics'])->name('api.statistics');
 
@@ -67,8 +94,6 @@
         return response()->json($history);
     });
 
-    Route::get('/owners/{owner}', [OwnerApiController::class, 'show']);
-    Route::get('/owners/{owner}/pets', [OwnerApiController::class, 'pets']);
-    Route::get('/pets/{pet}', [PetApiController::class, 'show']);
+    Route::get('/pets/{pet}', [App\Http\Controllers\Api\PetApiController::class, 'show']);
 
     Route::get('products/{product}/binary-image', [ProductImageController::class, 'getBinaryImage']);

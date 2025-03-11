@@ -45,7 +45,7 @@
                                                 <label for="photo" class="photo-upload-label cursor-pointer">
                                                     <div class="position-relative">
                                                         <img id="preview" 
-                                                             src="{{ $pet->photo_url }}" 
+                                                             src="{{ $pet->photo_data ? $pet->photo_data : ($pet->photo ? Storage::url($pet->photo) : asset('images/default-pet.png')) }}" 
                                                              class="rounded-circle shadow-sm" 
                                                              style="width: 300px; height: 300px; object-fit: cover; border: 3px solid #e4e6ef;">
                                                         <div class="upload-overlay rounded-circle">
@@ -65,7 +65,7 @@
                                                     Recommended: Square image, max 2MB
                                                 </span>
                                             </div>
-                                            @if($pet->photo && Storage::disk('public')->exists($pet->photo))
+                                            @if($pet->photo_data || ($pet->photo && Storage::disk('public')->exists($pet->photo)))
                                                 <div class="mt-2">
                                                     <button type="button" class="btn btn-danger" onclick="removePhoto()">
                                                         <i class="fas fa-trash me-1"></i> Remove Photo
@@ -264,6 +264,73 @@ document.getElementById('ownerSelect').addEventListener('change', function() {
     formElements.forEach(element => {
         element.disabled = !this.value;
     });
+});
+
+// Add form submission handler for success message
+document.getElementById('petForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Convert photo to binary data if a file is selected
+    const photoInput = document.getElementById('photo');
+    if (photoInput.files && photoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Create a hidden input to store the binary data
+            const binaryInput = document.createElement('input');
+            binaryInput.type = 'hidden';
+            binaryInput.name = 'photo_binary';
+            binaryInput.value = e.target.result;
+            document.getElementById('petForm').appendChild(binaryInput);
+            
+            // Now submit the form
+            submitForm();
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+    } else {
+        submitForm();
+    }
+    
+    function submitForm() {
+        const form = document.getElementById('petForm');
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Pet information has been updated successfully.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = "{{ route('pets.index') }}";
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message || 'Something went wrong.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'An unexpected error occurred.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
 });
 </script>
 @endsection

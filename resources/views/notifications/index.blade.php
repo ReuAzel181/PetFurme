@@ -85,46 +85,50 @@
                 </div>
 
                 <!-- New Expiration Alerts Card -->
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header">
-                        <h3 class="card-title">
-                            {{ __('Expiration Alerts') }}
-                        </h3>
+                        <h3 class="card-title">{{ __('System Notifications') }}</h3>
+                        <span class="badge bg-blue ms-2">{{ $systemNotifications->count() }}</span>
                     </div>
                     <div class="card-body">
-                        @if($expiringProducts->isEmpty())
-                            <p>{{ __('No products are near expiration.') }}</p>
+                        @if($systemNotifications->isEmpty())
+                            <div class="empty">
+                                <div class="empty-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bell" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+                                        <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+                                    </svg>
+                                </div>
+                                <p class="empty-title">{{ __('No new notifications') }}</p>
+                                <p class="empty-subtitle text-muted">
+                                    {{ __('You\'re all caught up!') }}
+                                </p>
+                            </div>
                         @else
-                            <div class="list-group">
-                                @foreach($expiringProducts as $product)
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h3 class="mb-1">{{ $product->name }}</h3>
-                                            <p class="mb-1">
-                                                {{ __('Expires: ') }} {{ $product->expiry_date->format('M d, Y') }}
-                                                <br>
-                                                <small class="text-muted">
-                                                    {{ $product->expiry_date->diffForHumans() }}
-                                                </small>
-                                            </p>
+                            <div class="list-group list-group-flush">
+                                @foreach($systemNotifications as $notification)
+                                    <div class="list-group-item">
+                                        <div class="row align-items-center">
+                                            <div class="col-auto">
+                                                <span class="bg-blue text-white avatar">
+                                                    @if(str_contains($notification->type, 'pet'))
+                                                        🐾
+                                                    @else
+                                                        👤
+                                                    @endif
+                                                </span>
+                                            </div>
+                                            <div class="col text-truncate">
+                                                <p class="text-truncate">
+                                                    {{ $notification->data['message'] }}
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        {{ $notification->created_at->diffForHumans() }}
+                                                    </small>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <span class="badge 
-                                            @if($product->expiry_date->isPast()) 
-                                                bg-danger
-                                            @elseif($product->expiry_date->diffInDays(now()) <= 30) 
-                                                bg-warning
-                                            @else 
-                                                bg-info
-                                            @endif 
-                                            rounded-pill">
-                                            @if($product->expiry_date->isPast())
-                                                {{ __('Expired') }}
-                                            @elseif($product->expiry_date->diffInDays(now()) <= 30)
-                                                {{ __('Expires Soon') }}
-                                            @else
-                                                {{ __('Upcoming Expiration') }}
-                                            @endif
-                                        </span>
                                     </div>
                                 @endforeach
                             </div>

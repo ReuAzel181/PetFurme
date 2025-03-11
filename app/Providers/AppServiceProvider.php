@@ -7,6 +7,7 @@ use App\Breadcrumbs\Breadcrumbs;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,5 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Register cookie-consent component
         Blade::component('cookie-consent', \App\View\Components\CookieConsent::class);
+
+        DB::statement('SET NAMES utf8mb4');
     }
 }

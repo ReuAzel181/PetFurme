@@ -10,9 +10,9 @@
 ])
 
 <div class="card modern-analytics-card" onclick="navigateTo('{{ $route ?? '#' }}')">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-            <div class="d-flex align-items-center gap-3">
+    <div class="card-body p-0">
+        <div class="analytics-top-content">
+            <div class="analytics-icon-text">
                 @if($icon)
                     <div class="analytics-icon" style="background: var(--tblr-{{ $color }})">
                         <i class="{{ $icon }}"></i>
@@ -23,14 +23,16 @@
                         @endif
                     </div>
                 @endif
-                <div>
+                <div class="analytics-text-content">
                     <h3 class="analytics-value mb-0">
                         @switch($title)
                             @case("Today's Orders")
-                                {{ $value }} {{ $value == 1 ? 'Order' : 'Orders' }}
+                                <span class="analytics-value-number">{{ $value }}</span>
+                                <span class="analytics-value-text">{{ $value == 1 ? 'Order' : 'Orders' }}</span>
                                 @break
                             @default
-                                {{ $value }} {{ $value == 1 ? Str::singular($title) : Str::plural($title) }}
+                                <span class="analytics-value-number">{{ $value }}</span>
+                                <span class="analytics-value-text">{{ $value == 1 ? Str::singular($title) : Str::plural($title) }}</span>
                         @endswitch
                     </h3>
                     <div class="analytics-title">
@@ -73,7 +75,7 @@
                 </div>
             @endif
         </div>
-        <div class="analytics-context text-muted">
+        <div class="analytics-context">
             @switch($title)
                 @case('Total Pets')
                     @if($trend === 'up')
@@ -118,99 +120,141 @@
 
 <style>
 .modern-analytics-card {
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    transition: all 0.3s ease;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    padding: 0.8rem;
-}
-
-.modern-analytics-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-    z-index: 1;
+    padding: 1.25rem;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
 }
 
 .modern-analytics-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 .analytics-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     position: relative;
 }
 
 .analytics-value {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #1e293b;
+    color: #000000;
     line-height: 1.2;
+    margin-bottom: 0.2rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.analytics-value-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000000;
+}
+
+.analytics-value-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #000000;
 }
 
 .analytics-title {
-    color: var(--tblr-muted);
-    font-size: 1rem;
-    font-weight: 500;
-    margin-top: -2px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 400;
+    margin-top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.01em;
 }
 
 .trend-indicator {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 16px;
+    font-size: 0.75rem;
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.25rem;
     cursor: help;
     margin-top: 0.25rem;
+    width: fit-content;
+    max-width: 90px;
+    text-align: center;
 }
 
 .trend-indicator.positive {
-    background: rgba(46, 202, 106, 0.1);
-    color: var(--tblr-success);
+    background: rgba(46, 202, 106, 0.2);
+    color: #2e7d32;
 }
 
 .trend-indicator.negative {
-    background: rgba(255, 71, 87, 0.1);
-    color: var(--tblr-danger);
+    background: rgba(255, 71, 87, 0.2);
+    color: #c62828;
 }
 
 .analytics-context {
     font-size: 0.8rem;
-    line-height: 1.4;
-    margin-top: 0.75rem;
+    line-height: 1.3;
+    margin-top: 0.5rem;
     color: #64748b;
-    padding-left: calc(48px + 1rem); /* Icon width + gap */
+    padding-left: calc(42px + 0.75rem);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1;
+    font-weight: 400;
 }
 
 .today-count {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background: var(--tblr-primary);
+    top: -6px;
+    right: -6px;
+    background: #007bff;
     color: white;
-    border-radius: 12px;
-    padding: 2px 6px;
+    border-radius: 10px;
+    padding: 1px 4px;
     font-size: 0.7rem;
     font-weight: 600;
     border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.analytics-top-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.25rem;
+}
+
+.analytics-icon-text {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.analytics-text-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 </style>
 

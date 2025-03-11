@@ -8,20 +8,18 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('appointments', function (Blueprint $table) {
+        Schema::create('appointment', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('pet_id')->constrained()->onDelete('cascade');
-            $table->datetime('appointment_date');
-            $table->string('service_type');
-            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
+            $table->dateTime('appointment_date');
             $table->text('notes')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('appointments');
+        Schema::dropIfExists('appointment');
     }
 }; 

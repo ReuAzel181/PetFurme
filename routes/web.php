@@ -90,36 +90,32 @@ Route::resource('messages', MessageController::class);
 Route::middleware(['auth', 'verified'])->group(function () {
     // ... other routes ...
     
-    // Pets API route
+    // Pets API route - simplified to only return necessary data
     Route::get('/api/users/{user}/pets', function($user) {
         try {
-            \Log::info('Fetching pets for user', ['user_id' => $user]);
-            
-            // First get the user details
-            $userData = \App\Models\User::find($user);
-            
-            // Then get the pets with category
             $pets = \App\Models\Pet::where('user_id', $user)
-                ->select('id', 'name', 'category', 'age')
-                ->get();
+                ->select('id', 'name', 'category', 'breed', 'age', 'weight', 'gender', 'photo')
+                ->get()
+                ->map(function($pet) {
+                    return [
+                        'id' => $pet->id,
+                        'name' => $pet->name,
+                        'category' => $pet->category,
+                        'breed' => $pet->breed,
+                        'age' => $pet->age,
+                        'weight' => $pet->weight,
+                        'gender' => $pet->gender,
+                        'photo_url' => $pet->photo ? asset('storage/' . $pet->photo) : asset('storage/defaults/paw.png')
+                    ];
+                });
             
-            \Log::info('Found pets', ['count' => $pets->count(), 'pets' => $pets->toArray()]);
-            
-            return response()->json([
-                'user' => [
-                    'name' => $userData ? $userData->name : 'No Account',
-                    'has_account' => !is_null($userData)
-                ],
-                'pets' => $pets
-            ]);
+            return response()->json(['pets' => $pets]);
         } catch (\Exception $e) {
             \Log::error('Error fetching pets', [
                 'user_id' => $user,
                 'error' => $e->getMessage()
             ]);
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['error' => 'Failed to load pets'], 500);
         }
     })->name('api.user.pets');
 });
@@ -741,3 +737,29 @@ Route::post('/messages/mark-as-read/{userId}', [MessageController::class, 'markA
 
 Route::post('/appointments/delete-multiple', [AppointmentController::class, 'deleteMultiple'])->name('appointment.deleteMultiple');
 Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointment.updateStatus');
+
+Route::get('/user/photo/{id}', [UserController::class, 'getPhoto'])->name('user.photo');
+
+Route::get('/pet-photo/{id}', function($id) {
+    $pet = App\Models\Pet::find($id);
+    if (!$pet || (!$pet->photo_data && !$pet->photo)) {
+        return response()->file(public_path('images/default-pet.png'));
+    }
+    
+    if ($pet->photo_data) {
+        // Check if the data is already a complete data URL
+        if (strpos($pet->photo_data, 'data:') === 0) {
+            // Data is already in correct format, extract the base64 part
+            $base64Data = preg_replace('/data:.*?;base64,/', '', $pet->photo_data);
+        } else {
+            // Data is raw base64, use as is
+            $base64Data = $pet->photo_data;
+        }
+        
+        $decodedData = base64_decode($base64Data);
+        return response($decodedData)->header('Content-Type', 'image/jpeg');
+    } else {
+        // Fall back to the file path
+        return response()->file(storage_path('app/public/' . $pet->photo));
+    }
+})->name('pet.photo');

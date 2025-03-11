@@ -12,16 +12,13 @@ class PetController extends Controller
     // Display a listing of the pets
     public function index()
     {
-        $pendingPets = Pet::whereNull('verified_by')
-                          ->with(['user', 'creator'])
-                          ->latest()
-                          ->get();
-                          
-        $pets = Pet::whereNotNull('verified_by')
-                   ->with(['user', 'appointments', 'creator', 'verifier'])
-                   ->get();
+        // Fetch all pets with their relationships
+        $pets = Pet::with(['user', 'creator', 'verifier'])
+            ->whereNull('deleted_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        return view('pet.index', compact('pets', 'pendingPets'));
+        return view('pet.index', compact('pets'));
     }
 
     public function edit(Pet $pet)
@@ -101,57 +98,61 @@ class PetController extends Controller
         }
     }
 
-    public function update(Request $request, Pet $pet)
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'category' => 'required|string',
-            'type' => 'required|string|max:255',
+        // Validate the request
+        $validatedData = $request->validate([
             'user_id' => 'nullable|exists:users,id',
-            'owner_name' => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'breed' => 'nullable|string|max:255',
-            'gender' => 'nullable|in:Male,Female',
+            'gender' => 'nullable|string|max:255',
             'age' => 'nullable|numeric',
+            'age_unit' => 'nullable|string|in:months,years',
             'weight' => 'nullable|numeric',
             'allergies' => 'nullable|string',
             'notes' => 'nullable|string',
             'photo' => 'nullable|image|max:2048',
+            'remove_photo' => 'nullable|boolean',
+            'photo_binary' => 'nullable|string',
         ]);
 
-        // Update the pet with all fields
-        $updateData = [
-            'name' => $request->name,
-            'category' => $request->category,
-            'type' => $request->type,
-            'breed' => $request->breed,
-            'gender' => $request->gender,
-            'age' => $request->age,
-            'weight' => $request->weight,
-            'allergies' => $request->allergies,
-            'notes' => $request->notes,
-        ];
+        $pet = Pet::findOrFail($id);
 
-        // Handle user_id and owner_name separately
-        if ($request->filled('user_id')) {
-            $updateData['user_id'] = $request->user_id;
-            $updateData['owner_name'] = null;
-        } else {
-            $updateData['user_id'] = null;
-            $updateData['owner_name'] = $request->owner_name;
-        }
-
-        // Handle photo update
-        if ($request->hasFile('photo')) {
-            if ($pet->photo) {
-                Storage::disk('public')->delete($pet->photo);
+        // Handle age conversion
+        if (isset($validatedData['age']) && isset($validatedData['age_unit'])) {
+            if ($validatedData['age_unit'] == 'years') {
+                $validatedData['age'] = $validatedData['age'] * 12; // Convert years to months
             }
-            $photoPath = $request->file('photo')->store('pet_photos', 'public');
-            $updateData['photo'] = $photoPath;
+            unset($validatedData['age_unit']); // Remove age_unit as it's not a column in the database
         }
 
-        $pet->update($updateData);
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            // We'll use the binary data from photo_binary instead
+            unset($validatedData['photo']);
+        } elseif ($request->input('remove_photo') == '1') {
+            $validatedData['photo'] = null;
+            $validatedData['photo_data'] = null;
+        }
 
-        return redirect()->route('pets.index')->with('success', 'Pet updated successfully!');
+        // Handle binary photo data
+        if ($request->has('photo_binary')) {
+            $validatedData['photo_data'] = $request->input('photo_binary');
+            $validatedData['photo'] = $request->input('photo_binary');
+            unset($validatedData['photo_binary']);
+        }
+
+        // Remove remove_photo from validated data as it's not a column in the database
+        unset($validatedData['remove_photo']);
+
+        $pet->update($validatedData);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->route('pets.index')->with('success', 'Pet updated successfully');
     }
 
     // Remove the specified pet from storage
@@ -281,15 +282,15 @@ class PetController extends Controller
         ]);
     }
 
-    public function verify(Request $request, Pet $pet)
+    public function verify(Pet $pet)
     {
-        if ($request->status === 'approved') {
-            $pet->update([
-                'verified_by' => auth()->id()
-            ]);
-            return response()->json(['success' => true]);
-        }
-        
-        return response()->json(['success' => false], 422);
+        $pet->update([
+            'verified_by' => auth()->id()
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pet verified successfully'
+        ]);
     }
 }

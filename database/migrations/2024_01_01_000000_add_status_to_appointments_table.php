@@ -8,14 +8,16 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('appointments', function (Blueprint $table) {
-            $table->string('status')->default('pending')->after('appointment_date');
+        Schema::table('appointment', function (Blueprint $table) {
+            if (!Schema::hasColumn('appointment', 'status')) {
+                $table->string('status')->default('pending')->after('appointment_date');
+            }
         });
     }
 
     public function down()
     {
-        Schema::table('appointments', function (Blueprint $table) {
+        Schema::table('appointment', function (Blueprint $table) {
             $table->dropColumn('status');
         });
     }

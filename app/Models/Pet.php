@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Notifications\SystemNotification;
 
 class Pet extends Model
 {
@@ -16,19 +18,23 @@ class Pet extends Model
         'name',
         'category',
         'type',
-        'breed',
         'gender',
+        'breed',
         'age',
         'weight',
         'allergies',
         'notes',
         'photo',
+        'size',
+        'created_by',
         'verified_by'
     ];
 
     protected $casts = [
         'age' => 'integer',
-        'weight' => 'float'
+        'weight' => 'float',
+        'photo_data' => 'string',
+        'photo' => 'string',
     ];
 
     public function user()
@@ -58,9 +64,20 @@ class Pet extends Model
 
     public function getPhotoUrlAttribute()
     {
-        if ($this->photo && Storage::disk('public')->exists($this->photo)) {
-            return asset('storage/' . $this->photo);
+        if (!$this->photo) {
+            return asset('images/default-pet.png');
         }
+
+        if (Str::startsWith($this->photo, ['http://', 'https://'])) {
+            return $this->photo;
+        }
+
+        if (Str::startsWith($this->photo, 'uploads/')) {
+            return Storage::disk('public')->exists($this->photo) 
+                ? asset('storage/' . $this->photo)
+                : asset('images/default-pet.png');
+        }
+
         return asset('images/default-pet.png');
     }
 
@@ -80,5 +97,24 @@ class Pet extends Model
     public function verifier()
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($pet) {
+            Notification::create([
+                'id' => Str::uuid(),
+                'type' => 'new_pet',
+                'notifiable_type' => 'App\\Models\\Pet',
+                'notifiable_id' => $pet->id,
+                'data' => [
+                    'message' => "New pet registered: {$pet->name}",
+                    'pet_id' => $pet->id
+                ],
+                'user_id' => auth()->id(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        });
     }
 }

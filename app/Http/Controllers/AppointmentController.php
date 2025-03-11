@@ -18,7 +18,9 @@ class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = Appointment::with(['user', 'pet', 'creator', 'confirmer'])
+        $appointments = Appointment::with(['user', 'pet', 'creator', 'confirmer', 'pet' => function($query) {
+            $query->select('id', 'name', 'photo', 'photo_data');
+        }])
             ->latest()
             ->get();
     

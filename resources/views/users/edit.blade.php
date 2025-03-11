@@ -117,13 +117,21 @@
                                 <label class="form-label">Profile Photo</label>
                                 @if($user->photo)
                                     <div class="mb-3">
-                                        <img src="{{ asset('storage/' . $user->photo) }}" 
-                                             alt="Current Profile Photo" 
-                                             class="avatar avatar-xl mb-3">
+                                        @if(is_string($user->photo) && (str_starts_with($user->photo, 'user_photos/') || str_starts_with($user->photo, 'storage/')))
+                                            <img src="{{ asset('storage/' . $user->photo) }}" 
+                                                 alt="Current Profile Photo" 
+                                                 class="avatar avatar-xl mb-3">
+                                        @else
+                                            <img src="data:image/jpeg;base64,{{ base64_encode($user->photo) }}" 
+                                                 alt="Current Profile Photo" 
+                                                 class="avatar avatar-xl mb-3">
+                                        @endif
                                     </div>
                                 @endif
                                 <input type="file" class="form-control @error('photo') is-invalid @enderror" 
-                                       id="photo" name="photo" accept="image/*">
+                                       id="photo" name="photo" accept="image/*"
+                                       onchange="validateAndConvertImage(this)">
+                                <input type="hidden" name="photo_binary" id="photo_binary">
                                 <small class="form-text text-muted">Leave blank to keep current photo</small>
                                 @error('photo')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -163,4 +171,22 @@
         border-top: 1px solid #e6e7e9;
     }
 </style>
+
+@push('scripts')
+<script>
+function validateAndConvertImage(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            document.getElementById('photo_binary').value = e.target.result;
+        };
+        
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+@endpush
+
 @endsection

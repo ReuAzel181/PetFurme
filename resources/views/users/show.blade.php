@@ -27,11 +27,9 @@
                                     {{ __('Profile Image') }}
                                 </h3>
 
-                                <img id="image-preview"
-                                     class="img-account-profile mb-2"
-                                     src="{{ asset('assets/img/demo/user-placeholder.svg') }}"
-                                     alt=""
-                                >
+                                <img src="{{ $user->photo_url }}" 
+                                     alt="{{ $user->name }}'s photo"
+                                     class="avatar avatar-xl">
                             </div>
                         </div>
                     </div>

@@ -71,9 +71,9 @@
                             <div class="row">
                                 <!-- Email -->
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label required">Email</label>
+                                    <label class="form-label">Email</label>
                                     <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                           id="email" name="email" value="{{ old('email') }}" required>
+                                           id="email" name="email" value="{{ old('email') }}">
                                     @error('email')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -81,9 +81,9 @@
 
                                 <!-- Phone -->
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label required">Phone</label>
+                                    <label class="form-label">Phone</label>
                                     <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
-                                           id="phone" name="phone" value="{{ old('phone') }}" required>
+                                           id="phone" name="phone" value="{{ old('phone') }}">
                                     @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -113,7 +113,9 @@
                             <div class="mb-4">
                                 <label class="form-label required">Profile Photo</label>
                                 <input type="file" class="form-control @error('photo') is-invalid @enderror" 
-                                       id="photo" name="photo" required accept="image/*">
+                                       id="photo" name="photo" required accept="image/*"
+                                       onchange="validateAndConvertImage(this)">
+                                <input type="hidden" name="photo_binary" id="photo_binary">
                                 @error('photo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -152,3 +154,20 @@
     }
 </style>
 @endsection
+
+@push('scripts')
+<script>
+function validateAndConvertImage(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            document.getElementById('photo_binary').value = e.target.result;
+        };
+        
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+@endpush

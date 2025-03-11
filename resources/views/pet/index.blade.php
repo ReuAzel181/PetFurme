@@ -1,7 +1,9 @@
 @extends('layouts.tabler')
 
 @section('content')
+<!-- Header Section -->
 <div class="container-fluid">
+    <!-- Page Title and Add Button -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="container-xl">
             <div class="row">
@@ -23,10 +25,12 @@
         </a>
     </div>
 
-    <!-- Add Tab Navigation -->
+    <!-- Tab Navigation -->
     <div class="card mb-3">
         <div class="card-header">
+            <!-- Tab Links -->
             <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">
+                <!-- Verified Pets Tab -->
                 <li class="nav-item">
                     <a href="#verified" class="nav-link active" data-bs-toggle="tab">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
@@ -34,25 +38,35 @@
                             <path d="M5 12l5 5l10 -10" />
                         </svg>
                         Verified Pets
+                        <span class="badge bg-blue-lt ms-2">
+                            {{ $pets->where('verified_by', '!=', null)->count() }}
+                        </span>
                     </a>
                 </li>
+                <!-- Pending Verification Tab -->
                 <li class="nav-item">
-                    <a href="#unverified" class="nav-link" data-bs-toggle="tab">
+                    <a href="#unverified" class="nav-link position-relative" data-bs-toggle="tab">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
                             <path d="M12 7v5l3 3" />
                         </svg>
                         Pending Verification
+                        @php $pendingCount = $pets->where('verified_by', null)->count() @endphp
+                        @if($pendingCount > 0)
+                            <span class="badge bg-red ms-2">{{ $pendingCount }}</span>
+                        @endif
                     </a>
                 </li>
             </ul>
         </div>
+
+        <!-- Tab Content -->
         <div class="card-body">
             <div class="tab-content">
-                <!-- Verified Pets Tab -->
+                <!-- Verified Pets Tab Content -->
                 <div class="tab-pane active show" id="verified">
-                    <!-- Add Toggle Buttons -->
+                    <!-- Filter Buttons -->
                     <div class="btn-group mb-3">
                         <input type="radio" class="btn-check" name="pet-filter" id="all-pets" checked>
                         <label class="btn btn-outline-primary" for="all-pets">All Pets</label>
@@ -64,7 +78,9 @@
                         <label class="btn btn-outline-primary" for="owner-added">Added by Owners</label>
                     </div>
 
+                    <!-- Verified Pets Table -->
                     @if($pets->where('verified_by', '!=', null)->isEmpty())
+                        <!-- Empty State -->
                         <div class="empty">
                             <div class="empty-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mood-sad" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
@@ -81,7 +97,7 @@
                             </p>
                         </div>
                     @else
-                        <!-- Existing table structure for verified pets -->
+                        <!-- Pets Table -->
                         <div class="table-responsive">
                             <table class="table table-vcenter card-table table-hover">
                                 <thead class="bg-light">
@@ -101,7 +117,12 @@
                                             onclick="showPetDetails({{ $pet->id }})">
                                             <td style="width: 15%">
                                                 <div class="d-flex align-items-center">
-                                                    <span class="avatar avatar-md me-2" style="background-image: url({{ $pet->photo_url }})"></span>
+                                                    <span class="avatar avatar-xl avatar-rounded border-white border-3 me-3" 
+                                                          style="background-image: url({{ $pet->photo_data 
+                                                              ? $pet->photo_data 
+                                                              : ($pet->photo ? Storage::url($pet->photo) : asset('images/default-pet.png')) }})"
+                                                          data-debug="{{ $pet->photo_data ? 'Has photo_data' : ($pet->photo ? 'Has photo path' : 'Using default') }}">
+                                                    </span>
                                                     <div class="font-weight-bold text-primary">{{ $pet->name }}</div>
                                                 </div>
                                             </td>
@@ -113,31 +134,8 @@
                                                         </svg>
                                                         {{ $pet->breed }}
                                                     </div>
-                                                    <!-- Add verification status badge -->
-                                                    @if($pet->verified_by)
-                                                        <div class="d-flex align-items-center mt-1">
-                                                            <span class="badge bg-green-lt d-flex align-items-center gap-1">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                    <path d="M5 12l5 5l10 -10" />
-                                                                </svg>
-                                                                Verified
-                                                            </span>
-                                                        </div>
-                                                    @else
-                                                        <div class="d-flex align-items-center mt-1">
-                                                            <span class="badge bg-yellow-lt d-flex align-items-center gap-1">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                                                                    <path d="M12 7v5l3 3" />
-                                                                </svg>
-                                                                Pending Verification
-                                                            </span>
-                                                        </div>
-                                                    @endif
                                                     <div class="text-muted">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler-clock me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                                                             <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
                                                             <path d="M12 7v5l3 3"/>
                                                         </svg>
@@ -162,7 +160,7 @@
                                             <td style="width: 20%">
                                                 <div class="d-flex align-items-center gap-2">
                                                     @if($pet->user && $pet->user->photo)
-                                                        <span class="avatar avatar-sm" style="background-image: url({{ Storage::disk('public')->exists($pet->user->photo) ? asset('storage/' . $pet->user->photo) : asset('images/default-avatar.png') }})"></span>
+                                                        <span class="avatar avatar-sm" style="background-image: url({{ 'data:image/jpeg;base64,' . base64_encode($pet->user->photo) }})"></span>
                                                     @else
                                                         <span class="avatar avatar-sm bg-blue-lt">
                                                             {{ strtoupper(substr($pet->user ? $pet->user->name : $pet->owner_name, 0, 1)) }}
@@ -170,15 +168,24 @@
                                                     @endif
                                                     <div>
                                                         <div class="font-weight-medium">{{ $pet->user ? $pet->user->name : $pet->owner_name }}</div>
-                                                        @if($pet->user)
-                                                            <div class="text-muted small">
-                                                                {{ $pet->user->email }}
-                                                                @if($pet->user->phone)
-                                                                    <div>{{ $pet->user->phone }}</div>
-                                                                @endif
-                                                            </div>
+                                                        <div class="text-muted">{{ $pet->user ? $pet->user->email : '' }}</div>
+                                                        @if($pet->user && $pet->user->verified_by)
+                                                            <span class="badge bg-green-lt d-flex align-items-center gap-1" style="width: fit-content">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                    <path d="M5 12l5 5l10 -10" />
+                                                                </svg>
+                                                                Verified
+                                                            </span>
                                                         @else
-                                                            <span class="badge bg-yellow">Not registered</span>
+                                                            <span class="badge bg-yellow-lt d-flex align-items-center gap-1" style="width: fit-content">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                                                    <path d="M12 7v5l3 3" />
+                                                                </svg>
+                                                                Pending
+                                                            </span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -188,23 +195,6 @@
                                                     <span class="badge bg-{{ $pet->category === 'Dog' ? 'blue' : ($pet->category === 'Cat' ? 'purple' : 'green') }}-lt">
                                                         {{ $pet->category }}
                                                     </span>
-                                                    @if($pet->gender)
-                                                        <span class="text-muted small d-flex align-items-center">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler {{ $pet->gender === 'Male' ? 'icon-tabler-gender-male' : 'icon-tabler-gender-female' }} me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                                @if($pet->gender === 'Male')
-                                                                    <path d="M10 14m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/>
-                                                                    <path d="M19 5l-5.4 5.4"/>
-                                                                    <path d="M19 5h-5"/>
-                                                                    <path d="M19 5v5"/>
-                                                                @else
-                                                                    <path d="M12 9m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/>
-                                                                    <path d="M12 14v7"/>
-                                                                    <path d="M9 18h6"/>
-                                                                @endif
-                                                            </svg>
-                                                            {{ $pet->gender }}
-                                                        </span>
-                                                    @endif
                                                 </div>
                                             </td>
                                             <td style="width: 15%">
@@ -245,7 +235,7 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         @if($pet->creator && $pet->creator->photo)
                                                             <span class="avatar avatar-xs" 
-                                                                  style="background-image: url({{ Storage::disk('public')->exists($pet->creator->photo) ? asset('storage/' . $pet->creator->photo) : asset('images/default-avatar.png') }})">
+                                                                  style="background-image: url({{ 'data:image/jpeg;base64,' . base64_encode($pet->creator->photo) }})">
                                                             </span>
                                                         @else
                                                             <span class="avatar avatar-xs bg-blue-lt">
@@ -262,7 +252,7 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         @if($pet->user && $pet->user->photo)
                                                             <span class="avatar avatar-xs" 
-                                                                  style="background-image: url({{ Storage::disk('public')->exists($pet->user->photo) ? asset('storage/' . $pet->user->photo) : asset('images/default-avatar.png') }})">
+                                                                  style="background-image: url({{ 'data:image/jpeg;base64,' . base64_encode($pet->user->photo) }})">
                                                             </span>
                                                         @else
                                                             <span class="avatar avatar-xs bg-green-lt">
@@ -311,7 +301,10 @@
                             <div class="pet-details-header position-relative p-4">
                                 <div class="d-flex align-items-center position-relative z-1">
                                     <span class="avatar avatar-xl avatar-rounded border-white border-3 me-3" 
-                                          style="background-image: url({{ $pet->photo ? asset('storage/' . $pet->photo) : asset('images/default-pet.png') }})">
+                                          style="background-image: url({{ $pet->photo_data 
+                                              ? $pet->photo_data 
+                                              : ($pet->photo ? Storage::url($pet->photo) : asset('images/default-pet.png')) }})"
+                                          data-debug="{{ $pet->photo_data ? 'Has photo_data' : ($pet->photo ? 'Has photo path' : 'Using default') }}">
                                     </span>
                                     <div class="text-white">
                                         <h2 class="mb-0">{{ $pet->name }}</h2>
@@ -529,9 +522,10 @@
                     @endif
                 </div>
 
-                <!-- Unverified Pets Tab -->
+                <!-- Unverified Pets Tab Content -->
                 <div class="tab-pane" id="unverified">
                     @if($pets->where('verified_by', null)->isEmpty())
+                        <!-- Empty State -->
                         <div class="empty">
                             <div class="empty-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
@@ -545,79 +539,10 @@
                             </p>
                         </div>
                     @else
-        <div class="table-responsive">
-            <table class="table table-vcenter card-table table-hover">
-                <thead>
-                    <tr>
-                        <th>Pet</th>
-                        <th>Details</th>
-                        <th>Owner</th>
-                        <th>Submitted At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                                    @foreach($pets->where('verified_by', null) as $pet)
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <span class="avatar avatar-md me-2" style="background-image: url({{ $pet->photo_url }})"></span>
-                                <div class="font-weight-bold">{{ $pet->name }}</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-column">
-                                <span>{{ $pet->breed }}</span>
-                                <span class="text-muted small">{{ $pet->category }}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <span class="avatar avatar-sm me-2" style="background-image: url({{ $pet->user->photo_url ?? asset('images/default-avatar.png') }})"></span>
-                                <div>
-                                    <div>{{ $pet->user->name }}</div>
-                                    <div class="text-muted small">{{ $pet->user->email }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            {{ $pet->created_at->format('M d, Y H:i') }}
-                        </td>
-                        <td>
-                            <div class="btn-list">
-                                <button type="button" class="btn btn-success btn-sm" 
-                                                        onclick="verifyPet({{ $pet->id }})">
-                                                    Verify
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @endif
-</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Message -->
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if($pets->isEmpty())
-        <div class="alert alert-info text-center">
-            No pets found! Click "Add New Pet" to start managing your pets.
-        </div>
-    @else
-        <div class="card">
+                        <!-- Unverified Pets Table -->
                         <div class="table-responsive">
                             <table class="table table-vcenter card-table table-hover">
-                                <thead class="bg-light">
+                                <thead>
                                     <tr>
                                         <th style="width: 15%">Pet</th>
                                         <th style="width: 15%">Details</th>
@@ -629,12 +554,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                        @foreach($pets as $pet)
+                                    @foreach($pets->where('verified_by', null) as $pet)
                                         <tr class="cursor-pointer pet-row {{ ($pet->created_by && $pet->created_by != $pet->user_id) ? 'admin-created' : 'owner-created' }}" 
                                             onclick="showPetDetails({{ $pet->id }})">
                                             <td style="width: 15%">
                                                 <div class="d-flex align-items-center">
-                                                    <span class="avatar avatar-md me-2" style="background-image: url({{ $pet->photo_url }})"></span>
+                                                    <span class="avatar avatar-md me-2" 
+                                                          style="background-image: url({{ $pet->photo_data 
+                                                              ? $pet->photo_data 
+                                                              : ($pet->photo ? Storage::url($pet->photo) : asset('images/default-pet.png')) }})"
+                                                          data-debug="{{ $pet->photo_data ? 'Has photo_data' : ($pet->photo ? 'Has photo path' : 'Using default') }}">
+                                                    </span>
                                                     <div class="font-weight-bold text-primary">{{ $pet->name }}</div>
                                                 </div>
                                             </td>
@@ -646,31 +576,8 @@
                                                         </svg>
                                                         {{ $pet->breed }}
                                                     </div>
-                                                    <!-- Add verification status badge -->
-                                                    @if($pet->verified_by)
-                                                        <div class="d-flex align-items-center mt-1">
-                                                            <span class="badge bg-green-lt d-flex align-items-center gap-1">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                    <path d="M5 12l5 5l10 -10" />
-                                                                </svg>
-                                                                Verified
-                                                            </span>
-                                                        </div>
-                                                    @else
-                                                        <div class="d-flex align-items-center mt-1">
-                                                            <span class="badge bg-yellow-lt d-flex align-items-center gap-1">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                                                                    <path d="M12 7v5l3 3" />
-                                                                </svg>
-                                                                Pending Verification
-                                                            </span>
-                                                        </div>
-                                                    @endif
                                                     <div class="text-muted">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler-clock me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                                                             <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
                                                             <path d="M12 7v5l3 3"/>
                                                         </svg>
@@ -684,7 +591,7 @@
                                                         @endif
                                                     </div>
                                                     <div class="text-muted">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-weight me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler-weight me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                                                             <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
                                                             <path d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
                                                         </svg>
@@ -695,7 +602,7 @@
                                             <td style="width: 20%">
                                                 <div class="d-flex align-items-center gap-2">
                                                     @if($pet->user && $pet->user->photo)
-                                                        <span class="avatar avatar-sm" style="background-image: url({{ Storage::disk('public')->exists($pet->user->photo) ? asset('storage/' . $pet->user->photo) : asset('images/default-avatar.png') }})"></span>
+                                                        <span class="avatar avatar-sm" style="background-image: url({{ 'data:image/jpeg;base64,' . base64_encode($pet->user->photo) }})"></span>
                                                     @else
                                                         <span class="avatar avatar-sm bg-blue-lt">
                                                             {{ strtoupper(substr($pet->user ? $pet->user->name : $pet->owner_name, 0, 1)) }}
@@ -703,15 +610,24 @@
                                                     @endif
                                                     <div>
                                                         <div class="font-weight-medium">{{ $pet->user ? $pet->user->name : $pet->owner_name }}</div>
-                                                        @if($pet->user)
-                                                            <div class="text-muted small">
-                                                                {{ $pet->user->email }}
-                                                                @if($pet->user->phone)
-                                                                    <div>{{ $pet->user->phone }}</div>
-                                                                @endif
-                                                            </div>
+                                                        <div class="text-muted">{{ $pet->user ? $pet->user->email : '' }}</div>
+                                                        @if($pet->user && $pet->user->verified_by)
+                                                            <span class="badge bg-green-lt d-flex align-items-center gap-1" style="width: fit-content">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                    <path d="M5 12l5 5l10 -10" />
+                                                                </svg>
+                                                                Verified
+                                                            </span>
                                                         @else
-                                                            <span class="badge bg-yellow">Not registered</span>
+                                                            <span class="badge bg-yellow-lt d-flex align-items-center gap-1" style="width: fit-content">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                                                    <path d="M12 7v5l3 3" />
+                                                                </svg>
+                                                                Pending
+                                                            </span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -721,23 +637,6 @@
                                                     <span class="badge bg-{{ $pet->category === 'Dog' ? 'blue' : ($pet->category === 'Cat' ? 'purple' : 'green') }}-lt">
                                                         {{ $pet->category }}
                                                     </span>
-                                                    @if($pet->gender)
-                                                        <span class="text-muted small d-flex align-items-center">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler {{ $pet->gender === 'Male' ? 'icon-tabler-gender-male' : 'icon-tabler-gender-female' }} me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                                @if($pet->gender === 'Male')
-                                                                    <path d="M10 14m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/>
-                                                                    <path d="M19 5l-5.4 5.4"/>
-                                                                    <path d="M19 5h-5"/>
-                                                                    <path d="M19 5v5"/>
-                                                                @else
-                                                                    <path d="M12 9m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/>
-                                                                    <path d="M12 14v7"/>
-                                                                    <path d="M9 18h6"/>
-                                                                @endif
-                                                            </svg>
-                                                            {{ $pet->gender }}
-                                                        </span>
-                                                    @endif
                                                 </div>
                                             </td>
                                             <td style="width: 15%">
@@ -778,7 +677,7 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         @if($pet->creator && $pet->creator->photo)
                                                             <span class="avatar avatar-xs" 
-                                                                  style="background-image: url({{ Storage::disk('public')->exists($pet->creator->photo) ? asset('storage/' . $pet->creator->photo) : asset('images/default-avatar.png') }})">
+                                                                  style="background-image: url({{ 'data:image/jpeg;base64,' . base64_encode($pet->creator->photo) }})">
                                                             </span>
                                                         @else
                                                             <span class="avatar avatar-xs bg-blue-lt">
@@ -795,7 +694,7 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         @if($pet->user && $pet->user->photo)
                                                             <span class="avatar avatar-xs" 
-                                                                  style="background-image: url({{ Storage::disk('public')->exists($pet->user->photo) ? asset('storage/' . $pet->user->photo) : asset('images/default-avatar.png') }})">
+                                                                  style="background-image: url({{ 'data:image/jpeg;base64,' . base64_encode($pet->user->photo) }})">
                                                             </span>
                                                         @else
                                                             <span class="avatar avatar-xs bg-green-lt">
@@ -811,7 +710,15 @@
                                             </td>
                                             <td style="width: 8%">
                                                 <div class="btn-list flex-nowrap" onclick="event.stopPropagation();">
-                                                    <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-icon btn-warning">
+                                                    <button type="button" class="btn btn-success btn-sm" 
+                                                            onclick="verifyPet({{ $pet->id }})">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check me-2" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                            <path d="M5 12l5 5l10 -10" />
+                                                        </svg>
+                                                        Verify
+                                                    </button>
+                                                    <a href="{{ route('pets.edit', $pet->id) }}" class="btn btn-icon btn-warning" onclick="event.stopPropagation();">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                                             <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
@@ -822,7 +729,7 @@
                                                     <form action="{{ route('pets.destroy', $pet->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-icon btn-danger" onclick="return confirm('Are you sure?')">
+                                                        <button type="submit" class="btn btn-icon btn-danger" onclick="return confirm('Are you sure you want to delete this pet?')">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                                                 <path d="M4 7l16 0"></path>
@@ -836,233 +743,30 @@
                                                 </div>
                                             </td>
                                         </tr>
-
-                    <!-- Pet Details Div (Hidden by default) -->
-                    <div id="petDetails{{ $pet->id }}" class="pet-details-popup" style="display: none;">
-                        <div class="card border-0">
-                            <!-- Header Section with gradient background -->
-                            <div class="pet-details-header position-relative p-4">
-                                <div class="d-flex align-items-center position-relative z-1">
-                                    <span class="avatar avatar-xl avatar-rounded border-white border-3 me-3" 
-                                          style="background-image: url({{ $pet->photo ? asset('storage/' . $pet->photo) : asset('images/default-pet.png') }})">
-                                    </span>
-                                    <div class="text-white">
-                                        <h2 class="mb-0">{{ $pet->name }}</h2>
-                                        <div class="d-flex align-items-center mt-2">
-                                            <span class="badge bg-white bg-opacity-20 me-2">{{ $pet->category }}</span>
-                                            <span class="badge bg-white bg-opacity-20">{{ $pet->breed }}</span>
-                                        </div>
-                                    </div>
-                                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" onclick="hideAllPetDetails()"></button>
-                                </div>
-                                <!-- Decorative element -->
-                                <div class="position-absolute top-0 end-0 p-4 opacity-10">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-pet" width="100" height="100" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" fill="none">
-                                        <path d="M14.7 13.5c-1.1 1.4-2.3 2.5-3.7 2.5-1.4 0-2.6-1.1-3.7-2.5-2.2-2.8-3.3-6.5-3.3-8.5 0-1.1.9-2 2-2 .8 0 1.5.4 1.8 1.1l.2.4c.3.7 1 1.2 1.8 1.2.8 0 1.5-.5 1.8-1.2l.2-.4c.3-.7 1-1.1 1.8-1.1 1.1 0 2 .9 2 2 0 2-1.1 5.7-3.3 8.5z"/>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <!-- Content Section -->
-                            <div class="p-4">
-                                <div class="row g-4">
-                                    <!-- Left Column - Pet Details -->
-                                    <div class="col-md-6">
-                                        <div class="info-card bg-azure-lt">
-                                            <div class="info-card-header">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-circle me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-                                                            <path d="M12 8l.01 0"></path>
-                                                            <path d="M11 12l1 0l0 4l1 0"></path>
-                                                    </svg>
-                                                Pet Details
-                                                </div>
-                                            <div class="info-card-body">
-                                                <div class="info-item">
-                                                    <span class="info-label">Age</span>
-                                                    <span class="info-value">{{ floor($pet->age/12) }}y {{ $pet->age % 12 }}m</span>
-                                                </div>
-                                                <div class="info-item">
-                                                    <span class="info-label">Weight</span>
-                                                    <span class="info-value">{{ $pet->weight }} kg</span>
-                                                </div>
-                                                @if($pet->allergies)
-                                                <div class="info-item">
-                                                    <span class="info-label">Allergies</span>
-                                                    <span class="info-value">{{ $pet->allergies }}</span>
-                                                </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Right Column - Owner Information -->
-                                    <div class="col-md-6">
-                                        <div class="info-card bg-purple-lt">
-                                            <div class="info-card-header">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
-                                                    <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                                    <path d="M6.168 18.849a4 4 0 0 1 3.832-2.849h4a4 4 0 0 1 3.834 2.855"/>
-                                                </svg>
-                                                    Owner Information
-                                            </div>
-                                            <div class="info-card-body">
-                                                <div class="info-item">
-                                                    <span class="info-label">Name</span>
-                                                    <span class="info-value">{{ $pet->user ? $pet->user->name : $pet->owner_name }}</span>
-                                                </div>
-                                                @if($pet->user)
-                                                <div class="info-item">
-                                                    <span class="info-label">Email</span>
-                                                    <span class="info-value">{{ $pet->user->email }}</span>
-                                                    </div>
-                                                @if($pet->user->phone)
-                                                <div class="info-item">
-                                                    <span class="info-label">Phone</span>
-                                                    <span class="info-value">{{ $pet->user->phone }}</span>
-                                                    </div>
-                                                @endif
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Appointments Section -->
-                                    <div class="col-12">
-                                        <div class="info-card">
-                                            <div class="info-card-header d-flex justify-content-between align-items-center">
-                                                <div class="d-flex align-items-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                        <path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/>
-                                                        <path d="M16 3v4"/>
-                                                        <path d="M8 3v4"/>
-                                                        <path d="M4 11h16"/>
-                                                    </svg>
-                                                    Appointments
-                                                </div>
-                                                <a href="{{ route('appointments.create', ['pet_id' => $pet->id]) }}" class="btn btn-primary">
-                                                    Schedule Now
-                                                </a>
-                                            </div>
-                                            <div class="info-card-body">
-                                                @if($pet->appointments && $pet->appointments->count() > 0)
-                                                    <div class="appointment-timeline">
-                                                        @foreach($pet->appointments->sortByDesc('appointment_date')->take(3) as $appointment)
-                                                        <div class="appointment-item">
-                                                            <div class="appointment-date">
-                                                                <div class="date-badge">
-                                                                    <div class="month">{{ $appointment->appointment_date->format('M') }}</div>
-                                                                    <div class="day">{{ $appointment->appointment_date->format('d') }}</div>
-                                                                    <div class="year text-muted">{{ $appointment->appointment_date->format('Y') }}</div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="appointment-content">
-                                                                <div class="d-flex align-items-center gap-2 mb-2">
-                                                                    @php
-                                                                        $serviceTypeColor = match($appointment->service_type) {
-                                                                            'Checkup' => 'blue',
-                                                                            'Vaccination' => 'green',
-                                                                            'Surgery' => 'red',
-                                                                            'Grooming' => 'purple',
-                                                                            default => 'azure'
-                                                                        };
-                                                                    @endphp
-                                                                    <span class="service-type-icon bg-{{ $serviceTypeColor }}-lt">
-                                                                        @switch($appointment->service_type)
-                                                                            @case('Checkup')
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-stethoscope" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                                    <path d="M6 4h-1a2 2 0 0 0 -2 2v3.5h0a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1" />
-                                                                                    <path d="M8 15a6 6 0 1 0 12 0v-3" />
-                                                                                    <path d="M11 3v2" />
-                                                                                    <path d="M6 3v2" />
-                                                                                    <path d="M20 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                                                                </svg>
-                                                                                @break
-                                                                            @case('Vaccination')
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-vaccine" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                                    <path d="M17 3l4 4" />
-                                                                                    <path d="M19 5l-4.5 4.5" />
-                                                                                    <path d="M11.5 6.5l6 6" />
-                                                                                    <path d="M16.5 11.5l-6.5 6.5h-4v-4l6.5 -6.5" />
-                                                                                    <path d="M7.5 12.5l1.5 1.5" />
-                                                                                    <path d="M10.5 9.5l1.5 1.5" />
-                                                                                    <path d="M3 21l3 -3" />
-                                                                                </svg>
-                                                                                @break
-                                                                            @case('Surgery')
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-emergency-bed" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                                    <path d="M16 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                                                                    <path d="M8 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                                                                    <path d="M4 8l2.1 2.8a3 3 0 0 0 2.4 1.2h11.5" />
-                                                                                    <path d="M10 6h4" />
-                                                                                    <path d="M12 4v4" />
-                                                                                </svg>
-                                                                                @break
-                                                                            @case('Grooming')
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cut" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                                    <path d="M7 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-                                                                                    <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-                                                                                    <path d="M9.15 14.85l8.85 -8.85" />
-                                                                                    <path d="M6 4l8.85 8.85" />
-                                                                                </svg>
-                                                                                @break
-                                                                            @default
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-medical-cross" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                                                    <path d="M13 3a1 1 0 0 1 1 1v4.535l3.928 -2.267a1 1 0 0 1 1.366 .366l1 1.732a1 1 0 0 1 -.366 1.366l-3.927 2.268l3.927 2.269a1 1 0 0 1 .366 1.366l-1 1.732a1 1 0 0 1 -1.366 .366l-3.928 -2.269v4.536a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-4.536l-3.928 2.268a1 1 0 0 1 -1.366 -.366l-1 -1.732a1 1 0 0 1 .366 -1.366l3.927 -2.268l-3.927 -2.268a1 1 0 0 1 -.366 -1.366l1 -1.732a1 1 0 0 1 1.366 -.366l3.928 2.267v-4.535a1 1 0 0 1 1 -1h2z" />
-                                                                                </svg>
-                                                                        @endswitch
-                                                                    </span>
-                                                                    <span class="h4 mb-0">{{ $appointment->service_type }}</span>
-                                                                </div>
-                                                                @if($appointment->reason_for_visit)
-                                                                <div class="text-muted mb-2 reason-text">
-                                                                    <strong>Reason:</strong> 
-                                                                    @if(is_array($appointment->reason_for_visit))
-                                                                        {{ implode(', ', $appointment->reason_for_visit) }}
-                                                                    @else
-                                                                        {{ $appointment->reason_for_visit }}
-                                                                    @endif
-                                                                </div>
-                                                                @endif
-                                                                @if($appointment->notes)
-                                                                <div class="text-muted small">
-                                                                    <strong>Notes:</strong> {{ $appointment->notes }}
-                                                                </div>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                        @endforeach
-                                                    </div>
-                                                @else
-                                                    <div class="empty-state">
-                                                        <div class="empty-state-icon">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-off" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                                <path d="M19.823 19.824a2 2 0 0 1-1.823 1.176h-12a2 2 0 0 1-2-2v-12a2 2 0 0 1 1.175-1.823m3.825-.177h9a2 2 0 0 1 2 2v9"/>
-                                                                <path d="M16 3v4"/>
-                                                                <path d="M8 3v1"/>
-                                                                <path d="M4 11h7m4 0h5"/>
-                                                                <path d="M3 3l18 18"/>
-                                                            </svg>
-                                                        </div>
-                                                        <p>No appointments scheduled yet</p>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                    @endforeach
-                </tbody>
-            </table>
+                    @endif
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Success Message -->
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
     @endif
+
+    <!-- Pet Details Popup Template -->
+    <div id="petDetails{{ $pet->id }}" class="pet-details-popup" style="display: none;">
+        <!-- ... pet details popup content ... -->
+    </div>
 </div>
 
+<!-- Styles -->
 <style>
 .cursor-pointer {
     cursor: pointer;
@@ -1450,16 +1154,52 @@
 .gap-1 {
     gap: 0.25rem !important;
 }
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.6em;
+    font-weight: 500;
+}
+
+.bg-red {
+    background-color: #d63939 !important;
+    color: #fff !important;
+}
+
+.bg-blue-lt {
+    background-color: rgba(32, 107, 196, 0.1) !important;
+    color: #206bc4 !important;
+}
+
+.nav-tabs .nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nav-tabs .nav-link.active {
+    color: #206bc4;
+    border-bottom-color: #206bc4;
+}
+
+.nav-tabs .nav-link.active .badge.bg-red {
+    background-color: #206bc4 !important;
+}
 </style>
 
+<!-- Scripts -->
 <script>
 function showPetDetails(petId) {
-    // Hide all pet details first
     hideAllPetDetails();
     
-    // Show the clicked pet's details
     const detailsDiv = document.getElementById('petDetails' + petId);
     if (detailsDiv) {
+        console.log('Showing pet details for ID:', petId);
+        const petAvatar = detailsDiv.querySelector('.avatar');
+        if (petAvatar) {
+            console.log('Pet details avatar debug info:', petAvatar.getAttribute('data-debug'));
+            console.log('Pet details avatar background:', getComputedStyle(petAvatar).backgroundImage);
+        }
         detailsDiv.style.display = 'block';
     }
 }
@@ -1513,18 +1253,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function verifyPet(petId) {
     if (confirm('Are you sure you want to verify this pet?')) {
-        axios.post(`/pets/${petId}/verify`, {
-            verified_by: {{ auth()->id() }} // Send the current user's ID
+        // Send verification request
+        fetch(`/pets/${petId}/verify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
         })
-        .then(response => {
-            if (response.data.success) {
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to show updated status
                 window.location.reload();
+            } else {
+                alert('Error verifying pet');
             }
         })
         .catch(error => {
+            console.error('Error:', error);
             alert('Error verifying pet');
         });
     }
 }
+
+// Add debug logging for pet photos
+document.addEventListener('DOMContentLoaded', function() {
+    const petAvatars = document.querySelectorAll('.avatar');
+    
+    petAvatars.forEach(avatar => {
+        const bgImage = getComputedStyle(avatar).backgroundImage;
+        console.log('Avatar background image:', bgImage);
+        
+        // Extract the actual URL/data from background-image
+        const imageUrl = bgImage.replace(/url\(['"](.+)['"]\)/, '$1');
+        if (imageUrl !== 'none') {
+            // Log the length of the data to check if it's reasonable
+            console.log('Image URL/data length:', imageUrl.length);
+            
+            // If it's base64 data, log the first 100 characters
+            if (imageUrl.startsWith('data:')) {
+                console.log('Base64 data preview:', imageUrl.substring(0, 100) + '...');
+            }
+            
+            // Try loading the image to check if it's valid
+            const img = new Image();
+            img.onload = () => console.log('Image loaded successfully:', imageUrl.substring(0, 50) + '...');
+            img.onerror = () => console.error('Image failed to load:', imageUrl.substring(0, 50) + '...');
+            img.src = imageUrl.replace(/["']/g, '');
+        }
+        
+        // Log the debug attribute we added earlier
+        const debugInfo = avatar.getAttribute('data-debug');
+        console.log('Debug info:', debugInfo);
+    });
+});
 </script>
 @endsection
