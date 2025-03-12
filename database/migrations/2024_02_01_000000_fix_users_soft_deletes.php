@@ -3,11 +3,15 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up()
     {
+        // First, disable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         // First, drop the table if it exists
         Schema::dropIfExists('users');
 
@@ -31,10 +35,19 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     public function down()
     {
+        // First, disable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         Schema::dropIfExists('users');
+
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }; 

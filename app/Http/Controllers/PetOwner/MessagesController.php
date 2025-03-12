@@ -33,7 +33,7 @@ class MessagesController extends Controller
             ->orWhere(function($query) use ($admin) {
                 $query->whereNull('conversation_id')
                     ->where('sender_id', auth()->id())
-                    ->where('receiver_id', $admin->id);
+                    ->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => $admin->id])]);
             })
             ->orderBy('created_at')
             ->get();
@@ -41,7 +41,7 @@ class MessagesController extends Controller
         // Update any messages that don't have a conversation_id
         Message::whereNull('conversation_id')
             ->where('sender_id', auth()->id())
-            ->where('receiver_id', $admin->id)
+            ->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => $admin->id])])
             ->update(['conversation_id' => $conversation->id]);
 
         // Add conversation data to clinic contact
@@ -53,7 +53,8 @@ class MessagesController extends Controller
         ]);
 
         $clinicContact->conversation = $conversation;
-        $clinicContact->unreadCount = $messages->where('receiver_id', auth()->id())
+        $clinicContact->unreadCount = $messages->where('sender_id', auth()->id())
+            ->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => $admin->id])])
             ->where('sent_at', null)
             ->count();
         $clinicContact->lastMessage = $messages->first();
@@ -68,7 +69,7 @@ class MessagesController extends Controller
         ]);
     }
 
-    public function show()
+    public function show($conversationId)
     {
         $cacheKey = 'messages_' . auth()->id();
         
@@ -96,15 +97,8 @@ class MessagesController extends Controller
                     return Message::where(function($query) use ($conversation) {
                         $query->where('conversation_id', $conversation->id)
                               ->orWhere(function($q) use ($conversation) {
-                                  $q->whereNull('conversation_id')
-                                    ->where(function($q2) use ($conversation) {
-                                        $q2->where('sender_id', $conversation->pet_owner_id)
-                                           ->orWhere('sender_id', $conversation->admin_id);
-                                    })
-                                    ->where(function($q2) use ($conversation) {
-                                        $q2->where('receiver_id', $conversation->pet_owner_id)
-                                           ->orWhere('receiver_id', $conversation->admin_id);
-                                    });
+                                  $q->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => $conversation->pet_owner_id])])
+                                    ->orWhereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => $conversation->admin_id])]);
                               });
                     })
                     ->with(['sender'])
@@ -142,7 +136,7 @@ class MessagesController extends Controller
         $message = Message::create([
             'conversation_id' => $conversation->id,
             'sender_id' => auth()->id(),
-            'receiver_id' => $admin->id,
+            'receivers' => [['id' => $admin->id, 'role' => 'admin']],
             'message' => $request->message
         ]);
 

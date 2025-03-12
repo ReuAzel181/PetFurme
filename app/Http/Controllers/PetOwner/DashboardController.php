@@ -43,12 +43,12 @@ class DashboardController extends Controller
             });
 
         // Get messages
-        $unreadMessages = Message::where('receiver_id', $user->id)
+        $unreadMessagesCount = Message::whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => auth()->id()])])
             ->whereNull('read_at')
             ->count();
 
         $latestMessage = Message::where(function($query) use ($user) {
-                $query->where('receiver_id', $user->id)
+                $query->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => $user->id])])
                       ->orWhere('sender_id', $user->id);
             })
             ->latest()
@@ -58,7 +58,7 @@ class DashboardController extends Controller
             'pets',
             'appointments',
             'products',
-            'unreadMessages',
+            'unreadMessagesCount',
             'latestMessage'
         ));
     }

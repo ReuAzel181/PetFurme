@@ -8,6 +8,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,5 +35,9 @@ class AppServiceProvider extends ServiceProvider
         Blade::component('cookie-consent', \App\View\Components\CookieConsent::class);
 
         DB::statement('SET NAMES utf8mb4');
+
+        if (empty(config('app.key'))) {
+            Config::set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        }
     }
 }

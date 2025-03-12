@@ -25,11 +25,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'username',
         'uuid',
         'role',
-        'address',
+        'username',
         'phone',
+        'address',
         'photo',
         'store_name',
         'store_address',
@@ -51,6 +51,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_completed' => 'boolean',
         'role' => 'string',
     ];
+
+    // Add this if your table name is different
+    protected $table = 'users';
 
     // Add a scope for pet owners
     public function scopePetOwners($query)
@@ -209,5 +212,10 @@ class User extends Authenticatable implements MustVerifyEmail
                 ]);
             }
         });
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
     }
 }

@@ -27,11 +27,11 @@ class MessagesController extends Controller
     {
         $conversation = Conversation::with(['petOwner', 'messages.sender'])->findOrFail($conversationId);
         
-        // Mark unread messages as read
+        // Update to use receivers JSON column instead of receiver_id
         Message::where('conversation_id', $conversation->id)
-            ->where('receiver_id', auth()->id())
-            ->whereNull('sent_at')
-            ->update(['sent_at' => now()]);
+            ->whereRaw('JSON_CONTAINS(receivers, ?)', [json_encode(['id' => auth()->id()])])
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         return view('admin.messages.show', compact('conversation'));
     }
@@ -47,7 +47,7 @@ class MessagesController extends Controller
         Message::create([
             'conversation_id' => $conversation->id,
             'sender_id' => auth()->id(),
-            'receiver_id' => $conversation->pet_owner_id,
+            'receivers' => [['id' => $conversation->pet_owner_id, 'role' => 'pet_owner']],
             'message' => $request->message
         ]);
 

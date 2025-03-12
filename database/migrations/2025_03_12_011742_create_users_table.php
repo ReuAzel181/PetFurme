@@ -16,12 +16,26 @@ return new class extends Migration
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         // Drop and recreate the table
-        Schema::dropIfExists('user_archives');
+        Schema::dropIfExists('users');
 
-        Schema::create('user_archives', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
-            // Add your other columns here
+            $table->uuid('uuid')->unique();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->string('role')->default('pet_owner');
+            $table->string('username')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
+            $table->string('photo')->nullable();
+            $table->string('store_name')->nullable();
+            $table->string('store_address')->nullable();
+            $table->string('store_email')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         // Re-enable foreign key checks
@@ -36,7 +50,7 @@ return new class extends Migration
         // First, disable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         
-        Schema::dropIfExists('user_archives');
+        Schema::dropIfExists('users');
         
         // Re-enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
