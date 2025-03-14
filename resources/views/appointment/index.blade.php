@@ -85,19 +85,36 @@
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column gap-1">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    @if($appointment->user && $appointment->user->photo)
-                                                        <img src="{{ asset('storage/' . $appointment->user->photo) }}" 
-                                                             alt="{{ $appointment->display_name }}" 
-                                                             class="avatar avatar-sm rounded-circle"
-                                                             style="width: 32px; height: 32px; object-fit: cover;">
-                                                    @else
-                                                        <span class="avatar avatar-sm rounded-circle bg-primary-lt">
-                                                            {{ strtoupper(substr($appointment->display_name, 0, 1)) }}
-                                                        </span>
-                                                    @endif
-                                                    <div class="text-dark fw-bold">{{ $appointment->display_name }}</div>
-                                                </div>
+                                                @if($appointment->user)
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        @php
+                                                            $userImage = null;
+                                                            // First try photo_data
+                                                            if ($appointment->user->photo_data) {
+                                                                $userImage = 'data:image/jpeg;base64,' . base64_encode($appointment->user->photo_data);
+                                                            }
+                                                            // Then try photo path
+                                                            elseif ($appointment->user->photo) {
+                                                                $photoPath = storage_path('app/public/' . $appointment->user->photo);
+                                                                if (file_exists($photoPath)) {
+                                                                    $userImage = asset('storage/' . $appointment->user->photo);
+                                                                }
+                                                            }
+                                                        @endphp
+
+                                                        @if($userImage)
+                                                            <img src="{{ $userImage }}" 
+                                                                 alt="{{ $appointment->display_name }}" 
+                                                                 class="avatar avatar-sm rounded-circle"
+                                                                 style="width: 32px; height: 32px; object-fit: cover;">
+                                                        @else
+                                                            <span class="avatar avatar-sm rounded-circle bg-primary-lt">
+                                                                {{ strtoupper(substr($appointment->display_name, 0, 1)) }}
+                                                            </span>
+                                                        @endif
+                                                        <div class="text-dark fw-bold">{{ $appointment->display_name }}</div>
+                                                    </div>
+                                                @endif
                                                 @if($appointment->is_walk_in)
                                                     <span class="badge bg-yellow-lt" title="Walk-in appointment">
                                                         <i class="fas fa-walking me-1"></i>Walk-in
@@ -112,18 +129,43 @@
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <div class="d-flex align-items-center gap-2">
-                                                    @if($appointment->pet && $appointment->pet->photo)
-                                                        <img src="{{ asset('storage/' . $appointment->pet->photo) }}" 
-                                                             alt="{{ $appointment->pet_name }}" 
-                                                             class="avatar avatar-sm rounded-circle"
-                                                             style="width: 32px; height: 32px; object-fit: cover;">
-                                                    @else
-                                                        <img src="{{ asset('images/default-pet.png') }}" 
-                                                             alt="Default Pet" 
-                                                             class="avatar avatar-sm rounded-circle"
-                                                             style="width: 32px; height: 32px; object-fit: cover;">
+                                                    @if($appointment->pet)
+                                                        @php
+                                                            $petImage = null;
+                                                            // First try photo_data
+                                                            if ($appointment->pet->photo_data) {
+                                                                $petImage = 'data:image/jpeg;base64,' . base64_encode($appointment->pet->photo_data);
+                                                            }
+                                                            // Then try photo field
+                                                            elseif ($appointment->pet->photo) {
+                                                                // Check if photo contains binary data
+                                                                if (substr($appointment->pet->photo, 0, 4) !== 'http' && 
+                                                                    substr($appointment->pet->photo, 0, 8) !== 'uploads/') {
+                                                                    $petImage = 'data:image/jpeg;base64,' . base64_encode($appointment->pet->photo);
+                                                                }
+                                                                // Otherwise treat as file path
+                                                                else {
+                                                                    $photoPath = storage_path('app/public/' . $appointment->pet->photo);
+                                                                    if (file_exists($photoPath)) {
+                                                                        $petImage = asset('storage/' . $appointment->pet->photo);
+                                                                    }
+                                                                }
+                                                            }
+                                                        @endphp
+
+                                                        @if($petImage)
+                                                            <img src="{{ $petImage }}" 
+                                                                 alt="{{ $appointment->pet_name }}" 
+                                                                 class="avatar avatar-sm rounded-circle"
+                                                                 style="width: 32px; height: 32px; object-fit: cover;">
+                                                        @else
+                                                            <img src="{{ asset('images/default-pet.png') }}" 
+                                                                 alt="Default Pet" 
+                                                                 class="avatar avatar-sm rounded-circle"
+                                                                 style="width: 32px; height: 32px; object-fit: cover;">
+                                                        @endif
+                                                        <div class="text-dark">{{ $appointment->pet_name }}</div>
                                                     @endif
-                                                    <div class="text-dark">{{ $appointment->pet_name }}</div>
                                                 </div>
                                                 <div class="text-muted small">
                                                     <span class="badge bg-blue-lt">{{ $appointment->pet_type }}</span>

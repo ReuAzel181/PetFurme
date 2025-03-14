@@ -6,6 +6,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -31,13 +32,12 @@ class ProductController extends Controller
         $data = $request->validated();
         
         if ($request->hasFile('product_image')) {
-            $file = $request->file('product_image');
+            // Store the file path
+            $path = $request->file('product_image')->store('products', 'public');
+            $data['product_image'] = $path;
             
-            // Store file path for web display
-            $data['product_image'] = $file->store('products', 'public');
-            
-            // Store binary data for mobile app
-            $data['product_image_data'] = file_get_contents($file->getRealPath());
+            // Store the binary data
+            $data['product_image_data'] = file_get_contents($request->file('product_image')->getRealPath());
         }
         
         // Add user_id and generate uuid/slug
@@ -73,6 +73,20 @@ class ProductController extends Controller
             'quantity' => 'required|numeric|min:0',
             'quantity_alert' => 'required|numeric|min:0',
         ]);
+
+        if ($request->hasFile('product_image')) {
+            // Delete old image if exists
+            if ($product->product_image) {
+                Storage::disk('public')->delete($product->product_image);
+            }
+            
+            // Store the new image
+            $path = $request->file('product_image')->store('products', 'public');
+            $product->product_image = $path;
+            
+            // Optionally store binary data if needed
+            $product->product_image_data = file_get_contents($request->file('product_image')->getRealPath());
+        }
 
         $product->update($validated);
 

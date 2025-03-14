@@ -370,7 +370,7 @@
     <script src="<?php echo e(asset('dist/libs/jsvectormap/dist/maps/world-merc.js')); ?>" defer></script>
 <?php $__env->stopPush(); ?>
 
-<?php if (! $__env->hasRenderedOnce('42c0783f-4f87-49cf-bca0-2ab02c5c94c9')): $__env->markAsRenderedOnce('42c0783f-4f87-49cf-bca0-2ab02c5c94c9');
+<?php if (! $__env->hasRenderedOnce('62c5c417-6dea-4de4-992c-8912b42919e3')): $__env->markAsRenderedOnce('62c5c417-6dea-4de4-992c-8912b42919e3');
 $__env->startPush('page-scripts'); ?>
     <script>
         // @formatter:off

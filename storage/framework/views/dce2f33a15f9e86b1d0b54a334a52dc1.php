@@ -41,17 +41,110 @@
 
 <div class="card modern-analytics-card" onclick="navigateTo('<?php echo e($route ?? '#'); ?>')">
     <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="analytics-widget-title">
-                <i class="<?php echo e($icon); ?> me-2"></i> <?php echo e($title); ?>
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="d-flex align-items-center gap-3">
+                <?php if($icon): ?>
+                    <div class="analytics-icon" style="background: var(--tblr-<?php echo e($color); ?>)">
+                        <i class="<?php echo e($icon); ?>"></i>
+                        <?php if(isset($todayCount)): ?>
+                            <div class="today-count" data-bs-toggle="tooltip" title="Added today">
+                                +<?php echo e($todayCount); ?>
 
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                <div>
+                    <h3 class="analytics-value mb-0">
+                        <?php switch($title):
+                            case ("Today's Orders"): ?>
+                                <?php echo e($value); ?> <?php echo e($value == 1 ? 'Order' : 'Orders'); ?>
+
+                                <?php break; ?>
+                            <?php default: ?>
+                                <?php echo e($value); ?> <?php echo e($value == 1 ? Str::singular($title) : Str::plural($title)); ?>
+
+                        <?php endswitch; ?>
+                    </h3>
+                    <div class="analytics-title">
+                        <?php switch($title):
+                            case ('Total Pets'): ?>
+                                Active Pets in System
+                                <?php break; ?>
+                            <?php case ('Appointments'): ?>
+                                Scheduled Appointments
+                                <?php break; ?>
+                            <?php case ('Pet Owners'): ?>
+                                Registered Pet Owners
+                                <?php break; ?>
+                            <?php case ("Today's Orders"): ?>
+                                Daily Order Summary
+                                <?php break; ?>
+                        <?php endswitch; ?>
+                    </div>
+                </div>
             </div>
-            <div class="analytics-widget-percentage text-muted">
-                <?php echo e($percentage); ?>%
-            </div>
+            <?php if($percentage !== null): ?>
+                <div class="trend-indicator <?php echo e($trend === 'up' ? 'positive' : ($trend === 'down' ? 'negative' : '')); ?>"
+                     data-bs-toggle="tooltip" 
+                     title="<?php switch($title):
+                         case ('Total Pets'): ?>
+                             <?php echo e(abs(number_format($percentage, 1))); ?>% <?php echo e($trend === 'up' ? 'increase' : 'decrease'); ?> in pet registrations this month
+                             <?php break; ?>
+                         <?php case ('Appointments'): ?>
+                             <?php echo e(abs(number_format($percentage, 1))); ?>% <?php echo e($trend === 'up' ? 'more' : 'fewer'); ?> appointments compared to last month
+                             <?php break; ?>
+                         <?php case ('Pet Owners'): ?>
+                             <?php echo e(abs(number_format($percentage, 1))); ?>% <?php echo e($trend === 'up' ? 'growth' : 'decline'); ?> in active pet owners
+                             <?php break; ?>
+                         <?php case ("Today's Orders"): ?>
+                             <?php echo e(abs(number_format($percentage, 1))); ?>% <?php echo e($trend === 'up' ? 'higher' : 'lower'); ?> than daily average
+                             <?php break; ?>
+                     <?php endswitch; ?>">
+                    <span class="percentage"><?php echo e(number_format($percentage, 1)); ?>%</span>
+                    <i class="fas fa-arrow-<?php echo e($trend === 'up' ? 'up' : 'down'); ?>"></i>
+                </div>
+            <?php endif; ?>
         </div>
-        <div class="mt-2">
-            <span class="text-muted"><?php echo e($todayCount); ?> today</span>
+        <div class="analytics-context text-muted">
+            <?php switch($title):
+                case ('Total Pets'): ?>
+                    <?php if($trend === 'up'): ?>
+                        <?php echo e($value == 1 ? 'One pet is' : "{$value} pets are"); ?> registered in the system. 
+                        Pet registrations <?php echo e(abs(number_format($percentage, 1))); ?>% higher than last month.
+                    <?php else: ?>
+                        Currently managing <?php echo e($value == 1 ? 'one pet' : "{$value} pets"); ?>. 
+                        <?php echo e(abs(number_format($percentage, 1))); ?>% decrease in registrations from previous month.
+                    <?php endif; ?>
+                    <?php break; ?>
+                <?php case ('Appointments'): ?>
+                    <?php if($trend === 'up'): ?>
+                        <?php echo e($value == 1 ? 'One appointment' : "{$value} appointments"); ?> in the system. 
+                        Booking volume up <?php echo e(abs(number_format($percentage, 1))); ?>% from last month.
+                    <?php else: ?>
+                        <?php echo e($value == 1 ? 'One active appointment' : "{$value} active appointments"); ?>. 
+                        <?php echo e(abs(number_format($percentage, 1))); ?>% reduction in bookings compared to last month.
+                    <?php endif; ?>
+                    <?php break; ?>
+                <?php case ('Pet Owners'): ?>
+                    <?php if($trend === 'up'): ?>
+                        <?php echo e($value == 1 ? 'One active pet owner' : "{$value} active pet owners"); ?> registered. 
+                        <?php echo e(abs(number_format($percentage, 1))); ?>% increase in client base this month.
+                    <?php else: ?>
+                        <?php echo e($value == 1 ? 'One registered owner' : "{$value} registered owners"); ?> in database. 
+                        <?php echo e(abs(number_format($percentage, 1))); ?>% decrease in new registrations.
+                    <?php endif; ?>
+                    <?php break; ?>
+                <?php case ("Today's Orders"): ?>
+                    <?php if($trend === 'up'): ?>
+                        <?php echo e($value == 1 ? 'One order processed' : "{$value} orders processed"); ?> today. 
+                        Performance <?php echo e(abs(number_format($percentage, 1))); ?>% above 30-day average.
+                    <?php else: ?>
+                        <?php echo e($value == 1 ? 'One order received' : "{$value} orders received"); ?> today. 
+                        <?php echo e(abs(number_format($percentage, 1))); ?>% below typical daily volume.
+                    <?php endif; ?>
+                    <?php break; ?>
+            <?php endswitch; ?>
         </div>
     </div>
 </div>
@@ -151,18 +244,6 @@
     font-weight: 600;
     border: 2px solid white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.analytics-widget-title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.analytics-widget-percentage {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 </style>
 

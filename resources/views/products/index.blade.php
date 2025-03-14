@@ -1,6 +1,10 @@
 @extends('layouts.tabler')
 
 @section('content')
+    @php
+    use Illuminate\Support\Facades\Storage;
+    @endphp
+
     <div class="page">
         <div class="page-header d-print-none">
             <div class="container-xl">
@@ -54,7 +58,13 @@
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 <img style="width: 90px;"
-                                                     src="{{ $product->product_image ? asset('storage/' . $product->product_image) : asset('assets/img/products/default.webp') }}"
+                                                     src="@if($product->product_image_data)
+                                                              data:image/jpeg;base64,{{ base64_encode($product->product_image_data) }}
+                                                          @elseif($product->product_image && Storage::disk('public')->exists($product->product_image))
+                                                              {{ asset('storage/' . $product->product_image) }}
+                                                          @else
+                                                              {{ asset('assets/img/products/default.webp') }}
+                                                          @endif"
                                                      alt="{{ $product->name }}">
                                                 <div class="font-weight-medium">{{ $product->name }}</div>
                                             </div>

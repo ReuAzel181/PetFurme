@@ -6,7 +6,7 @@
         <x-alert/>
 
         <div class="row row-cards">
-            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="row">

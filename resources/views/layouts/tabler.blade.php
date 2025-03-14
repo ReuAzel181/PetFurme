@@ -194,7 +194,7 @@
         /* Navigation container */
         .navbar-nav {
             width: 100%;
-            padding: 8px;
+            padding: 20px 0; /* Reduced default padding */
             display: flex;
             flex-direction: column;
             height: calc(100vh - 70px); /* Full viewport height minus header */
@@ -1278,7 +1278,26 @@
 
         /* Ensure proper vertical spacing for the entire nav */
         .navbar-nav {
-            padding: 4px 0;
+            padding: 20px 0; /* Reduced default padding */
+        }
+
+        /* Add responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                padding: 10px 0;
+            }
+        }
+
+        /* For very small screens */
+        @media (max-width: 480px) {
+            .navbar-nav {
+                padding: 5px 0;
+            }
+        }
+
+        /* Ensure nav items are always visible */
+        .navbar-nav .nav-item {
+            margin-bottom: 5px;
         }
 
         /* Remove duplicate styles */

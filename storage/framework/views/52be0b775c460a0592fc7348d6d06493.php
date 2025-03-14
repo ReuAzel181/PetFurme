@@ -85,20 +85,37 @@
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column gap-1">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <?php if($appointment->user && $appointment->user->photo): ?>
-                                                        <img src="<?php echo e(asset('storage/' . $appointment->user->photo)); ?>" 
-                                                             alt="<?php echo e($appointment->display_name); ?>" 
-                                                             class="avatar avatar-sm rounded-circle"
-                                                             style="width: 32px; height: 32px; object-fit: cover;">
-                                                    <?php else: ?>
-                                                        <span class="avatar avatar-sm rounded-circle bg-primary-lt">
-                                                            <?php echo e(strtoupper(substr($appointment->display_name, 0, 1))); ?>
+                                                <?php if($appointment->user): ?>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <?php
+                                                            $userImage = null;
+                                                            // First try photo_data
+                                                            if ($appointment->user->photo_data) {
+                                                                $userImage = 'data:image/jpeg;base64,' . base64_encode($appointment->user->photo_data);
+                                                            }
+                                                            // Then try photo path
+                                                            elseif ($appointment->user->photo) {
+                                                                $photoPath = storage_path('app/public/' . $appointment->user->photo);
+                                                                if (file_exists($photoPath)) {
+                                                                    $userImage = asset('storage/' . $appointment->user->photo);
+                                                                }
+                                                            }
+                                                        ?>
 
-                                                        </span>
-                                                    <?php endif; ?>
-                                                    <div class="text-dark fw-bold"><?php echo e($appointment->display_name); ?></div>
-                                                </div>
+                                                        <?php if($userImage): ?>
+                                                            <img src="<?php echo e($userImage); ?>" 
+                                                                 alt="<?php echo e($appointment->display_name); ?>" 
+                                                                 class="avatar avatar-sm rounded-circle"
+                                                                 style="width: 32px; height: 32px; object-fit: cover;">
+                                                        <?php else: ?>
+                                                            <span class="avatar avatar-sm rounded-circle bg-primary-lt">
+                                                                <?php echo e(strtoupper(substr($appointment->display_name, 0, 1))); ?>
+
+                                                            </span>
+                                                        <?php endif; ?>
+                                                        <div class="text-dark fw-bold"><?php echo e($appointment->display_name); ?></div>
+                                                    </div>
+                                                <?php endif; ?>
                                                 <?php if($appointment->is_walk_in): ?>
                                                     <span class="badge bg-yellow-lt" title="Walk-in appointment">
                                                         <i class="fas fa-walking me-1"></i>Walk-in
@@ -113,18 +130,43 @@
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <div class="d-flex align-items-center gap-2">
-                                                    <?php if($appointment->pet && $appointment->pet->photo): ?>
-                                                        <img src="<?php echo e(asset('storage/' . $appointment->pet->photo)); ?>" 
-                                                             alt="<?php echo e($appointment->pet_name); ?>" 
-                                                             class="avatar avatar-sm rounded-circle"
-                                                             style="width: 32px; height: 32px; object-fit: cover;">
-                                                    <?php else: ?>
-                                                        <img src="<?php echo e(asset('images/default-pet.png')); ?>" 
-                                                             alt="Default Pet" 
-                                                             class="avatar avatar-sm rounded-circle"
-                                                             style="width: 32px; height: 32px; object-fit: cover;">
+                                                    <?php if($appointment->pet): ?>
+                                                        <?php
+                                                            $petImage = null;
+                                                            // First try photo_data
+                                                            if ($appointment->pet->photo_data) {
+                                                                $petImage = 'data:image/jpeg;base64,' . base64_encode($appointment->pet->photo_data);
+                                                            }
+                                                            // Then try photo field
+                                                            elseif ($appointment->pet->photo) {
+                                                                // Check if photo contains binary data
+                                                                if (substr($appointment->pet->photo, 0, 4) !== 'http' && 
+                                                                    substr($appointment->pet->photo, 0, 8) !== 'uploads/') {
+                                                                    $petImage = 'data:image/jpeg;base64,' . base64_encode($appointment->pet->photo);
+                                                                }
+                                                                // Otherwise treat as file path
+                                                                else {
+                                                                    $photoPath = storage_path('app/public/' . $appointment->pet->photo);
+                                                                    if (file_exists($photoPath)) {
+                                                                        $petImage = asset('storage/' . $appointment->pet->photo);
+                                                                    }
+                                                                }
+                                                            }
+                                                        ?>
+
+                                                        <?php if($petImage): ?>
+                                                            <img src="<?php echo e($petImage); ?>" 
+                                                                 alt="<?php echo e($appointment->pet_name); ?>" 
+                                                                 class="avatar avatar-sm rounded-circle"
+                                                                 style="width: 32px; height: 32px; object-fit: cover;">
+                                                        <?php else: ?>
+                                                            <img src="<?php echo e(asset('images/default-pet.png')); ?>" 
+                                                                 alt="Default Pet" 
+                                                                 class="avatar avatar-sm rounded-circle"
+                                                                 style="width: 32px; height: 32px; object-fit: cover;">
+                                                        <?php endif; ?>
+                                                        <div class="text-dark"><?php echo e($appointment->pet_name); ?></div>
                                                     <?php endif; ?>
-                                                    <div class="text-dark"><?php echo e($appointment->pet_name); ?></div>
                                                 </div>
                                                 <div class="text-muted small">
                                                     <span class="badge bg-blue-lt"><?php echo e($appointment->pet_type); ?></span>
