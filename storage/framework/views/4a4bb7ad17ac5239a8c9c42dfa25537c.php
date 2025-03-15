@@ -57,12 +57,13 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="d-flex align-items-center mb-3">
+                                                    <!-- Owner Avatar Display -->
                                                     <div class="avatar-wrapper me-3">
-                                                        <img src="<?php echo e(isset($owner) && $owner->photo ? asset('storage/' . $owner->photo) : asset('storage/defaults/avatar.png')); ?>" 
+                                                        <img src="<?php echo e(isset($owner) && $owner->photo_data ? 'data:image/jpeg;base64,' . base64_encode($owner->photo_data) : (isset($owner) && $owner->photo ? asset('storage/' . $owner->photo) : asset('storage/defaults/avatar.png'))); ?>" 
                                                              class="avatar avatar-lg" 
                                                              id="owner_avatar"
                                                              alt="Owner Avatar"
-                                                             style="width: 64px; height: 64px;">
+                                                             style="width: 64px; height: 64px; object-fit: cover;">
                                                     </div>
                                                     <div class="flex-grow-1">
                                                         <label class="form-label required">Pet Owner</label>
@@ -71,7 +72,7 @@
                                                             <option value="no_account">No Account (Walk-in)</option>
                                                             <?php $__currentLoopData = $owners; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ownerOption): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                 <option value="<?php echo e($ownerOption->id); ?>" 
-                                                                    data-avatar="<?php echo e($ownerOption->photo ? asset('storage/' . $ownerOption->photo) : asset('storage/defaults/avatar.png')); ?>"
+                                                                    data-avatar="<?php echo e($ownerOption->photo_data ? 'data:image/jpeg;base64,' . base64_encode($ownerOption->photo_data) : ($ownerOption->photo ? asset('storage/' . $ownerOption->photo) : asset('storage/defaults/avatar.png'))); ?>"
                                                                     <?php echo e((old('owner_id') == $ownerOption->id || (isset($owner) && $owner->id == $ownerOption->id)) ? 'selected' : ''); ?>>
                                                                     <?php echo e($ownerOption->name); ?>
 
@@ -99,12 +100,13 @@ unset($__errorArgs, $__bag); ?>
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="d-flex align-items-center mb-3">
+                                                    <!-- Pet Avatar Display -->
                                                     <div class="avatar-wrapper me-3">
-                                                        <img src="<?php echo e(isset($pet) && $pet->photo ? asset('storage/' . $pet->photo) : asset('storage/defaults/paw.png')); ?>" 
+                                                        <img src="<?php echo e(isset($pet) && $pet->photo_data ? 'data:image/jpeg;base64,' . base64_encode($pet->photo_data) : (isset($pet) && $pet->photo ? asset('storage/' . $pet->photo) : asset('storage/defaults/paw.png'))); ?>" 
                                                              class="avatar avatar-lg" 
                                                              id="dynamic_avatar"
                                                              alt="Pet Avatar"
-                                                             style="width: 64px; height: 64px;">
+                                                             style="width: 64px; height: 64px; object-fit: cover;">
                                                     </div>
                                                     <div class="flex-grow-1">
                                                         <!-- Pet Selection (for registered users) -->
@@ -115,7 +117,7 @@ unset($__errorArgs, $__bag); ?>
                                                                 <?php if(isset($ownerPets)): ?>
                                                                     <?php $__currentLoopData = $ownerPets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $petOption): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                         <option value="<?php echo e($petOption->id); ?>" 
-                                                                            data-photo="<?php echo e($petOption->photo_url ?? asset('storage/defaults/paw.png')); ?>"
+                                                                            data-photo="<?php echo e($petOption->photo_data ? 'data:image/jpeg;base64,' . base64_encode($petOption->photo_data) : ($petOption->photo ? asset('storage/' . $petOption->photo) : asset('storage/defaults/paw.png'))); ?>"
                                                                             <?php echo e((old('pet_id') == $petOption->id || (isset($pet) && $pet->id == $petOption->id)) ? 'selected' : ''); ?>
 
                                                                             data-name="<?php echo e($petOption->name); ?>"
@@ -3166,41 +3168,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 const ownerData = await response.json();
                 console.log('Owner data received:', ownerData);
                 
-                // Update owner avatar
-                ownerAvatar.src = ownerData.avatar_url || '/storage/defaults/avatar.png';
-                
-                // Fetch and update pets dropdown
-                console.log('Fetching pets data...');
-                const petsResponse = await fetch(`/api/owners/${selectedOption.value}/pets`);
-                console.log('Pets API response:', petsResponse);
-                
-                if (!petsResponse.ok) {
-                    console.error('Pets API response not ok:', petsResponse.status, petsResponse.statusText);
-                    throw new Error('Failed to fetch pets data');
+                // Update owner avatar - first try avatar_url (which should be a complete URL)
+                if (ownerData.avatar_url) {
+                    ownerAvatar.src = ownerData.avatar_url;
+                }
+                // Then try photo_data (base64)
+                else if (ownerData.photo_data) {
+                    ownerAvatar.src = `data:image/jpeg;base64,${ownerData.photo_data}`;
+                } 
+                // Fall back to default
+                else {
+                    ownerAvatar.src = defaultAvatarPath;
                 }
                 
-                const petsData = await petsResponse.json();
-                console.log('Pets data received:', petsData);
+                // Add error handling for the image loading
+                ownerAvatar.onerror = function() {
+                    console.log('Owner avatar failed to load, using default');
+                    this.src = defaultAvatarPath;
+                };
                 
-                // Update pets dropdown
-                updatePetsDropdown(petsData);
-                
-                // Show/hide appropriate sections with null checks
-                const ownerNameGroup = document.getElementById('owner_name_group');
-                const petSelectionGroup = document.getElementById('pet_selection_group');
-                const walkinPetGroup = document.getElementById('walkin_pet_group');
-                const registeredPetDetails = document.getElementById('registered_pet_details');
-
-                if (ownerNameGroup) ownerNameGroup.style.display = 'none';
-                if (petSelectionGroup) petSelectionGroup.style.display = 'block';
-                if (walkinPetGroup) walkinPetGroup.style.display = 'none';
-                if (registeredPetDetails) registeredPetDetails.style.display = 'block';
-                
+                // Continue with pets fetching...
             } catch (error) {
-                console.error('Error in owner selection:', error);
-                console.error('Error stack:', error.stack);
-                // Show error notification
-                showNotification('error', 'Failed to fetch owner data');
+                // Error handling...
             }
         } else {
             console.log('No owner selected, resetting form');
@@ -4226,6 +4215,259 @@ unset($__errorArgs, $__bag); ?>
 
     // Add change event listener
     reasonSelect.addEventListener('change', toggleVaccinationDetails);
+</script>
+<?php $__env->stopPush(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+    // Define default paths for images
+    const defaultAvatarPath = "<?php echo e(asset('storage/defaults/avatar.png')); ?>";
+    const defaultPawPath = "<?php echo e(asset('storage/defaults/paw.png')); ?>";
+    
+    // DOM elements loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing appointment form...');
+        
+        // Owner selection handling
+        const ownerSelect = document.getElementById('owner_id');
+        const ownerAvatar = document.getElementById('owner_avatar');
+        const petSelect = document.getElementById('pet_id');
+        const dynamicAvatar = document.getElementById('dynamic_avatar');
+        
+        // Check for required DOM elements
+        const ownerNameGroup = document.getElementById('owner_name_container');
+        const petSelectionGroup = document.getElementById('pet_select_container');
+        const walkinPetGroup = document.getElementById('walkin_pet_group');
+        const registeredPetDetails = document.getElementById('registered_pet_details');
+        
+        console.log('Elements check:', {
+            ownerSelect, ownerAvatar, petSelect, dynamicAvatar,
+            ownerNameGroup, petSelectionGroup, walkinPetGroup, registeredPetDetails,
+            defaultAvatarPath, defaultPawPath
+        });
+        
+        if (ownerSelect) {
+            ownerSelect.addEventListener('change', async function() {
+                const selectedOption = this.options[this.selectedIndex];
+                
+                if (selectedOption.value === 'no_account') {
+                    console.log('Walk-in selection');
+                    // Show walk-in UI
+                    ownerAvatar.src = defaultAvatarPath;
+                    
+                    if (petSelectionGroup) petSelectionGroup.style.display = 'none';
+                    if (ownerNameGroup) ownerNameGroup.style.display = 'block';
+                    if (walkinPetGroup) walkinPetGroup.style.display = 'block';
+                    if (registeredPetDetails) registeredPetDetails.style.display = 'none';
+                    
+                } else if (selectedOption.value) {
+                    console.log('Owner selected:', selectedOption.value, selectedOption.text);
+                    try {
+                        // 1. FETCH OWNER DATA
+                        console.log('Fetching owner data...');
+                        const ownerResponse = await fetch(`/api/owners/${selectedOption.value}`);
+                        
+                        if (!ownerResponse.ok) {
+                            console.error('Owner API error:', ownerResponse.status, ownerResponse.statusText);
+                            throw new Error('Failed to fetch owner data');
+                        }
+                        
+                        const ownerData = await ownerResponse.json();
+                        console.log('Owner data received:', ownerData);
+                        
+                        // Update owner avatar (prioritize photo_data)
+                        if (ownerData.photo_data) {
+                            ownerAvatar.src = `data:image/jpeg;base64,${ownerData.photo_data}`;
+                        } else if (ownerData.avatar_url) {
+                            ownerAvatar.src = ownerData.avatar_url;
+                        } else {
+                            ownerAvatar.src = defaultAvatarPath;
+                        }
+                        
+                        // Add error handling for image loading
+                        ownerAvatar.onerror = function() {
+                            console.log('Owner image failed to load, using default');
+                            this.src = defaultAvatarPath;
+                        };
+                        
+                        // 2. FETCH PETS FOR THIS OWNER
+                        console.log('Fetching pets for owner ID:', selectedOption.value);
+                        const petsResponse = await fetch(`/api/owners/${selectedOption.value}/pets`);
+                        
+                        if (!petsResponse.ok) {
+                            console.error('Pets API error:', petsResponse.status, petsResponse.statusText);
+                            throw new Error('Failed to fetch pets data');
+                        }
+                        
+                        const petsData = await petsResponse.json();
+                        console.log('Pets data received:', petsData);
+                        
+                        // 3. UPDATE PETS DROPDOWN
+                        updatePetsDropdown(petsData);
+                        
+                        // 4. SHOW/HIDE APPROPRIATE SECTIONS
+                        if (petSelectionGroup) petSelectionGroup.style.display = 'block';
+                        if (ownerNameGroup) ownerNameGroup.style.display = 'none';
+                        if (walkinPetGroup) walkinPetGroup.style.display = 'none';
+                        if (registeredPetDetails) registeredPetDetails.style.display = 'block';
+                        
+                    } catch (error) {
+                        console.error('Error in owner selection process:', error);
+                        ownerAvatar.src = defaultAvatarPath;
+                        
+                        // Show error notification if available
+                        if (typeof showNotification === 'function') {
+                            showNotification('error', `Failed to load data: ${error.message}`);
+                        } else {
+                            alert(`Error: ${error.message}`);
+                        }
+                    }
+                } else {
+                    console.log('No owner selected');
+                    ownerAvatar.src = defaultAvatarPath;
+                    
+                    // Reset pet section
+                    if (petSelect) {
+                        petSelect.innerHTML = '<option value="">Select Pet</option>';
+                    }
+                    if (dynamicAvatar) {
+                        dynamicAvatar.src = defaultPawPath;
+                    }
+                }
+            });
+        }
+        
+        // Pet selection event handling
+        if (petSelect) {
+            petSelect.addEventListener('change', function() {
+                console.log('Pet selection changed');
+                const selectedOption = this.options[this.selectedIndex];
+                
+                if (!dynamicAvatar) {
+                    console.error('Dynamic avatar element not found');
+                    return;
+                }
+                
+                if (selectedOption && selectedOption.value) {
+                    // Get pet data from data attributes
+                    const photoSrc = selectedOption.getAttribute('data-photo');
+                    console.log('Selected pet photo:', photoSrc);
+                    
+                    // Update pet image
+                    dynamicAvatar.src = photoSrc || defaultPawPath;
+                    
+                    // Add error handling for pet image
+                    dynamicAvatar.onerror = function() {
+                        console.log('Pet image failed to load, using default');
+                        this.src = defaultPawPath;
+                    };
+                    
+                    // Get and update pet details
+                    const petData = {
+                        name: selectedOption.getAttribute('data-name'),
+                        category: selectedOption.getAttribute('data-category'),
+                        breed: selectedOption.getAttribute('data-breed'),
+                        age: selectedOption.getAttribute('data-age'),
+                        weight: selectedOption.getAttribute('data-weight'),
+                        gender: selectedOption.getAttribute('data-gender')
+                    };
+                    
+                    // Update form fields with pet data
+                    updatePetDetails(petData);
+                    
+                } else {
+                    // Reset pet image and details
+                    console.log('No pet selected, using default image');
+                    dynamicAvatar.src = defaultPawPath;
+                    clearPetDetails();
+                }
+            });
+        }
+    });
+    
+    // Function to update pets dropdown with data from API
+    function updatePetsDropdown(pets) {
+        const petSelect = document.getElementById('pet_id');
+        if (!petSelect) {
+            console.error('Pet select element not found');
+            return;
+        }
+        
+        // Clear existing options
+        petSelect.innerHTML = '<option value="">Select Pet</option>';
+        
+        // Validate pets data
+        if (!Array.isArray(pets) || pets.length === 0) {
+            console.log('No pets found for this owner');
+            return;
+        }
+        
+        console.log(`Adding ${pets.length} pets to dropdown`);
+        
+        // Add each pet to the dropdown
+        pets.forEach(pet => {
+            const option = document.createElement('option');
+            option.value = pet.id;
+            option.textContent = `${pet.name} (${pet.category || 'Unknown'})`;
+            
+            // Set data attributes for pet details (prioritize photo_data)
+            if (pet.photo_data) {
+                option.setAttribute('data-photo', `data:image/jpeg;base64,${pet.photo_data}`);
+            } else if (pet.photo) {
+                option.setAttribute('data-photo', `/storage/${pet.photo}`);
+            } else {
+                option.setAttribute('data-photo', defaultPawPath);
+            }
+            
+            // Set other data attributes
+            option.setAttribute('data-name', pet.name || '');
+            option.setAttribute('data-category', pet.category || '');
+            option.setAttribute('data-breed', pet.breed || '');
+            option.setAttribute('data-age', pet.age ? pet.age.toString() : '');
+            option.setAttribute('data-weight', pet.weight ? pet.weight.toString() : '');
+            option.setAttribute('data-gender', pet.gender ? pet.gender.toLowerCase() : '');
+            
+            petSelect.appendChild(option);
+        });
+        
+        console.log(`Pet dropdown updated with ${pets.length} pets`);
+    }
+    
+    // Function to update pet detail fields
+    function updatePetDetails(petData) {
+        console.log('Updating pet details with:', petData);
+        
+        const petFields = {
+            'pet_name': petData.name || '',
+            'pet_category': petData.category || '',
+            'pet_breed': petData.breed || '',
+            'pet_age': petData.age || '',
+            'pet_weight': petData.weight || '',
+            'pet_gender': petData.gender ? 
+                petData.gender.charAt(0).toUpperCase() + petData.gender.slice(1) : ''
+        };
+        
+        // Update each field if it exists
+        Object.entries(petFields).forEach(([id, value]) => {
+            const field = document.getElementById(id);
+            if (field) field.value = value;
+        });
+    }
+    
+    // Function to clear pet detail fields
+    function clearPetDetails() {
+        console.log('Clearing pet details');
+        
+        const petFieldIds = [
+            'pet_name', 'pet_category', 'pet_breed', 
+            'pet_age', 'pet_weight', 'pet_gender'
+        ];
+        
+        petFieldIds.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) field.value = '';
+        });
+    }
 </script>
 <?php $__env->stopPush(); ?>
 

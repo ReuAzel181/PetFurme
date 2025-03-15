@@ -67,8 +67,8 @@
         return response()->json($history);
     });
 
-    Route::get('/owners/{owner}', [OwnerApiController::class, 'show']);
-    Route::get('/owners/{owner}/pets', [OwnerApiController::class, 'pets']);
+    Route::get('/owners/{owner}', [App\Http\Controllers\Api\OwnerApiController::class, 'show']);
+    Route::get('/owners/{owner}/pets', [App\Http\Controllers\Api\OwnerApiController::class, 'pets']);
     Route::get('/pets/{pet}', [PetApiController::class, 'show']);
 
     Route::get('products/{product}/binary-image', [ProductImageController::class, 'getBinaryImage']);

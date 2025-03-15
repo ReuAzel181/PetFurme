@@ -516,8 +516,20 @@
                                         </td>
                                         <td onclick="event.stopPropagation()"><?php echo e($user->id); ?></td>
                                         <td onclick="showUserDetails(<?php echo e($user->id); ?>)">
-                                            <img src="<?php echo e($user->photo ? asset('storage/' . $user->photo) : asset('PetFurme/default-avatar.png')); ?>" 
-                                                 alt="Avatar" class="avatar" style="width: 32px; height: 32px; border-radius: 50%;">
+                                            <?php
+                                                $modalImageSource = '';
+                                                if ($user->photo_data) {
+                                                    $modalImageSource = 'data:image/jpeg;base64,' . base64_encode($user->photo_data);
+                                                } elseif ($user->photo) {
+                                                    $modalImageSource = asset('storage/' . $user->photo);
+                                                } else {
+                                                    $modalImageSource = asset('PetFurme/default-avatar.png');
+                                                }
+                                            ?>
+                                            <img src="<?php echo e($modalImageSource); ?>" 
+                                                 alt="Avatar" 
+                                                 class="rounded-circle" 
+                                                 style="width: 60px; height: 60px; object-fit: cover; border: none; box-shadow: none;">
                                         </td>
                                         <td onclick="showUserDetails(<?php echo e($user->id); ?>)"><?php echo e($user->name); ?></td>
                                         <td onclick="showUserDetails(<?php echo e($user->id); ?>)"><?php echo e($user->email); ?></td>
@@ -665,8 +677,20 @@
                 <div class="modal-header bg-primary text-white py-3">
                     <div class="d-flex align-items-center">
                         <div class="me-3">
-                            <img src="<?php echo e($user->photo ? asset('storage/' . $user->photo) : asset('PetFurme/default-avatar.png')); ?>" 
-                                 alt="Avatar" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover; border: none; box-shadow: none;">
+                            <?php
+                                $modalImageSource = '';
+                                if ($user->photo_data) {
+                                    $modalImageSource = 'data:image/jpeg;base64,' . base64_encode($user->photo_data);
+                                } elseif ($user->photo) {
+                                    $modalImageSource = asset('storage/' . $user->photo);
+                                } else {
+                                    $modalImageSource = asset('PetFurme/default-avatar.png');
+                                }
+                            ?>
+                            <img src="<?php echo e($modalImageSource); ?>" 
+                                 alt="Avatar" 
+                                 class="rounded-circle" 
+                                 style="width: 60px; height: 60px; object-fit: cover; border: none; box-shadow: none;">
                         </div>
                         <div>
                             <h5 class="modal-title mb-0 fw-bold"><?php echo e($user->name); ?></h5>
@@ -825,8 +849,19 @@
                                                                 <div class="d-flex flex-column">
                                                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                                                         <div class="d-flex gap-3">
-                                                                            <img src="<?php echo e($pet->photo ? asset('storage/' . $pet->photo) : asset('images/default-pet.png')); ?>" 
-                                                                                 class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                                                            <?php
+                                                                                $petImageSource = '';
+                                                                                if ($pet->photo_data) {
+                                                                                    $petImageSource = 'data:image/jpeg;base64,' . base64_encode($pet->photo_data);
+                                                                                } elseif ($pet->photo) {
+                                                                                    $petImageSource = asset('storage/' . $pet->photo);
+                                                                                } else {
+                                                                                    $petImageSource = asset('images/default-pet.png');
+                                                                                }
+                                                                            ?>
+                                                                            <img src="<?php echo e($petImageSource); ?>" 
+                                                                                 class="rounded" 
+                                                                                 style="width: 80px; height: 80px; object-fit: cover;">
                                                                             <div>
                                                                                 <h4 class="mb-1"><?php echo e($pet->name); ?></h4>
                                                                                 <div class="text-muted"><?php echo e($pet->breed); ?></div>

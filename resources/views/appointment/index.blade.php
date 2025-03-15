@@ -14,9 +14,6 @@
                 </div>
                 <div class="col-auto ms-auto d-print-none">
                     <div class="d-flex gap-2">
-                        <button id="deleteSelected" class="btn btn-danger d-none">
-                            <i class="fas fa-trash me-2"></i>Delete Selected
-                        </button>
                         <a href="{{ route('appointment.create') }}" class="btn btn-success">
                             <i class="fas fa-plus me-2"></i>Add Appointment
                         </a>
@@ -58,9 +55,6 @@
                         <table class="table table-vcenter card-table table-striped">
                             <thead>
                                 <tr>
-                                    <th width="3%">
-                                        <input type="checkbox" class="form-check-input" id="selectAll">
-                                    </th>
                                     <th width="5%">ID</th>
                                     <th width="12%">Owner Details</th>
                                     <th width="12%">Pet Details</th>
@@ -75,11 +69,8 @@
                             <tbody>
                                 @forelse($appointments as $appointment)
                                     <tr style="cursor: pointer" 
-                                        onclick="showAppointmentDetails({{ json_encode($appointment) }})"
+                                        data-appointment="{{ htmlspecialchars(json_encode($appointment), ENT_QUOTES, 'UTF-8') }}"
                                         class="appointment-row">
-                                        <td onclick="event.stopPropagation()">
-                                            <input type="checkbox" class="form-check-input appointment-checkbox" value="{{ $appointment->id }}">
-                                        </td>
                                         <td class="text-muted">
                                             #{{ str_pad($appointment->id, 5, '0', STR_PAD_LEFT) }}
                                         </td>
@@ -104,15 +95,15 @@
 
                                                         @if($userImage)
                                                             <img src="{{ $userImage }}" 
-                                                                 alt="{{ $appointment->display_name }}" 
+                                                                 alt="{{ $appointment->user->name }}" 
                                                                  class="avatar avatar-sm rounded-circle"
                                                                  style="width: 32px; height: 32px; object-fit: cover;">
                                                         @else
                                                             <span class="avatar avatar-sm rounded-circle bg-primary-lt">
-                                                                {{ strtoupper(substr($appointment->display_name, 0, 1)) }}
+                                                                {{ strtoupper(substr($appointment->user->name, 0, 1)) }}
                                                             </span>
                                                         @endif
-                                                        <div class="text-dark fw-bold">{{ $appointment->display_name }}</div>
+                                                        <div class="text-dark fw-bold">{{ $appointment->user->name }}</div>
                                                     </div>
                                                 @endif
                                                 @if($appointment->is_walk_in)
@@ -261,11 +252,23 @@
                                         </td>
                                         <td>
                                             @if($appointment->status !== 'completed')
+                                                @php
+                                                    // Convert the appointment to an array and remove any circular references
+                                                    $appointmentData = [
+                                                        'id' => $appointment->id,
+                                                        'user_id' => $appointment->user_id,
+                                                        'pet_id' => $appointment->pet_id,
+                                                        'pet_name' => $appointment->pet_name,
+                                                        'appointment_date' => $appointment->appointment_date,
+                                                        'appointment_time' => $appointment->appointment_time,
+                                                        'reason_for_visit' => $appointment->reason_for_visit,
+                                                        'status' => $appointment->status,
+                                                        'display_name' => $appointment->user ? $appointment->user->name : $appointment->owner_name,
+                                                    ];
+                                                @endphp
                                                 <button type="button" 
-                                                        class="btn btn-primary btn-sm"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#medicalRecordModal"
-                                                        onclick="initializeMedicalRecord({{ json_encode($appointment) }})">
+                                                        class="btn btn-primary btn-sm complete-btn"
+                                                        data-appointment='{{ json_encode($appointmentData) }}'>
                                                     <i class="fas fa-clipboard-check me-1"></i>
                                                     Complete
                                                 </button>
@@ -343,7 +346,7 @@
 
 <!-- Medical Record Modal -->
 <div class="modal fade" id="medicalRecordModal" tabindex="-1" role="dialog" aria-labelledby="medicalRecordModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: 1200px;">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document" style="max-width: 1300px;">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white py-2">
                 <div class="d-flex align-items-center">
@@ -379,13 +382,13 @@
                             <div class="row g-3 mb-4">
                         <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="form-label small mb-1">Name of Patient</label>
+                                        <label class="form-label small mb-1">Name</label>
                                         <input type="text" class="form-control" id="patientName" name="patient_name" readonly>
                                     </div>
                         </div>
                         <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="form-label small mb-1">Address</label>
+                                        <label class="form-label small mb-1">Number</label>
                                         <input type="text" class="form-control" name="address">
                                     </div>
                                 </div>
@@ -404,9 +407,9 @@
                     </div>
 
                             <!-- Services Section -->
-                            <div class="mb-4">
+                            <div class="mb-4 services-section">
                                 <h6 class="fw-bold mb-3">Services</h6>
-                                <div class="table-responsive">
+                                <div class="services-table-container">
                                     <table class="table table-borderless align-middle" id="servicesTable">
                                         <thead>
                                             <tr>
@@ -421,14 +424,11 @@
                                                     <div class="d-flex flex-column">
                                                         <select class="form-select form-select-sm" name="services[]" onchange="handleServiceSelection(this)">
                                                             <option value="">Select Service</option>
-                                                            <option value="consultation" data-price="300">Consultation</option>
-                                                            <option value="vaccination" data-price="800">Vaccination</option>
-                                                            <option value="deworming" data-price="500">Deworming</option>
-                                                            <option value="grooming" data-price="800">Grooming</option>
-                                                            <option value="surgery" data-price="5000">Surgery</option>
-                                                            <option value="laboratory" data-price="1500">Laboratory</option>
-                                                            <option value="dental" data-price="1000">Dental Cleaning</option>
-                                                            <option value="boarding" data-price="500">Boarding (per day)</option>
+                                                            <option value="consultation">Consultation</option>
+                                                            <option value="vaccination">Vaccination</option>
+                                                            <option value="deworming">Deworming</option>
+                                                            <option value="grooming">Grooming</option>
+                                                            <option value="surgery">Surgery</option>
                                                             <option value="custom">Other Service</option>
                                                         </select>
                                                         <input type="text" class="form-control form-control-sm custom-service d-none mt-2" 
@@ -436,10 +436,13 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text border-0 bg-transparent px-0">₱</span>
-                                                        <input type="number" class="form-control form-control-sm text-end border-0 service-amount" 
-                                                               name="service_amounts[]" value="0">
+                                                    <div class="input-group has-peso">
+                                                        <span class="input-group-text bg-transparent">₱</span>
+                                                        <input type="number" class="form-control form-control-sm text-end service-amount" 
+                                                               name="service_amounts[]" value="0" 
+                                                               onfocus="if(this.value=='0'){this.value='';}" 
+                                                               onblur="if(this.value==''){this.value='0';}"
+                                                               oninput="updateTotals()">
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
@@ -472,25 +475,23 @@
                                         <table class="table table-borderless align-middle" id="productsTable">
                                             <thead class="sticky-top bg-white">
                                                 <tr>
-                                                    <th class="text-muted small" style="width: 50%">ITEM</th>
+                                                    <th class="text-muted small" style="width: 45%">ITEM</th>
                                                     <th class="text-center text-muted small" style="width: 20%">QTY</th>
                                                     <th class="text-end text-muted small" style="width: 25%">AMOUNT</th>
-                                                    <th style="width: 5%"></th>
+                                                    <th style="width: 10%"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <select class="form-select form-select-sm mb-2" name="products[]" onchange="handleProductSelection(this)">
+                                                        <select class="form-select form-select-sm" name="products[]" onchange="handleProductSelection(this)">
                                                             <option value="">Select Product</option>
                                                             @foreach($products as $product)
                                                                 <option value="{{ $product->id }}" 
-                                                                        data-price="{{ $product->selling_price }}"
                                                                         data-stock="{{ $product->quantity }}">
-                                                                    {{ $product->name }} (₱{{ number_format($product->selling_price, 2) }})
+                                                                    {{ $product->name }} (₱{{ number_format($product->selling_price * 100, 2) }})
                                                                 </option>
                                                             @endforeach
-                                                            <option value="custom">Other Product</option>
                                                         </select>
                                                         <input type="text" class="form-control form-control-sm custom-product d-none" 
                                                                placeholder="Enter product name" name="custom_products[]">
@@ -500,14 +501,16 @@
                                                                name="product_qty[]" value="1" min="1" onchange="updateProductTotal(this)">
                                                     </td>
                                                     <td>
-                                                        <div class="input-group input-group-sm">
-                                                            <span class="input-group-text border-0 bg-transparent px-0">₱</span>
-                                                            <input type="number" class="form-control form-control-sm text-end border-0 product-amount" 
-                                                                   name="product_amounts[]" value="0" readonly>
+                                                        <div class="input-group has-peso">
+                                                            <span class="input-group-text bg-transparent">₱</span>
+                                                            <input type="number" class="form-control form-control-sm text-end product-amount" 
+                                                                   name="product_amounts[]" value="0" readonly
+                                                                   onfocus="if(this.value=='0'){this.value='';}" 
+                                                                   onblur="if(this.value==''){this.value='0';}">
                                                         </div>
                                                     </td>
                                                     <td class="text-center">
-                                                        <button type="button" class="btn btn-sm btn-link text-danger p-1" onclick="removeProductRow(this)">
+                                                        <button type="button" class="btn btn-sm btn-link text-danger p-1 delete-product-btn" style="display: none;" onclick="removeProductRow(this)">
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </td>
@@ -530,23 +533,22 @@
                                             <span class="text-muted">Products Subtotal:</span>
                                             <span class="fw-medium">₱<span id="productsSubtotal">0.00</span></span>
                                         </div>
-                                        <div class="mb-2 d-flex justify-content-between">
-                                            <span class="text-muted">Total:</span>
-                                            <span class="fw-medium">₱<span id="subtotal">0.00</span></span>
-                                        </div>
-                                        <div class="mb-2">
-                                            <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex justify-content-between mb-2">
                                                 <span class="text-muted">Discount:</span>
-                                                <div class="d-flex gap-2" style="width: 150px">
-                                                    <input type="number" class="form-control form-control-sm text-end" 
-                                                           id="discountAmount" name="discount_amount" value="0">
-                                                    <select class="form-select form-select-sm" id="discountType" 
-                                                            name="discount_type" style="width: 60px">
-                                                        <option value="amount">₱</option>
-                                                        <option value="percent">%</option>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="input-group input-group-sm" style="width: 200px;">
+                                                    <input type="number" id="discountAmount" class="form-control text-end" value="0" min="0">
+                                                    <select id="discountType" class="form-select" style="max-width: 100px;">
+                                                        <option value="fixed">₱</option>
+                                                        <option value="percentage">%</option>
                                                     </select>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="text-end text-muted small" id="discountDisplay">₱0.00</div>
+                                        <div class="mb-2 d-flex justify-content-between">
+                                            <span class="text-muted">Total:</span>
+                                            <span class="fw-medium">₱<span id="subtotal">0.00</span></span>
                                         </div>
                                         <div class="pt-2 border-top">
                                             <div class="d-flex justify-content-between align-items-center">
@@ -820,8 +822,10 @@
     }
 
     .modal-body {
+        height: auto;
+        max-height: none;
+        overflow-y: visible;
         padding: 1.5rem;
-        position: relative;
     }
 
     .input-group-flat .form-control {
@@ -1026,8 +1030,10 @@
     }
 
     /* Update modal styles */
-    .modal-dialog.modal-lg {
-        max-width: 800px;
+    .modal-dialog.modal-xl {
+        max-width: 1300px;
+        width: 95%;
+        margin: 1.75rem auto;
     }
 
     .modal-content {
@@ -1159,261 +1165,333 @@
     }
 
     .input-group-sm > .form-control,
-    .input-group-sm > .form-select {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
+    .input-group-sm > .form-select,
+    .input-group-sm > .input-group-text {
+        min-width: 60px;
+        text-align: right;
+    }
+    
+    .input-group-text.border-0 {
+        padding: 0.375rem 0.5rem;
+        display: flex;
+        align-items: center;
+        height: 100%;
     }
 
+    .input-group > .input-group-text {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Ensure input groups maintain proper height */
+    .input-group {
+        align-items: center;
+        height: 36px;
+    }
+
+    /* Adjust amount input padding to accommodate the peso symbol */
     .service-amount,
-    .service-total {
-        background-color: #f8f9fa;
+    .product-amount {
+        padding-left: 1.5rem !important;
     }
 
-    /* Add to your existing styles */
-    .table.align-middle td {
-        vertical-align: middle;
-    }
-
-    .service-amount,
-    .service-total {
-        background-color: transparent !important;
-        font-family: monospace;
-        font-size: 14px;
-    }
-
-    .input-group-sm .form-control {
-        min-height: 30px;
-    }
-
-    .input-group-text.bg-transparent {
-        font-family: monospace;
-        font-size: 14px;
-    }
-
-    .card.shadow-sm {
-        border: 1px solid rgba(0,0,0,.05);
-    }
-
-    #total {
-        font-family: monospace;
-        font-size: 20px;
-    }
-
-    #subtotal {
-        font-family: monospace;
-    }
-
-    .form-control:read-only {
-        background-color: transparent !important;
-    }
-
-    .table td {
-        padding: 0.5rem;
-    }
-
-    .form-select-sm {
-        min-height: 30px;
-    }
-
-    /* Improve number input appearance */
-    input[type="number"] {
-        -moz-appearance: textfield;
-    }
-
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    /* Add subtle hover effect to service rows */
-    #servicesTable tbody tr:hover {
-        background-color: rgba(0,0,0,.01);
-    }
-
-    /* Improve discount inputs */
-    #discountAmount {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-    }
-
-    #discountType {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-left: 0;
-    }
-
-    /* Add to your existing styles */
-    .custom-service {
-        margin-top: 0.5rem;
-        background-color: #fff !important;
-        border: 1px solid #dee2e6;
-    }
-
-    .service-amount {
-        background-color: transparent !important;
-        font-family: monospace;
-        font-size: 14px;
-    }
-
-    .service-amount:not([readonly]) {
-        background-color: #fff !important;
-        border: 1px solid #dee2e6 !important;
-    }
-
-    /* Add to your existing styles */
-    .btn-link.text-danger {
-        padding: 4px 8px;
-        border-radius: 4px;
-    }
-
-    .btn-link.text-danger:hover {
-        background-color: rgba(220, 53, 69, 0.1);
-    }
-
-    .btn-link.text-danger i {
-        font-size: 14px;
-    }
-
-    #servicesTable tbody tr {
-        transition: all 0.2s ease-in-out;
-    }
-
-    #servicesTable tbody tr:hover {
-        background-color: rgba(0,0,0,0.02);
-    }
-
-    /* Add to your existing styles */
-    .table-responsive {
-        scrollbar-width: thin;
-        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-    }
-
-    .table-responsive::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .table-responsive::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .table-responsive::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-    }
-
-    .sticky-top {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .form-select-sm {
-        min-height: 31px;
-    }
-
-    .card-body {
+    /* Position the peso symbol absolutely within the input group */
+    .input-group.has-peso {
         position: relative;
     }
 
-    #productsTable td {
-        padding: 0.5rem;
+    /* Ensure input fields have proper width for numbers */
+    .input-group.has-peso {
+        position: relative;
+        min-width: 120px; /* Set minimum width */
     }
-
-    #productsTable .form-select,
-    #productsTable .form-control {
-        font-size: 0.875rem;
+    
+    /* Make amount inputs wider to prevent number cutoff */
+    .service-amount,
+    .product-amount {
+        padding-left: 1.5rem !important;
+        min-width: 100px; /* Minimum width for number inputs */
     }
-
-    /* Add to your existing styles */
-    .modal-dialog-centered {
+    
+    /* Update the peso symbol positioning */
+    .input-group-text.bg-transparent {
+        position: absolute;
+        z-index: 4;
+        background: transparent !important;
+        border: none;
+        height: 100%;
         display: flex;
         align-items: center;
-        min-height: calc(100% - 1rem);
+        padding-left: 0.75rem;
+        margin-top: 0; /* Ensure vertical alignment */
+    }
+    
+    /* Make sure the remove buttons have enough space */
+    .btn-sm.btn-link.text-danger {
+        padding: 0.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        min-height: 28px;
     }
 
-    .modal-content {
-        max-height: 90vh;
-        overflow-y: auto;
+    /* Fix field alignment in product table */
+    #productsTable th, #productsTable td {
+        padding: 0.5rem;
+        vertical-align: middle;
+    }
+    
+    /* Make quantity input wider */
+    .product-qty {
+        min-width: 70px;
+        width: 100%;
+    }
+    
+    /* Ensure consistent spacing */
+    #productsTable tr {
+        display: table-row;
+    }
+    
+    #productsTable td {
+        display: table-cell;
+    }
+    
+    /* Align amount column to the right */
+    #productsTable th:nth-child(3), 
+    #productsTable td:nth-child(3) {
+        text-align: right;
+    }
+    
+    /* Ensure service table has matching alignment */
+    #servicesTable th, #servicesTable td {
+        padding: 0.5rem;
+        vertical-align: middle;
     }
 
-    .modal-body {
-        padding: 2rem !important;
+    /* Fixed width columns to prevent shifting */
+    #productsTable {
+        table-layout: fixed;
+        width: 100%;
+    }
+    
+    /* Ensure product table cells maintain fixed width */
+    #productsTable th:nth-child(1), 
+    #productsTable td:nth-child(1) {
+        width: 45%;
+    }
+    
+    #productsTable th:nth-child(2), 
+    #productsTable td:nth-child(2) {
+        width: 20%;
+        text-align: center;
+    }
+    
+    #productsTable th:nth-child(3), 
+    #productsTable td:nth-child(3) {
+        width: 25%;
+        text-align: right;
+    }
+    
+    /* Fix action buttons position */
+    .delete-product-btn {
+        position: relative;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Fix product qty input to prevent layout shifts */
+    .product-qty {
+        width: 70px;
+        min-width: 70px;
+        text-align: center;
     }
 
-    .card {
-        border: 1px solid rgba(0,0,0,.08);
+    /* Ensure all form elements in product table are aligned */
+    #productsTable .form-select,
+    #productsTable .form-control,
+    #productsTable .input-group {
+        margin-bottom: 0 !important;
+        height: 36px !important;
     }
-
-    .table-responsive {
-        background: #fff;
-        border-radius: 0.5rem;
+    
+    /* Remove extra margin from the select dropdown that's causing misalignment */
+    #productsTable .form-select-sm.mb-2 {
+        margin-bottom: 0 !important;
+        vertical-align: middle;
+    }
+    
+    /* Make sure all cells are vertically aligned */
+    #productsTable td {
+        vertical-align: middle !important;
         padding: 0.5rem;
     }
+    
+    /* Ensure consistent sizing for all input elements */
+    #productsTable input,
+    #productsTable select {
+        height: 36px !important;
+        line-height: 1.5;
+        box-sizing: border-box;
+    }
 
-    #productsTable thead th {
-        padding: 0.75rem 0.5rem;
-        background: #f8f9fa;
+    /* Center the peso symbol */
+    .input-group-text.bg-transparent {
+        position: absolute;
+        z-index: 4;
+        background: transparent !important;
+        border: none;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 25px;
+        padding: 0;
+        left: 0;
+        text-align: center;
+    }
+    
+    /* Center percentage symbol in dropdown */
+    #discountType {
+        text-align: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* Make services table scrollable */
+    #servicesTable {
+        width: 100%;
+        margin-bottom: 0;
+        table-layout: fixed;
+    }
+    
+    /* Ensure table cells have proper width */
+    #servicesTable th, 
+    #servicesTable td {
+        vertical-align: middle;
+    }
+    
+    /* Fix tbody display to not be a block element */
+    #servicesTable tbody {
+        display: table-row-group; /* Reset to default table display */
+    }
+    
+    /* Fix header position */
+    #servicesTable thead {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 1;
+        display: table-header-group;
+    }
+    
+    /* Ensure consistent styling for table footer */
+    #servicesTable tfoot {
+        display: table-footer-group;
+    }
+    
+    /* Remove unnecessary flex properties that may affect layout */
+    .services-section {
+        height: auto;
+        display: block;
+    }
+    
+    /* Ensure table cells have proper width */
+    #servicesTable th, 
+    #servicesTable td {
+        vertical-align: middle;
+    }
+
+    /* Fix modal to have a consistent height without scrolling */
+    .modal-dialog.modal-xl {
+        max-width: 1300px;
+        width: 95%;
+        margin: 1.75rem auto;
+    }
+    
+    /* Remove scrolling from modal body */
+    .modal-body {
+        overflow-y: initial !important;
+        height: auto !important;
+        padding: 1rem !important;
+    }
+    
+    /* Make only the services container scrollable */
+    .services-table-container {
+        height: 220px !important; /* Reduced from 300px */
+        max-height: 220px !important;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border: 1px solid rgba(0,0,0,0.08);
         border-radius: 0.25rem;
     }
-
-    .form-control, .form-select {
-        padding: 0.5rem 0.75rem;
+    
+    /* Ensure tables inside the scrollable container work properly */
+    .services-table-container #servicesTable {
+        margin-bottom: 0;
+    }
+    
+    /* Fix services section layout */
+    .services-section {
+        display: block;
+        height: auto;
+    }
+    
+    /* Keep the header at the top when scrolling */
+    #servicesTable thead {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 2;
     }
 
-    .input-group-sm > .form-control,
-    .input-group-sm > .form-select {
-        padding: 0.4rem 0.5rem;
+    /* Reduce products section height */
+    #productsTable {
+        margin-bottom: 0;
     }
-
-    /* Improve scrollbar appearance */
-    .modal-content::-webkit-scrollbar,
-    .table-responsive::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+    
+    /* Reduce products container height */
+    .table-responsive[style*="max-height: 400px"] {
+        max-height: 220px !important; /* Reduced from 400px */
     }
-
-    .modal-content::-webkit-scrollbar-thumb,
-    .table-responsive::-webkit-scrollbar-thumb {
-        background: #d1d5db;
-        border-radius: 4px;
+    
+    /* Reduce spacing in form sections */
+    .row.g-4 {
+        --bs-gutter-y: 0.5rem !important;
     }
-
-    .modal-content::-webkit-scrollbar-track,
-    .table-responsive::-webkit-scrollbar-track {
-        background: #f3f4f6;
-        border-radius: 4px;
+    
+    /* Reduce padding in card body */
+    .card-body.p-4 {
+        padding: 0.75rem !important;
     }
-
-    /* Add subtle transitions */
-    .modal.fade .modal-dialog {
-        transition: transform 0.2s ease-out;
+    
+    /* Reduce spacing in summary section */
+    .border-top.pt-4 {
+        padding-top: 0.75rem !important;
     }
-
-    .modal.fade .modal-content {
-        transition: opacity 0.2s ease-out;
+    
+    /* Reduce spacing between sections */
+    .mb-4 {
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* Keep header sticky */
+    #servicesTable thead,
+    #productsTable thead {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 2;
     }
 </style>
 @endpush
 
 @push('page-scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Show success toast if there's a success message
-    @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: "{{ session('success') }}",
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true
-        });
-    @endif
-});
-
+// Define functions first
 function showAppointmentDetails(appointment) {
     // Prevent row click when clicking action buttons
     if (event.target.closest('.btn')) {
@@ -1438,196 +1516,34 @@ function showAppointmentDetails(appointment) {
         </div>
     `;
 
-    document.getElementById('pet-details').innerHTML = `
-        <div class="d-flex flex-column">
-            <span class="fw-bold">${appointment.pet_name}</span>
-            <div class="mt-1">
-                <span class="badge bg-blue-lt">${appointment.pet_type}</span>
-                <span class="badge bg-green-lt ms-1">${appointment.age_display}</span>
-            </div>
-        </div>
-    `;
-
     modal.show();
 }
 
-function removeBackdrop() {
-    // Remove any lingering backdrop
-    const backdrops = document.getElementsByClassName('modal-backdrop');
-    while(backdrops.length > 0) {
-        backdrops[0].parentNode.removeChild(backdrops[0]);
+function handleCompleteClick(appointment) {
+    console.log('HandleCompleteClick called with:', appointment);
+    
+    // Show the modal first
+    const modalElement = document.getElementById('medicalRecordModal');
+    if (!modalElement) {
+        console.error('Modal element not found!');
+        return;
     }
     
-    // Remove modal-open class from body
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
-}
-
-// Add event listener for modal hidden event
-document.getElementById('appointmentModal').addEventListener('hidden.bs.modal', removeBackdrop);
-
-function saveDiagnosis() {
-    const form = document.getElementById('diagnosisForm');
-    const formData = new FormData(form);
-
-    Swal.fire({
-        title: 'Saving Medical Record',
-        text: 'Please wait...',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        willOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    fetch('/medical-records', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Medical record has been saved',
-                showConfirmButton: false,
-                timer: 1500
-            }).then(() => {
-                location.reload();
-            });
-        } else {
-            throw new Error(data.message || 'Error saving medical record');
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message
-        });
-    });
-}
-
-function showDiagnosisForm(appointment) {
-    const modal = new bootstrap.Modal(document.getElementById('appointmentModal'));
-    
-    // Set hidden fields
-    document.getElementById('appointment_id').value = appointment.id;
-    document.getElementById('pet_id').value = appointment.pet_id;
-
-    // Set owner details
-    document.getElementById('owner-details').innerHTML = `
-        <strong>${appointment.display_name}</strong>
-        <span class="badge ${appointment.is_walk_in ? 'bg-yellow-lt' : 'bg-azure-lt'} ms-1">
-            ${appointment.is_walk_in ? 'Walk-in' : 'Registered'}
-        </span>
-    `;
-
-    // Set pet details
-    document.getElementById('pet-details').innerHTML = `
-        <strong>${appointment.pet_name}</strong>
-        <span class="badge bg-blue-lt ms-1">${appointment.pet_type}</span>
-    `;
-
+    const modal = new bootstrap.Modal(modalElement);
     modal.show();
-}
-
-function handleServiceSelection(select) {
-    const row = select.closest('tr');
-    const customServiceInput = row.querySelector('.custom-service');
-    const amountInput = row.querySelector('.service-amount');
-    const selectedOption = select.options[select.selectedIndex];
     
-    if (select.value === 'custom') {
-        customServiceInput.classList.remove('d-none');
-        amountInput.readOnly = false;
-        amountInput.value = '0';
-    } else {
-        customServiceInput.classList.add('d-none');
-        customServiceInput.value = '';
-        amountInput.readOnly = true;
-        if (selectedOption.dataset.price) {
-            amountInput.value = selectedOption.dataset.price;
-        } else {
-            amountInput.value = '0';
-        }
+    // Then try to initialize with appointment data
+    try {
+        initializeMedicalRecord(appointment);
+    } catch (error) {
+        console.error('Error in initializeMedicalRecord:', error);
     }
-    
-    updateTotals();
 }
-
-function addServiceRow() {
-    const tbody = document.querySelector('#servicesTable tbody');
-    const firstRow = tbody.querySelector('tr');
-    const newRow = firstRow.cloneNode(true);
-    
-    // Reset values in the new row
-    newRow.querySelectorAll('select, input').forEach(input => {
-        input.value = '';
-        if (input.classList.contains('service-amount')) {
-            input.value = '0';
-        }
-        if (input.classList.contains('custom-service')) {
-            input.classList.add('d-none');
-        }
-    });
-    
-    tbody.appendChild(newRow);
-    updateTotals();
-}
-
-function updateTotals() {
-    let servicesSubtotal = 0;
-    let productsSubtotal = 0;
-
-    // Calculate services subtotal
-    document.querySelectorAll('.service-amount').forEach(input => {
-        servicesSubtotal += parseFloat(input.value || 0);
-    });
-    
-    // Calculate products subtotal
-    document.querySelectorAll('.product-amount').forEach(input => {
-        productsSubtotal += parseFloat(input.value || 0);
-    });
-    
-    // Update subtotals display
-    document.getElementById('servicesSubtotal').textContent = servicesSubtotal.toFixed(2);
-    document.getElementById('productsSubtotal').textContent = productsSubtotal.toFixed(2);
-    
-    const subtotal = servicesSubtotal + productsSubtotal;
-    document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-
-    // Calculate discount
-    const discountAmount = parseFloat(document.getElementById('discountAmount').value || 0);
-    const discountType = document.getElementById('discountType').value;
-    let discount = 0;
-
-    if (discountType === 'percent') {
-        discount = subtotal * (discountAmount / 100);
-    } else {
-        discount = discountAmount;
-    }
-
-    // Calculate and update total
-    const total = subtotal - discount;
-    document.getElementById('total').textContent = `₱${total.toFixed(2)}`;
-}
-
-// Add event listeners for discount changes
-document.getElementById('discountAmount').addEventListener('input', updateTotals);
-document.getElementById('discountType').addEventListener('change', updateTotals);
 
 function initializeMedicalRecord(appointment) {
     // Set appointment details in the form
     document.getElementById('appointment_id').value = appointment.id;
     document.getElementById('pet_id').value = appointment.pet_id;
-
-    // Set patient name (owner's name)
     document.getElementById('patientName').value = appointment.display_name;
 
     // Reset form sections
@@ -1639,12 +1555,37 @@ function initializeMedicalRecord(appointment) {
     // Initialize invoice number
     document.getElementById('invoiceNumber').textContent = generateInvoiceNumber();
     
-    // Reset services table to initial state
-    const tbody = document.querySelector('#servicesTable tbody');
-    while (tbody.rows.length > 1) {
-        tbody.deleteRow(1);
+    // Get the first service select dropdown
+    const serviceSelect = document.querySelector('#servicesTable tbody tr:first-child select');
+    
+    if (serviceSelect && appointment.reason_for_visit) {
+        try {
+            let reason = appointment.reason_for_visit[0];
+            // Clean up the reason string if it contains extra quotes or brackets
+            reason = reason.replace(/[\[\]"]/g, '');
+            
+            // Map the reason to the corresponding option value
+            const reasonToValue = {
+                'Consultation': 'consultation',
+                'Vaccination': 'vaccination',
+                'Deworming': 'deworming',
+                'Grooming': 'grooming',
+                'Surgery': 'surgery',
+                'Laboratory': 'laboratory',
+                'Dental Cleaning': 'dental',
+                'Boarding': 'boarding'
+            };
+
+            // Set the selected value
+            if (reasonToValue[reason]) {
+                serviceSelect.value = reasonToValue[reason];
+                // Trigger the change event to update any dependent fields
+                handleServiceSelection(serviceSelect);
+            }
+        } catch (error) {
+            console.error('Error setting service:', error);
+        }
     }
-    tbody.rows[0].querySelectorAll('input, select').forEach(input => input.value = '');
     
     // Reset products table to initial state
     const productsTbody = document.querySelector('#productsTable tbody');
@@ -1657,129 +1598,175 @@ function initializeMedicalRecord(appointment) {
     updateTotals();
 }
 
+// Make sure this function exists
 function generateInvoiceNumber() {
-    // Generate a random 7-digit number
-    return String(Math.floor(Math.random() * 9000000) + 1000000).padStart(7, '0'));
+    return String(Math.floor(Math.random() * 9000000) + 1000000);
 }
 
-function saveMedicalRecord() {
-    const form = document.getElementById('medicalRecordForm');
-    const formData = new FormData(form);
-
-    // Show loading state
-    Swal.fire({
-        title: 'Saving...',
-        text: 'Please wait while we save the medical record',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        willOpen: () => {
-            Swal.showLoading();
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event delegation for appointment rows
+    document.querySelector('tbody').addEventListener('click', function(e) {
+        const row = e.target.closest('.appointment-row');
+        if (row && !e.target.closest('.btn')) {
+            try {
+                const appointmentData = row.dataset.appointment;
+                if (!appointmentData) {
+                    console.error('No appointment data found');
+                    return;
+                }
+                const appointment = JSON.parse(appointmentData);
+                showAppointmentDetails(appointment);
+            } catch (error) {
+                console.error('Error parsing appointment data:', error);
+            }
         }
     });
 
-    // Submit the form
-    fetch('/medical-records', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+    // Add event delegation for complete buttons with more detailed debugging
+    document.querySelector('tbody').addEventListener('click', function(e) {
+        const completeBtn = e.target.closest('.complete-btn');
+        if (completeBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Complete button clicked');
+            console.log('Button element:', completeBtn);
+            console.log('Raw data-appointment:', completeBtn.getAttribute('data-appointment'));
+            
+            try {
+                const appointmentData = completeBtn.getAttribute('data-appointment');
+                console.log('Appointment data string:', appointmentData);
+                
+                if (!appointmentData) {
+                    console.error('No appointment data found on complete button');
+                    return;
+                }
+                
+                const appointment = JSON.parse(appointmentData);
+                console.log('Parsed appointment:', appointment);
+                
+                handleCompleteClick(appointment);
+            } catch (error) {
+                console.error('Error details:', {
+                    message: error.message,
+                    button: completeBtn,
+                    rawData: completeBtn.getAttribute('data-appointment')
+                });
+            }
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
+    });
+
+    // Show success toast if there's a success message
+    @if(session('success'))
             Swal.fire({
                 icon: 'success',
                 title: 'Success!',
-                text: 'Medical record has been saved',
+            text: "{{ session('success') }}",
+            toast: true,
+            position: 'top-end',
                 showConfirmButton: false,
-                timer: 1500
-            }).then(() => {
-                // Close modal and refresh page
-                bootstrap.Modal.getInstance(document.getElementById('medicalRecordModal')).hide();
-                location.reload();
-            });
-        } else {
-            throw new Error(data.message || 'Error saving medical record');
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message
+            timer: 3000,
+            timerProgressBar: true
+        });
+    @endif
+
+    // Add quantity change handler
+    document.querySelectorAll('.product-qty').forEach(input => {
+        input.addEventListener('change', function() {
+            const row = this.closest('tr');
+            const select = row.querySelector('select');
+            if (select.value && select.value !== 'custom') {
+                const selectedText = select.options[select.selectedIndex].text;
+                const priceMatch = selectedText.match(/₱([\d,]+\.?\d*)/);
+                if (priceMatch) {
+                    const price = parseFloat(priceMatch[1].replace(/,/g, ''));
+                    const quantity = parseFloat(this.value) || 0;
+                    const amountInput = row.querySelector('.product-amount');
+                    amountInput.value = (price * quantity).toFixed(2);
+                    updateTotals();
+                }
+            }
         });
     });
-}
 
-function removeServiceRow(button) {
-    const tbody = document.querySelector('#servicesTable tbody');
-    if (tbody.rows.length > 1) {
-        // Remove the row
-        const row = button.closest('tr');
-        row.remove();
-        // Update totals after removing the row
-        updateTotals();
-    } else {
-        // If it's the last row, just clear the values
-        const row = button.closest('tr');
-        row.querySelector('select').value = '';
-        row.querySelector('.service-amount').value = '0';
-        const customService = row.querySelector('.custom-service');
-        if (customService) {
-            customService.value = '';
-            customService.classList.add('d-none');
-        }
-        updateTotals();
+    // Add discount input handlers
+    const discountAmount = document.getElementById('discountAmount');
+    const discountType = document.getElementById('discountType');
+
+    if (discountAmount && discountType) {
+        discountAmount.addEventListener('input', updateTotals);
+        discountType.addEventListener('change', updateTotals);
+        
+        // Clear zero on focus
+        discountAmount.addEventListener('focus', function() {
+            if (this.value === '0') {
+                this.value = '';
+            }
+        });
+        
+        // Reset to zero if empty on blur
+        discountAmount.addEventListener('blur', function() {
+            if (this.value === '') {
+                this.value = '0';
+            }
+        });
     }
-}
+});
 
-function handleProductSelection(select) {
+// Improved function to handle service selection
+function handleServiceSelection(select) {
     const row = select.closest('tr');
-    const customProductInput = row.querySelector('.custom-product');
-    const amountInput = row.querySelector('.product-amount');
-    const selectedOption = select.options[select.selectedIndex];
+    const customServiceInput = row.querySelector('.custom-service');
+    const amountInput = row.querySelector('.service-amount');
     
     if (select.value === 'custom') {
-        customProductInput.classList.remove('d-none');
-        amountInput.readOnly = false;
-        amountInput.value = '0';
+        // Hide the select and show the custom input
+        select.style.display = 'none';
+        if (customServiceInput) {
+            customServiceInput.classList.remove('d-none');
+            customServiceInput.placeholder = "Enter service description";
+            // Focus on the custom input field
+            setTimeout(() => customServiceInput.focus(), 100);
+        }
+        if (amountInput) {
+            amountInput.readOnly = false;
+            amountInput.value = '0';
+        }
     } else {
-        customProductInput.classList.add('d-none');
-        customProductInput.value = '';
-        amountInput.readOnly = true;
-        if (selectedOption.dataset.price) {
-            amountInput.value = selectedOption.dataset.price;
-        } else {
+        // Always make sure the select is visible and custom input is hidden
+        select.style.display = '';
+        if (customServiceInput) {
+            customServiceInput.classList.add('d-none');
+            customServiceInput.value = '';
+        }
+        if (amountInput) {
+            amountInput.readOnly = false;
             amountInput.value = '0';
         }
     }
     
-    updateProductTotal(row.querySelector('.product-qty'));
-}
-
-function updateProductTotal(input) {
-    const row = input.closest('tr');
-    const amountInput = row.querySelector('.product-amount');
-    const qty = parseInt(input.value) || 1;
-    const unitPrice = parseFloat(amountInput.value) || 0;
-    
-    amountInput.value = (qty * unitPrice).toFixed(2);
     updateTotals();
 }
 
-function addProductRow() {
-    const tbody = document.querySelector('#productsTable tbody');
+// Modified function to add new service row
+function addServiceRow() {
+    const tbody = document.querySelector('#servicesTable tbody');
     const firstRow = tbody.querySelector('tr');
     const newRow = firstRow.cloneNode(true);
     
-    newRow.querySelectorAll('select, input').forEach(input => {
-        input.value = input.type === 'number' && input.classList.contains('product-qty') ? '1' : '';
-        if (input.classList.contains('product-amount')) {
+    // Reset values in the new row
+    newRow.querySelectorAll('input, select').forEach(input => {
+        input.value = '';
+        if (input.classList.contains('service-amount')) {
             input.value = '0';
         }
-        if (input.classList.contains('custom-product')) {
+        if (input.classList.contains('custom-service')) {
             input.classList.add('d-none');
+        }
+        // Make sure select is visible
+        if (input.tagName === 'SELECT') {
+            input.style.display = '';
         }
     });
     
@@ -1787,298 +1774,171 @@ function addProductRow() {
     updateTotals();
 }
 
+// Modified function to remove service row
+function removeServiceRow(button) {
+    const tbody = document.querySelector('#servicesTable tbody');
+    
+    if (tbody.rows.length > 1) {
+        button.closest('tr').remove();
+    } else {
+        // If it's the last row, just clear values
+        const row = button.closest('tr');
+        const selectElement = row.querySelector('select');
+        
+        // Reset the select to visible state
+        if (selectElement) {
+            selectElement.style.display = '';
+            selectElement.selectedIndex = 0;
+        }
+        
+        // Hide and clear custom input
+        const customInput = row.querySelector('.custom-service');
+        if (customInput) {
+            customInput.classList.add('d-none');
+            customInput.value = '';
+        }
+        
+        // Reset amount
+        const amountInput = row.querySelector('.service-amount');
+        if (amountInput) {
+            amountInput.value = '0';
+        }
+    }
+    
+    updateTotals();
+}
+
+// Updated function to handle product selection
+function handleProductSelection(select) {
+    const row = select.closest('tr');
+    const qtyInput = row.querySelector('.product-qty');
+    const amountInput = row.querySelector('.product-amount');
+    const customProductInput = row.querySelector('.custom-product');
+    const deleteBtn = row.querySelector('.delete-product-btn');
+    
+    // Toggle delete button visibility
+    if (select.value) {
+        if (deleteBtn) deleteBtn.style.display = 'inline-flex';
+        
+        // Always set quantity to 1 when a product is selected
+        qtyInput.value = '1';
+    } else {
+        if (deleteBtn) deleteBtn.style.display = 'none';
+        // Reset amount to 0 and clear quantity when deselecting
+        amountInput.value = '0';
+        qtyInput.value = '';
+    }
+    
+    if (select.value === 'custom') {
+        if (customProductInput) {
+            customProductInput.classList.remove('d-none');
+        }
+        if (amountInput) {
+            amountInput.readOnly = false;
+            amountInput.value = '0';
+        }
+    } else if (select.value) {
+        if (customProductInput) {
+            customProductInput.classList.add('d-none');
+            customProductInput.value = '';
+        }
+        
+        // Get the selected option's text which contains the price
+        const selectedText = select.options[select.selectedIndex].text;
+        const priceMatch = selectedText.match(/₱([\d,]+\.?\d*)/);
+        if (priceMatch) {
+            const price = parseFloat(priceMatch[1].replace(/,/g, ''));
+            // Use fixed quantity of 1
+            amountInput.value = (price * 1).toFixed(2);
+        }
+    }
+    
+    updateTotals();
+}
+
+// Updated function to add a new product row
+function addProductRow() {
+    const tbody = document.querySelector('#productsTable tbody');
+    const firstRow = tbody.querySelector('tr');
+    const newRow = firstRow.cloneNode(true);
+    
+    // Reset values in the new row
+    newRow.querySelectorAll('input, select').forEach(input => {
+        input.value = input.type === 'number' && input.classList.contains('product-qty') ? '1' : 
+                      input.type === 'number' ? '0' : '';
+        if (input.classList.contains('custom-product')) {
+            input.classList.add('d-none');
+        }
+    });
+    
+    // Ensure the delete button is hidden for the new row
+    const deleteBtn = newRow.querySelector('.delete-product-btn');
+    if (deleteBtn) deleteBtn.style.display = 'none';
+    
+    tbody.appendChild(newRow);
+    updateTotals();
+}
+
+// Updated function to handle product quantity changes
+function updateProductTotal(qtyInput) {
+    const row = qtyInput.closest('tr');
+    const select = row.querySelector('select[name="products[]"]');
+    const amountInput = row.querySelector('.product-amount');
+    
+    if (select.value && select.value !== 'custom') {
+        const selectedText = select.options[select.selectedIndex].text;
+        const priceMatch = selectedText.match(/₱([\d,]+\.?\d*)/);
+        if (priceMatch) {
+            const price = parseFloat(priceMatch[1].replace(/,/g, ''));
+            const quantity = parseFloat(qtyInput.value) || 0;
+            amountInput.value = (price * quantity).toFixed(2);
+        }
+    }
+    
+    updateTotals();
+}
+
+// Updated function to remove a product row and completely clear values
 function removeProductRow(button) {
     const tbody = document.querySelector('#productsTable tbody');
     if (tbody.rows.length > 1) {
         button.closest('tr').remove();
     } else {
+        // If it's the last row, just clear all values
         const row = button.closest('tr');
-        row.querySelectorAll('select, input').forEach(input => {
-            input.value = input.type === 'number' && input.classList.contains('product-qty') ? '1' : '';
-            if (input.classList.contains('product-amount')) {
-                input.value = '0';
-            }
-        });
+        
+        // Clear the product selection first (select dropdown)
+        const productSelect = row.querySelector('select[name="products[]"]');
+        if (productSelect) {
+            productSelect.selectedIndex = 0;
+        }
+        
+        // Completely clear quantity field instead of setting to 1
+        const qtyInput = row.querySelector('.product-qty');
+        if (qtyInput) {
+            qtyInput.value = '';
+        }
+        
+        // Reset amount to empty
+        const amountInput = row.querySelector('.product-amount');
+        if (amountInput) {
+            amountInput.value = '0';
+        }
+        
+        // Hide any custom product field
+        const customProductInput = row.querySelector('.custom-product');
+        if (customProductInput) {
+            customProductInput.classList.add('d-none');
+            customProductInput.value = '';
+        }
+        
+        // Hide the delete button since we've cleared the selection
+        const deleteBtn = row.querySelector('.delete-product-btn');
+        if (deleteBtn) {
+            deleteBtn.style.display = 'none';
+        }
     }
     updateTotals();
 }
-
-function printChargeSlip() {
-    // Update printable version with current values
-    document.getElementById('printInvoiceNumber').textContent = document.getElementById('invoiceNumber').textContent;
-    document.getElementById('printPatientName').textContent = document.getElementById('patientName').value;
-    document.getElementById('printAddress').textContent = document.querySelector('input[name="address"]').value;
-    document.getElementById('printPhysician').textContent = document.querySelector('input[name="attending_physician"]').value;
-    document.getElementById('printNotes').textContent = document.querySelector('textarea[name="notes"]').value;
-
-    // Copy services
-    const printServicesBody = document.querySelector('#printServicesTable tbody');
-    printServicesBody.innerHTML = '';
-    document.querySelectorAll('#servicesTable tbody tr').forEach(row => {
-        const service = row.querySelector('select').selectedOptions[0].text;
-        const amount = row.querySelector('.service-amount').value;
-        if (service && amount > 0) {
-            const newRow = `<tr>
-                <td>${service}</td>
-                <td class="text-end">₱${parseFloat(amount).toFixed(2)}</td>
-            </tr>`;
-            printServicesBody.insertAdjacentHTML('beforeend', newRow);
-        }
-    });
-
-    // Copy products
-    const printProductsBody = document.querySelector('#printProductsTable tbody');
-    printProductsBody.innerHTML = '';
-    document.querySelectorAll('#productsTable tbody tr').forEach(row => {
-        const product = row.querySelector('select').selectedOptions[0].text;
-        const qty = row.querySelector('.product-qty').value;
-        const amount = row.querySelector('.product-amount').value;
-        if (product && amount > 0) {
-            const price = parseFloat(amount) / parseInt(qty);
-            const newRow = `<tr>
-                <td>${product}</td>
-                <td class="text-center">${qty}</td>
-                <td class="text-end">₱${price.toFixed(2)}</td>
-                <td class="text-end">₱${parseFloat(amount).toFixed(2)}</td>
-            </tr>`;
-            printProductsBody.insertAdjacentHTML('beforeend', newRow);
-        }
-    });
-
-    // Copy totals
-    document.getElementById('printServicesSubtotal').textContent = document.getElementById('servicesSubtotal').textContent;
-    document.getElementById('printProductsSubtotal').textContent = document.getElementById('productsSubtotal').textContent;
-    document.getElementById('printDiscount').textContent = document.getElementById('discountAmount').value;
-    document.getElementById('printTotal').textContent = document.getElementById('total').textContent.replace('₱', '');
-
-    // Print the document
-    const printContent = document.getElementById('printableArea').innerHTML;
-    const originalContent = document.body.innerHTML;
-
-    document.body.innerHTML = `
-        <style>
-            @media print {
-                body { font-size: 12px; }
-                .invoice-header { margin-bottom: 30px; }
-                table { width: 100%; }
-                th, td { padding: 5px; }
-                .footer-section { margin-top: 50px; }
-            }
-        </style>
-        ${printContent}
-    `;
-
-    window.print();
-    document.body.innerHTML = originalContent;
-    
-    // Reinitialize any necessary event listeners
-    initializeEventListeners();
-}
-
-// Add this to your existing scripts
-document.addEventListener('DOMContentLoaded', function() {
-    const selectAll = document.getElementById('selectAll');
-    const deleteSelected = document.getElementById('deleteSelected');
-    const checkboxes = document.querySelectorAll('.appointment-checkbox');
-
-    // Handle "Select All" checkbox
-    selectAll.addEventListener('change', function() {
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-        updateDeleteButton();
-    });
-
-    // Handle individual checkboxes
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            updateDeleteButton();
-            // Update "Select All" checkbox state
-            selectAll.checked = [...checkboxes].every(c => c.checked);
-        });
-    });
-
-    // Update delete button visibility
-    function updateDeleteButton() {
-        const checkedCount = [...checkboxes].filter(c => c.checked).length;
-        if (checkedCount > 0) {
-            deleteSelected.classList.remove('d-none');
-            deleteSelected.textContent = `Delete Selected (${checkedCount})`;
-        } else {
-            deleteSelected.classList.add('d-none');
-        }
-    }
-
-    // Handle delete selected
-    deleteSelected.addEventListener('click', function() {
-        const selectedIds = [...checkboxes]
-            .filter(c => c.checked)
-            .map(c => c.value);
-
-        if (selectedIds.length === 0) return;
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: `You are about to delete ${selectedIds.length} appointment(s).`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete them!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Submit delete request
-                fetch('{{ route("appointment.deleteMultiple") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ ids: selectedIds })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire(
-                            'Deleted!',
-                            'Selected appointments have been deleted.',
-                            'success'
-                        ).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        throw new Error(data.message);
-                    }
-                })
-                .catch(error => {
-                    Swal.fire(
-                        'Error!',
-                        error.message || 'Something went wrong.',
-                        'error'
-                    );
-                });
-            }
-        });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle status update forms
-    document.querySelectorAll('.status-update-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const appointment_id = this.action.split('/').pop();
-            const newStatus = formData.get('status');
-            const statusButton = this.closest('.dropdown').querySelector('.btn');
-            const dropdownContainer = this.closest('.dropdown');
-            
-            fetch(this.action, {
-                method: 'PATCH',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    status: newStatus
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Update button appearance
-                    statusButton.className = `btn btn-sm ${
-                        newStatus === 'confirmed' ? 'btn-success' : 
-                        newStatus === 'cancelled' ? 'btn-danger' : 
-                        'btn-warning'
-                    } dropdown-toggle`;
-                    
-                    statusButton.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-
-                    // Add confirmation details if status is confirmed
-                    if (newStatus === 'confirmed') {
-                        const actions = JSON.parse(data.appointment.actions);
-                        const confirmationDetails = `
-                            <div class="mt-1">
-                                <small class="text-muted">
-                                    Confirmed by: ${actions.confirmer_name}
-                                    <br>
-                                    <span class="text-muted">${moment(actions.confirmed_at).format('MMM DD, YYYY h:mm A')}</span>
-                                </small>
-                            </div>
-                        `;
-                        // Find or create container for confirmation details
-                        let detailsContainer = dropdownContainer.nextElementSibling;
-                        if (!detailsContainer || !detailsContainer.classList.contains('mt-1')) {
-                            detailsContainer = document.createElement('div');
-                            dropdownContainer.parentNode.insertBefore(detailsContainer, dropdownContainer.nextSibling);
-                        }
-                        detailsContainer.outerHTML = confirmationDetails;
-                    }
-
-                    // Update dropdown options
-                    const dropdownMenu = this.closest('.dropdown-menu');
-                    dropdownMenu.innerHTML = '';
-                    
-                    if (newStatus !== 'confirmed') {
-                        dropdownMenu.innerHTML += `
-                            <li>
-                                <form action="/appointments/${appointment_id}/status" method="POST" class="status-update-form">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="confirmed">
-                                    <button type="submit" class="dropdown-item text-success">
-                                        <i class="fas fa-check me-2"></i>Confirm
-                                    </button>
-                                </form>
-                            </li>
-                        `;
-                    }
-                    
-                    if (newStatus !== 'cancelled') {
-                        dropdownMenu.innerHTML += `
-                            <li>
-                                <form action="/appointments/${appointment_id}/status" method="POST" class="status-update-form">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="status" value="cancelled">
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fas fa-times me-2"></i>Cancel
-                                    </button>
-                                </form>
-                            </li>
-                        `;
-                    }
-
-                    // Show success message
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Status Updated',
-                        text: data.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                } else {
-                    throw new Error(data.message || 'Failed to update status');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to update status'
-                });
-            });
-        });
-    });
-});
 </script>
 @endpush
