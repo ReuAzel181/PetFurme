@@ -22,6 +22,8 @@ class LaboratoryTest extends Model
         'follow_up_date',
     ];
 
+    protected $table = 'appt_laboratory';
+
     public function appointment()
     {
         return $this->belongsTo(Appointment::class);

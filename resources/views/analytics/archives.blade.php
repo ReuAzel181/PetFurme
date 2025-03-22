@@ -105,7 +105,7 @@
                         </span>
                     </label>
                     
-                    <input type="radio" class="btn-check" name="archive-type" id="appointments" value="appointments">
+                    <input type="radio" class="btn-check" name="archive-type" id="appointments" value="appointments" checked>
                     <label class="btn btn-outline-primary appointments-btn" for="appointments" style="border-color: #4299E1; color: #4299E1;">
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -115,7 +115,7 @@
                             <path d="M4 11l16 0"/>
                             <path d="M8 15h2v2h-2z"/>
                         </svg>
-                        Appointments
+                        Past Appointments
                         <span class="badge ms-2" style="background-color: rgba(66, 153, 225, 0.1) !important; color: #4299E1;">
                             {{ $archivedAppointments->count() }}
                         </span>
@@ -465,8 +465,21 @@
         </div>
 
         <!-- Archived Appointments Table -->
-        <div class="card" id="appointments-archive" style="display: none;">
+        <div class="card" id="appointments-archive">
             <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <h3 class="card-title">Archived Appointments</h3>
+                    </div>
+                    <div class="ms-auto text-muted">
+                        Total: <strong>{{ $totalAppointments }}</strong>
+                        <span class="mx-2">|</span>
+                        Completed: <strong>{{ $completedAppointments }}</strong>
+                        <span class="mx-2">|</span>
+                        Cancelled: <strong>{{ $cancelledAppointments }}</strong>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-vcenter card-table">
                         <thead>
@@ -476,9 +489,7 @@
                                 <th>Appointment Date</th>
                                 <th>Reason</th>
                                 <th>Status</th>
-                                <th>Deleted At</th>
-                                <th>Deleted By</th>
-                                <th class="w-1">Actions</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -492,78 +503,54 @@
                                             <span>{{ $appointment->user->name ?? $appointment->owner_name }}</span>
                                         </div>
                                     </td>
-                                    <td>{{ $appointment->pet_name }}</td>
-                                    <td>{{ $appointment->appointment_date->format('M d, Y g:i A') }}</td>
+                                    <td>{{ $appointment->pet->name ?? $appointment->pet_name }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y g:i A') }}</td>
                                     <td>
-                                        @if(is_array($appointment->reason_for_visit))
+                                        @php
+                                            $reasons = is_string($appointment->reason_for_visit) 
+                                                ? json_decode($appointment->reason_for_visit, true) 
+                                                : $appointment->reason_for_visit;
+                                        @endphp
+                                        @if(is_array($reasons))
                                             <ul class="list-unstyled mb-0">
-                                                @foreach($appointment->reason_for_visit as $reason)
+                                                @foreach($reasons as $reason)
                                                     <li><small>• {{ $reason }}</small></li>
                                                 @endforeach
                                             </ul>
                                         @else
-                                            {{ $appointment->reason_for_visit }}
+                                            {{ $reasons }}
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="badge bg-{{ $appointment->status_color }}">
+                                        <span class="badge bg-{{ $appointment->status === 'completed' ? 'success' : 'warning' }}-lt">
                                             {{ ucfirst($appointment->status) }}
                                         </span>
                                     </td>
                                     <td>
-                                        {{ $appointment->deleted_at->format('M d, Y g:i A') }}
-                                        <div class="text-muted small">
-                                            {{ $appointment->deleted_at->diffForHumans() }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        @if($appointment->deletedBy)
-                                            <div class="d-flex align-items-center justify-content-start gap-2">
-                                                <span class="avatar avatar-xs rounded-circle bg-blue-lt">
-                                                    {{ strtoupper(substr($appointment->deletedBy->name, 0, 1)) }}
-                                                </span>
-                                                <span>{{ $appointment->deletedBy->name }}</span>
-                                            </div>
-                                        @else
-                                            <span class="text-muted">
-                                                <i class="fas fa-user-circle me-1"></i>
-                                                System
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td>
                                         <div class="btn-group">
-                                            <a href="{{ route('appointments.view', $appointment->id) }}" 
-                                               class="btn btn-icon btn-outline-primary btn-sm" 
-                                               title="View Appointment">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path d="M10 12a2 2 0 1 0 4 0"></path>
-                                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-                                                </svg>
+                                            <a href="#" class="btn btn-icon btn-outline-primary btn-sm" title="View Details">
+                                                <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('appointments.restore', $appointment->id) }}"
-                                               class="btn btn-icon btn-outline-success btn-sm"
-                                               onclick="return confirm('Are you sure you want to restore this appointment?')"
-                                               title="Restore Appointment">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rotate-clockwise" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path d="M4.05 11a8 8 0 1 1 .5 4m-.5 5v-5h5"></path>
-                                                </svg>
-                                            </a>
+                                            <form action="{{ route('appointment.restore', $appointment->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-icon btn-outline-success btn-sm" title="Restore">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-4">
+                                    <td colspan="6" class="text-center py-4">
                                         <div class="empty">
                                             <div class="empty-icon">
-                                                <i class="fas fa-archive text-muted" style="font-size: 2.5rem;"></i>
+                                                <i class="fas fa-archive fa-3x text-muted"></i>
                                             </div>
                                             <p class="empty-title">No archived appointments found</p>
                                             <p class="empty-subtitle text-muted">
-                                                There are no archived appointment records in the system at this time.
+                                                Past appointments will appear here automatically.
                                             </p>
                                         </div>
                                     </td>
@@ -571,11 +558,6 @@
                             @endforelse
                         </tbody>
                     </table>
-                    @if($archivedAppointments->hasPages())
-                        <div class="card-footer d-flex align-items-center">
-                            {{ $archivedAppointments->links() }}
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

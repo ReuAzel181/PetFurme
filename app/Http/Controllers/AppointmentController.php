@@ -13,15 +13,23 @@ use App\Models\Checkup;
 use App\Models\GroomingSession;
 use App\Models\Surgery;
 use App\Models\LaboratoryTest;
+use Carbon\Carbon;
+use App\Models\Order;
+use App\Models\ApptVaccination;
 
 class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = Appointment::with(['user', 'pet', 'creator', 'confirmer'])
-            ->latest()
+        $today = Carbon::now()->startOfDay();
+        
+        // Only show current and future appointments
+        $appointments = Appointment::with(['user', 'pet'])
+            ->where('appointment_date', '>=', $today)
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
             ->get();
-    
+
         // Fetch only active products with stock
         $products = Product::where('quantity', '>', 0)
                          ->select('id', 'name', 'selling_price', 'quantity')
@@ -39,25 +47,51 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function archived()
+    public function archives()
     {
-        $archivedAppointments = DB::table('archived_appointments')
-            ->leftJoin('users', 'archived_appointments.user_id', '=', 'users.id')
-            ->select(
-                'archived_appointments.*',
-                DB::raw('CASE 
-                    WHEN users.id IS NOT NULL THEN users.name
-                    ELSE archived_appointments.owner_name
-                END as display_name'),
-                DB::raw('DATE(appointment_date) as appointment_date_display')
-            )
-            ->orderBy('archived_at', 'desc')
+        $today = Carbon::now()->startOfDay();
+        
+        // Get archived appointments (both soft-deleted and past appointments)
+        $archivedAppointments = Appointment::with(['user', 'pet'])
+            ->where(function($query) use ($today) {
+                $query->where('appointment_date', '<', $today)
+                      ->orWhereNotNull('deleted_at');
+            })
+            ->withTrashed() // Include soft-deleted records
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
             ->get();
 
-        return view('appointment.archived', [
-            'appointments' => $archivedAppointments,
-            'showArchived' => true
-        ]);
+        // Get other archived items from the existing system
+        $archivedUsers = User::onlyTrashed()
+            ->with(['deletedBy'])
+            ->latest('deleted_at')
+            ->paginate(10, ['*'], 'users_page');
+
+        $archivedPets = Pet::onlyTrashed()
+            ->with(['user', 'deletedBy'])
+            ->latest('deleted_at')
+            ->paginate(10, ['*'], 'pets_page');
+
+        $archivedOrders = Order::onlyTrashed()
+            ->with(['user', 'deletedBy'])
+            ->latest('deleted_at')
+            ->paginate(10, ['*'], 'orders_page');
+
+        // Calculate appointment statistics
+        $totalAppointments = $archivedAppointments->count();
+        $completedAppointments = $archivedAppointments->where('status', 'completed')->count();
+        $cancelledAppointments = $archivedAppointments->where('status', 'cancelled')->count();
+
+        return view('analytics.archives', compact(
+            'archivedAppointments',
+            'archivedUsers',
+            'archivedPets',
+            'archivedOrders',
+            'totalAppointments',
+            'completedAppointments',
+            'cancelledAppointments'
+        ));
     }
 
     public function create(Request $request)
@@ -68,14 +102,13 @@ class AppointmentController extends Controller
         $ownerPets = collect();
 
         if ($request->pet_id) {
-            $pet = Pet::with('owner')->findOrFail($request->pet_id);
+            $pet = Pet::with(['owner', 'vaccinations'])->findOrFail($request->pet_id);
             $owner = $pet->owner;
             $ownerPets = $owner->pets;
         } elseif ($request->owner_id) {
-            $owner = User::with('pets')->findOrFail($request->owner_id);
+            $owner = User::with(['pets.vaccinations'])->findOrFail($request->owner_id);
             $ownerPets = $owner->pets;
             
-            // If pet_id is provided in the URL, pre-select it
             if ($request->pet_id) {
                 $pet = $ownerPets->firstWhere('id', $request->pet_id);
             }
@@ -86,10 +119,24 @@ class AppointmentController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('Appointment store method called', [
-            'request_all' => $request->all(),
+        \Log::info('Appointment request data', [
+            'all_data' => $request->all(),
             'reason_for_visit' => $request->reason_for_visit,
-            'is_vaccination' => $request->reason_for_visit === 'Vaccination',
+            'vaccination_data' => [
+                'vaccine_type' => $request->vaccine_type,
+                'batch_number' => $request->batch_number,
+                'next_due_date' => $request->next_due_date,
+                'vaccine_array' => $request->vaccine
+            ]
+        ]);
+
+        \Log::info('Walk-in data debug', [
+            'is_walkin' => $request->owner_id === 'no_account',
+            'owner_name' => $request->owner_name,
+            'pet_name' => $request->walkin_pet_name,
+            'pet_type' => $request->walkin_pet_type,
+            'pet_age' => $request->walkin_pet_age,
+            'age_unit' => $request->walkin_age_unit
         ]);
 
         try {
@@ -97,95 +144,143 @@ class AppointmentController extends Controller
 
             // Base validation rules
             $rules = [
-                'appointment_date' => 'required|date',
+                'appointment_date' => 'required|date_format:Y-m-d',
                 'appointment_time' => 'required',
-                'reason_for_visit' => 'required|string',
-                'owner_id' => 'required_without:owner_name|exists:users,id,deleted_at,NULL',
-                'pet_id' => 'required_without:walkin_pet_name|exists:pets,id,deleted_at,NULL',
-                // Walk-in fields
+                'reason_for_visit' => 'required',
+                'owner_id' => 'required|string',
+                'pet_id' => 'required_if:owner_id,!=,no_account|nullable|exists:pets,id,deleted_at,NULL',
                 'owner_name' => 'required_if:owner_id,no_account|nullable|string',
-                'walkin_pet_name' => 'required_if:owner_id,no_account|nullable|string',
-                'walkin_pet_type' => 'required_if:owner_id,no_account|nullable|string',
-                'walkin_pet_age' => 'required_if:owner_id,no_account|nullable|numeric',
-                'walkin_age_unit' => 'required_if:owner_id,no_account|nullable|in:months,years'
+                'pet_name' => 'required_if:owner_id,no_account|nullable|string',
+                'pet_type' => 'required_if:owner_id,no_account|nullable|string',
+                'pet_age' => 'required_if:owner_id,no_account|nullable|numeric',
+                'age_unit' => 'required_if:owner_id,no_account|nullable|in:months,years'
             ];
 
-            // Add vaccination-specific rules if vaccination is selected
-            if ($request->reason_for_visit === 'Vaccination') {
-                // Extract vaccination data from the nested array
+            // Add vaccination-specific rules if needed
+            if (is_array($request->reason_for_visit) && in_array('Vaccination', $request->reason_for_visit)) {
+                // Validation for nested vaccination fields
+                $rules['vaccine.0.type'] = 'required|string';
+                $rules['vaccine.0.batch_number'] = 'required|string';
+                $rules['vaccine.0.next_due_date'] = 'required|date';
+                $rules['vaccine.0.administered_by'] = 'required|string';
+            } elseif ($request->reason_for_visit === 'Vaccination') {
+                // Handle single string reason for visit
                 if (!empty($request->vaccine) && is_array($request->vaccine)) {
-                    $vaccineData = $request->vaccine[0];
-                    // Map the nested data to flat fields
-                    $request->merge([
-                        'vaccine_type' => $vaccineData['type'] ?? null,
-                        'batch_number' => $vaccineData['batch_number'] ?? null,
-                        'next_due_date' => $vaccineData['next_due_date'] ?? null,
-                        'administered_by' => $vaccineData['administered_by'] ?? null,
-                        'reactions' => $vaccineData['reactions'] ?? null
-                    ]);
+                    $rules['vaccine.0.type'] = 'required|string';
+                    $rules['vaccine.0.batch_number'] = 'required|string';
+                    $rules['vaccine.0.next_due_date'] = 'required|date';
+                    $rules['vaccine.0.administered_by'] = 'required|string';
                 }
-
-                $rules = array_merge($rules, [
-                    'vaccine_type' => 'required|string',
-                    'batch_number' => 'required|string',
-                    'next_due_date' => 'required|date',
-                    'administered_by' => 'required|string'
-                ]);
-                
-                \Log::info('Vaccination validation rules applied', [
-                    'rules' => $rules,
-                    'vaccine_data' => [
-                        'type' => $request->vaccine_type,
-                        'batch' => $request->batch_number,
-                        'due_date' => $request->next_due_date,
-                        'admin_by' => $request->administered_by
-                    ]
-                ]);
             }
 
-            try {
-                $validated = $request->validate($rules);
-                \Log::info('Validation passed', ['validated_data' => $validated]);
-            } catch (\Illuminate\Validation\ValidationException $e) {
-                \Log::error('Validation failed', [
-                    'errors' => $e->errors(),
-                    'request_data' => $request->all()
-                ]);
-                throw $e;
-            }
+            $validated = $request->validate($rules);
             
             // Create the appointment
             $appointment = new Appointment();
             $appointment->appointment_date = $validated['appointment_date'];
-            $appointment->appointment_time = $validated['appointment_time'];
-            $appointment->reason_for_visit = json_encode([$validated['reason_for_visit']]);
-            $appointment->notes = $request->notes ?? '';
             
-            // Handle the reason_for_visit JSON format
+            // Convert 12-hour time format to 24-hour for MySQL
+            $time = $validated['appointment_time'];
+            if (strpos($time, 'AM') !== false || strpos($time, 'PM') !== false) {
+                // Parse the time string properly
+                $timeObj = \DateTime::createFromFormat('h:i A', $time);
+                if ($timeObj) {
+                    $time = $timeObj->format('H:i:s');
+                } else {
+                    // Try alternative format
+                    $timeObj = \DateTime::createFromFormat('g:i A', $time);
+                    if ($timeObj) {
+                        $time = $timeObj->format('H:i:s');
+                    }
+                }
+            }
+            $appointment->appointment_time = $time;
+            
+            // Handle the reason_for_visit field properly
             $reasonForVisit = $validated['reason_for_visit'];
-            if (is_string($reasonForVisit)) {
+
+            // Clean up the reason_for_visit to prevent double encoding
+            if (is_array($reasonForVisit)) {
+                // Flatten and clean the array
+                $cleanReasons = [];
+                foreach ($reasonForVisit as $reason) {
+                    // If it's a JSON string, decode it
+                    if (is_string($reason) && (strpos($reason, '[') === 0 || strpos($reason, '{') === 0)) {
+                        try {
+                            $decoded = json_decode($reason, true);
+                            if (is_array($decoded)) {
+                                // Flatten nested arrays
+                                foreach ($decoded as $item) {
+                                    $cleanReasons[] = $item;
+                                }
+                            } else {
+                                $cleanReasons[] = $reason;
+                            }
+                        } catch (\Exception $e) {
+                            $cleanReasons[] = $reason;
+                        }
+                    } else {
+                        $cleanReasons[] = $reason;
+                    }
+                }
+                $reasonForVisit = $cleanReasons;
+            } else if (!is_array($reasonForVisit)) {
+                // Convert single value to array
                 $reasonForVisit = [$reasonForVisit];
             }
+
+            // Store just a simple JSON array
             $appointment->reason_for_visit = json_encode($reasonForVisit);
+
+            // Debug log to check the value
+            \Log::info('Setting reason_for_visit', [
+                'input' => $validated['reason_for_visit'],
+                'cleaned' => $reasonForVisit,
+                'encoded' => json_encode($reasonForVisit)
+            ]);
+
+            $appointment->notes = $request->notes ?? '';
 
             // Handle walk-in vs registered user
             if ($request->owner_id === 'no_account') {
-                $appointment->owner_name = $validated['owner_name'];
-                $appointment->pet_name = $validated['walkin_pet_name'];
-                $appointment->pet_type = $validated['walkin_pet_type'];
+                // Log walk-in data before processing
+                \Log::info('Processing walk-in', [
+                    'owner_name' => $request->owner_name,
+                    'pet_name' => $request->pet_name,
+                    'pet_type' => $request->pet_type,
+                    'pet_age' => $request->pet_age,
+                    'age_unit' => $request->age_unit
+                ]);
                 
-                $age = $validated['walkin_pet_age'];
-                if ($validated['walkin_age_unit'] === 'years') {
-                    $age = $age * 12;
+                $appointment->owner_name = $request->owner_name;
+                $appointment->pet_name = $request->pet_name;
+                $appointment->pet_type = $request->pet_type;
+                
+                // Calculate age in years for display
+                $age = $request->pet_age;
+                if ($request->age_unit === 'months') {
+                    $age = round($age / 12, 1);
                 }
                 $appointment->pet_age = $age;
-            } else {
-                $appointment->user_id = $validated['owner_id'];
-                $appointment->pet_id = $validated['pet_id'];
                 
-                $pet = Pet::findOrFail($validated['pet_id']);
+                // Explicitly set these to null for walk-ins
+                $appointment->user_id = null;
+                $appointment->pet_id = null;
+                
+                \Log::info('Walk-in data saved to appointment', [
+                    'appointment_id' => $appointment->id,
+                    'owner_name' => $appointment->owner_name,
+                    'pet_name' => $appointment->pet_name,
+                    'pet_type' => $appointment->pet_type,
+                    'pet_age' => $appointment->pet_age
+                ]);
+            } else {
+                // Get pet details
+                $pet = Pet::findOrFail($request->pet_id);
+                $appointment->user_id = $request->owner_id;
+                $appointment->pet_id = $request->pet_id;
                 $appointment->pet_name = $pet->name;
-                $appointment->pet_type = $pet->category;
+                $appointment->pet_type = $pet->type;
                 $appointment->pet_age = $pet->age;
             }
 
@@ -199,59 +294,166 @@ class AppointmentController extends Controller
             }
             $appointment->created_by_id = auth()->id();
 
-            // Set scheduled_at
-            $appointment->scheduled_at = $validated['appointment_date'] . ' ' . $validated['appointment_time'];
+            // Set scheduled_at (also needs time conversion)
+            $scheduledTime = $validated['appointment_time'];
+            if (strpos($scheduledTime, 'AM') !== false || strpos($scheduledTime, 'PM') !== false) {
+                $scheduledTime = date('H:i:s', strtotime($scheduledTime));
+            }
+            $appointment->scheduled_at = $validated['appointment_date'] . ' ' . $scheduledTime;
 
-            \Log::info('About to save appointment', ['appointment' => $appointment->toArray()]);
             $appointment->save();
-            \Log::info('Appointment saved', ['id' => $appointment->id]);
 
-            // Create vaccination record if needed
-            if ($appointment->id && $validated['reason_for_visit'] === 'Vaccination') {
-                \Log::info('Creating vaccination record', [
-                    'vaccine_type' => $validated['vaccine_type'],
-                    'batch_number' => $validated['batch_number'],
-                    'next_due_date' => $validated['next_due_date']
+            // Process service-specific data here
+            if ($appointment->id) {
+                // Check the type before decoding to avoid errors
+                $reasonsArray = $appointment->reason_for_visit;
+                
+                // If it's already a string (JSON format), decode it
+                if (is_string($reasonsArray)) {
+                    $reasonsArray = json_decode($reasonsArray);
+                } 
+                // If it's already an array but not an object from json_decode
+                else if (is_array($reasonsArray) && !isset($reasonsArray[0]->type)) {
+                    // No need to decode, but ensure it's in the right format
+                    $reasonsArray = (array) $reasonsArray;
+                }
+                
+                // Debug the reason array to see its actual structure
+                \Log::info('Reason array structure:', [
+                    'raw_reasons' => $appointment->reason_for_visit,
+                    'decoded_reasons' => $reasonsArray
                 ]);
                 
-                Vaccination::create([
-                    'appointment_id' => $appointment->id,
-                    'pet_id' => $appointment->pet_id,
-                    'type' => $validated['vaccine_type'],
-                    'batch_number' => $validated['batch_number'],
-                    'date_given' => $appointment->appointment_date,
-                    'next_due_date' => $validated['next_due_date'],
-                    'reactions' => $request->reactions,
-                ]);
+                // Function to normalize reason values (handle double-nested values)
+                $normalizeReason = function($reason) {
+                    // If this is a JSON string, decode it
+                    if (is_string($reason) && (strpos($reason, '[') === 0 || strpos($reason, '{') === 0)) {
+                        try {
+                            $decoded = json_decode($reason, true);
+                            if (is_array($decoded) && count($decoded) === 1) {
+                                return $decoded[0];
+                            }
+                        } catch (\Exception $e) {
+                            // Ignore decode errors
+                        }
+                    }
+                    return $reason;
+                };
+                
+                // Process each reason for visit
+                foreach($reasonsArray as $reason) {
+                    // Normalize the reason value
+                    $normalizedReason = $normalizeReason($reason);
+                    
+                    \Log::info('Processing reason:', [
+                        'original' => $reason,
+                        'normalized' => $normalizedReason
+                    ]);
+                    
+                    switch($normalizedReason) {
+                        case 'Vaccination':
+                            if (!empty($request->vaccine) && is_array($request->vaccine)) {
+                                foreach ($request->vaccine as $vaccineData) {
+                                    $vaccination = new ApptVaccination([
+                                        'appointment_id' => $appointment->id,
+                                        'pet_id' => $appointment->pet_id,
+                                        'type' => $vaccineData['type'],
+                                        'batch_number' => $vaccineData['batch_number'],
+                                        'date_given' => $appointment->appointment_date,
+                                        'next_due_date' => $vaccineData['next_due_date'],
+                                        'administered_by' => $vaccineData['administered_by']
+                                    ]);
+                                    
+                                    \Log::info('Creating vaccination record', [
+                                        'data' => $vaccination->toArray()
+                                    ]);
+                                    
+                                    if (!$vaccination->save()) {
+                                        throw new \Exception('Failed to save vaccination record');
+                                    }
+                                }
+                            }
+                            break;
+                            
+                        case 'Grooming':
+                            if (!empty($request->grooming)) {
+                                $grooming = new GroomingSession();
+                                $grooming->appointment_id = $appointment->id;
+                                $grooming->pet_id = $appointment->pet_id;
+                                $grooming->date = $appointment->appointment_date;
+                                $grooming->services_done = json_encode($request->grooming['services_done'] ?? []);
+                                $grooming->products_used = !empty($request->grooming['products_used']) ? 
+                                    json_encode($request->grooming['products_used']) : null;
+                                $grooming->notes = $request->grooming['notes'] ?? null;
+                                $grooming->save();
+                            }
+                            break;
+                        
+                        case 'Check-up':
+                        case 'Consultation':
+                            if (!empty($request->checkup)) {
+                                $checkup = new Checkup();
+                                $checkup->appointment_id = $appointment->id;
+                                $checkup->pet_id = $appointment->pet_id;
+                                $checkup->date = $appointment->appointment_date;
+                                $checkup->findings = $request->checkup['findings'] ?? '';
+                                $checkup->vital_signs = $request->checkup['vital_signs'] ?? '';
+                                $checkup->treatment = $request->checkup['treatment'] ?? '';
+                                $checkup->medications = $request->checkup['medications'] ?? '';
+                                $checkup->next_visit = $request->checkup['next_visit'] ?? null;
+                                $checkup->notes = $request->checkup['notes'] ?? '';
+                                $checkup->save();
+                            }
+                            break;
+                            
+                        case 'Surgery':
+                            if (!empty($request->surgery)) {
+                                $surgery = new Surgery();
+                                $surgery->appointment_id = $appointment->id;
+                                $surgery->pet_id = $appointment->pet_id;
+                                $surgery->date = $appointment->appointment_date;
+                                $surgery->surgery_type = $request->surgery['surgery_type'] ?? '';
+                                $surgery->pre_surgery_notes = $request->surgery['pre_surgery_notes'] ?? '';
+                                $surgery->post_surgery_care = $request->surgery['post_surgery_care'] ?? '';
+                                $surgery->save();
+                            }
+                            break;
+                            
+                        case 'Laboratory':
+                            if (!empty($request->laboratory)) {
+                                $lab = new LaboratoryTest();
+                                $lab->appointment_id = $appointment->id;
+                                $lab->pet_id = $appointment->pet_id;
+                                $lab->date = $appointment->appointment_date;
+                                $lab->test_type = $request->laboratory['test_type'] ?? '';
+                                $lab->notes = $request->laboratory['notes'] ?? '';
+                                $lab->save();
+                            }
+                            break;
+                    }
+                }
             }
 
             DB::commit();
-            \Log::info('Transaction committed');
 
             return redirect()->route('appointment.index')
                 ->with('success', 'Appointment scheduled successfully!');
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            \Log::error('Validation exception caught', [
-                'errors' => $e->errors(),
-                'request_data' => $request->all()
-            ]);
-            return back()
-                ->withInput()
-                ->withErrors($e->validator)
-                ->with('error_section', 'vaccination');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Appointment creation error', [
+            
+            \Log::error('Appointment creation failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'request_data' => $request->all()
             ]);
             
-            return back()
+            // More helpful error message for debugging
+            $message = config('app.debug') ? $e->getMessage() : 'Error creating appointment. Please check the form and try again.';
+            
+            return redirect()->back()
                 ->withInput()
-                ->withErrors(['error' => 'Error creating appointment: ' . $e->getMessage()]);
+                ->with('error', $message);
         }
     }
 
@@ -273,6 +475,7 @@ class AppointmentController extends Controller
                         'batch_number' => $request->batch_number,
                         'date_given' => $appointment->appointment_date,
                         'next_due_date' => $request->next_due_date,
+                        'administered_by' => $request->administered_by ?? null,
                         'reactions' => $request->reactions,
                     ]);
                     \Log::info('Vaccination record created', ['vaccination' => $vaccination]);
@@ -567,6 +770,72 @@ class AppointmentController extends Controller
                 'success' => false,
                 'message' => 'Error updating appointment status: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    // Add method to automatically archive past appointments
+    public function archivePastAppointments()
+    {
+        $today = Carbon::now()->startOfDay();
+        
+        // Find past appointments that aren't already archived
+        $pastAppointments = Appointment::where('appointment_date', '<', $today)
+            ->whereNull('deleted_at')
+            ->get();
+
+        foreach($pastAppointments as $appointment) {
+            // Soft delete the appointment to mark it as archived
+            $appointment->delete();
+        }
+
+        return redirect()->back()->with('success', 'Past appointments have been archived.');
+    }
+
+    public function getServiceRecords($type, Request $request)
+    {
+        try {
+            $appointmentIds = explode(',', $request->get('appointments'));
+            
+            $records = DB::table($type)
+                ->whereIn('appointment_id', $appointmentIds)
+                ->orderBy('date_given', 'desc')
+                ->get();
+                
+            return response()->json($records);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getPetVaccinations(Pet $pet)
+    {
+        \Log::info('Fetching vaccinations for pet', [
+            'pet_id' => $pet->id,
+            'request_path' => request()->path(),
+            'request_method' => request()->method(),
+            'all_request_params' => request()->all()
+        ]);
+        
+        try {
+            // Use the relationship instead of raw query for better handling
+            $vaccinations = $pet->vaccinations()
+                ->orderBy('date_given', 'desc')
+                ->get();
+            
+            \Log::info('Vaccination records found', [
+                'count' => $vaccinations->count(),
+                'data' => $vaccinations->toArray()
+            ]);
+            
+            return response()->json($vaccinations);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching vaccinations', [
+                'pet_id' => $pet->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

@@ -52,6 +52,7 @@ use App\Http\Controllers\PetOwner\DashboardController as PetOwnerDashboardContro
 
 use App\Http\Controllers\CheckupHistoryController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\ChargeSlipController;
 
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
@@ -286,6 +287,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
 
+    // Add API route for pet vaccinations
+    Route::get('/api/pets/{pet}/vaccinations', [AppointmentController::class, 'getPetVaccinations'])
+        ->name('api.pet.vaccinations');
+
 });
 
 require __DIR__.'/auth.php';
@@ -345,9 +350,7 @@ Route::prefix('settings')->name('settings.')->group(function () {
         return view('settings.store');
     })->name('store');
     
-    Route::get('/invoice', function () {
-        return view('settings.invoice');
-    })->name('invoice');
+    Route::get('/invoice', [ChargeSlipController::class, 'index'])->name('invoice');
     
     Route::get('/notifications', function () {
         return view('settings.notifications');
@@ -741,3 +744,31 @@ Route::post('/messages/mark-as-read/{userId}', [MessageController::class, 'markA
 
 Route::post('/appointments/delete-multiple', [AppointmentController::class, 'deleteMultiple'])->name('appointment.deleteMultiple');
 Route::patch('/appointments/{appointment}/status', [AppointmentController::class, 'updateStatus'])->name('appointment.updateStatus');
+
+// Service form partials
+Route::get('/appointment/forms/checkup', function() {
+    return view('appointment.partials.checkup_form');
+});
+
+Route::get('/appointment/forms/vaccination', function() {
+    return view('appointment.partials.vaccination_form');
+});
+
+Route::get('/appointment/forms/grooming', function() {
+    return view('appointment.partials.grooming_form');
+});
+
+Route::get('/appointment/forms/surgery', function() {
+    return view('appointment.partials.surgery_form');
+});
+
+Route::get('/appointment/forms/laboratory', function() {
+    return view('appointment.partials.laboratory_form');
+});
+
+Route::get('/analytics/archives', [AppointmentController::class, 'archives'])->name('analytics.archives');
+
+Route::post('/appointments/archive-past', [AppointmentController::class, 'archivePastAppointments'])
+    ->name('appointments.archive-past');
+
+Route::post('/charge-slips', [ChargeSlipController::class, 'store'])->name('charge-slips.store');

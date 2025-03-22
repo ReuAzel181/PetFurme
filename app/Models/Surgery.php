@@ -22,6 +22,8 @@ class Surgery extends Model
         'follow_up_date',
     ];
 
+    protected $table = 'appt_surgeries';
+
     public function appointment()
     {
         return $this->belongsTo(Appointment::class);

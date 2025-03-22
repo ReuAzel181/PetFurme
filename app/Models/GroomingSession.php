@@ -24,6 +24,8 @@ class GroomingSession extends Model
         'products_used' => 'array',
     ];
 
+    protected $table = 'appt_grooming';
+
     public function appointment()
     {
         return $this->belongsTo(Appointment::class);

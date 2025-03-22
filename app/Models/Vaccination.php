@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Vaccination extends Model
 {
+    use HasFactory;
+
+    protected $table = 'appt_vaccinations';
+
     protected $fillable = [
         'appointment_id',
         'pet_id',
@@ -13,12 +18,13 @@ class Vaccination extends Model
         'batch_number',
         'date_given',
         'next_due_date',
+        'administered_by',
         'reactions',
     ];
 
-    protected $dates = [
-        'date_given',
-        'next_due_date',
+    protected $casts = [
+        'date_given' => 'date',
+        'next_due_date' => 'date',
     ];
 
     public function appointment()

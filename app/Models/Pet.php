@@ -11,20 +11,19 @@ class Pet extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'user_id',
-        'owner_name',
         'name',
         'category',
-        'type',
         'breed',
-        'gender',
         'age',
         'weight',
-        'allergies',
-        'notes',
+        'gender',
         'photo',
+        'photo_data',
+        'user_id',
         'verified_by'
     ];
+
+    protected $appends = ['photo_url'];
 
     protected $casts = [
         'age' => 'integer',
@@ -46,6 +45,11 @@ class Pet extends Model
         return $this->hasMany(Appointment::class);
     }
 
+    public function vaccinations()
+    {
+        return $this->hasMany(\App\Models\ApptVaccination::class, 'pet_id');
+    }
+
     public static function getTotalCount()
     {
         return self::count();
@@ -58,10 +62,25 @@ class Pet extends Model
 
     public function getPhotoUrlAttribute()
     {
-        if ($this->photo && Storage::disk('public')->exists($this->photo)) {
-            return asset('storage/' . $this->photo);
+        try {
+            if ($this->photo_data) {
+                $base64Data = base64_encode($this->photo_data);
+                if ($base64Data) {
+                    return 'data:image/jpeg;base64,' . $base64Data;
+                }
+            }
+            
+            if ($this->photo && Storage::disk('public')->exists($this->photo)) {
+                return asset('storage/' . $this->photo);
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Error getting pet photo URL:', [
+                'pet_id' => $this->id,
+                'error' => $e->getMessage()
+            ]);
         }
-        return asset('images/default-pet.png');
+        
+        return asset('storage/defaults/paw.png');
     }
 
     /**

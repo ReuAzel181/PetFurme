@@ -24,6 +24,8 @@ class Checkup extends Model
         'next_visit',
     ];
 
+    protected $table = 'appt_checkups';
+
     public function appointment()
     {
         return $this->belongsTo(Appointment::class);

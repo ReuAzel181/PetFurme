@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Pet;
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -291,5 +292,69 @@ class PetController extends Controller
         }
         
         return response()->json(['success' => false], 422);
+    }
+
+    public function getAppointments($id)
+    {
+        try {
+            $appointments = Appointment::where('pet_id', $id)
+                ->whereNull('deleted_at')
+                ->orderBy('appointment_date', 'desc')
+                ->get();
+                
+            return response()->json($appointments);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $pet = Pet::with(['user'])->findOrFail($id);
+            
+            $response = [
+                'id' => $pet->id,
+                'name' => $pet->name,
+                'category' => $pet->category,
+                'breed' => $pet->breed,
+                'age' => $pet->age,
+                'weight' => $pet->weight,
+                'gender' => $pet->gender,
+                'user_id' => $pet->user_id,
+                'owner' => $pet->user ? [
+                    'id' => $pet->user->id,
+                    'name' => $pet->user->name
+                ] : null
+            ];
+
+            // Handle photo URL
+            if ($pet->photo_data) {
+                try {
+                    $base64Data = base64_encode($pet->photo_data);
+                    if ($base64Data) {
+                        $response['photo_url'] = 'data:image/jpeg;base64,' . $base64Data;
+                    } else {
+                        throw new \Exception('Failed to encode photo data');
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Failed to encode pet photo:', ['pet_id' => $id, 'error' => $e->getMessage()]);
+                    $response['photo_url'] = asset('storage/defaults/paw.png');
+                }
+            } elseif ($pet->photo && Storage::disk('public')->exists($pet->photo)) {
+                $response['photo_url'] = asset('storage/' . $pet->photo);
+            } else {
+                $response['photo_url'] = asset('storage/defaults/paw.png');
+            }
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            \Log::error('Error in PetController@show', [
+                'pet_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Failed to fetch pet data'], 500);
+        }
     }
 }

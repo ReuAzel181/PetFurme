@@ -35,7 +35,7 @@ return new class extends Migration
             $table->text('payment_note')->nullable();
             $table->string('archive_reason')->default('completed'); // Changed to string instead of enum
             $table->text('archive_note')->nullable();
-            $table->timestamp('archived_at');
+            $table->timestamp('archived_at')->useCurrent();
             $table->timestamps();
             
             $table->index(['archive_reason', 'archived_at']);

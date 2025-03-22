@@ -9,14 +9,14 @@ return new class extends Migration
     public function up()
     {
         Schema::table('pets', function (Blueprint $table) {
-            $table->mediumBlob('photo')->nullable()->change();
+            $table->binary('photos')->nullable()->change();
         });
     }
 
     public function down()
     {
         Schema::table('pets', function (Blueprint $table) {
-            $table->string('photo')->nullable()->change();
+            $table->string('photos')->nullable()->change();
         });
     }
 }; 

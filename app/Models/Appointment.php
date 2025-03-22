@@ -65,14 +65,50 @@ class Appointment extends Model
         return $this->belongsTo(Pet::class);
     }
 
-    // Update the mutator
+    // Update the mutator to properly handle different input formats
     public function setReasonForVisitAttribute($value)
     {
-        if (is_string($value)) {
-            $this->attributes['reason_for_visit'] = $value ? json_encode(explode(',', $value)) : json_encode([]);
-        } else {
-            $this->attributes['reason_for_visit'] = is_array($value) ? json_encode($value) : json_encode([]);
+        // If it's already a string with commas, just encode it as an array
+        if (is_string($value) && strpos($value, ',') !== false) {
+            $reasons = array_map('trim', explode(',', $value));
+            $this->attributes['reason_for_visit'] = json_encode($reasons);
+            return;
         }
+
+        // If it's a string that looks like JSON, decode and re-encode to clean it
+        if (is_string($value) && (strpos($value, '[') === 0 || strpos($value, '{') === 0)) {
+            try {
+                $decoded = json_decode($value, true);
+                if (is_array($decoded)) {
+                    // Flatten and clean the array
+                    $reasons = [];
+                    array_walk_recursive($decoded, function($item) use (&$reasons) {
+                        if (is_string($item)) {
+                            $reasons[] = trim($item);
+                        }
+                    });
+                    $this->attributes['reason_for_visit'] = json_encode(array_values(array_unique($reasons)));
+                    return;
+                }
+            } catch (\Exception $e) {
+                // If JSON decode fails, treat as single reason
+            }
+        }
+
+        // If it's an array, clean and encode it
+        if (is_array($value)) {
+            $reasons = [];
+            array_walk_recursive($value, function($item) use (&$reasons) {
+                if (is_string($item)) {
+                    $reasons[] = trim($item);
+                }
+            });
+            $this->attributes['reason_for_visit'] = json_encode(array_values(array_unique($reasons)));
+            return;
+        }
+
+        // Single reason case
+        $this->attributes['reason_for_visit'] = json_encode([$value]);
     }
 
     // Add an accessor
@@ -159,5 +195,59 @@ class Appointment extends Model
     public function laboratoryTests()
     {
         return $this->hasMany(LaboratoryTest::class);
+    }
+
+    public function vaccination()
+    {
+        return $this->hasOne(Vaccination::class);
+    }
+
+    /**
+     * Get the formatted reason for visit.
+     *
+     * @return string
+     */
+    public function getFormattedReasonAttribute()
+    {
+        $reasons = $this->reason_for_visit;
+        
+        // If it's already a string, decode it
+        if (is_string($reasons)) {
+            $reasons = json_decode($reasons, true);
+        }
+        
+        // If it's not an array after decoding or wasn't a string to begin with
+        if (!is_array($reasons)) {
+            return $reasons;
+        }
+        
+        // Process each reason
+        $processed = array_map(function($reason) {
+            // If it's a string that looks like JSON
+            if (is_string($reason) && (strpos($reason, '[') === 0 || strpos($reason, '{') === 0)) {
+                try {
+                    $decoded = json_decode($reason, true);
+                    if (is_array($decoded)) {
+                        return implode(', ', $decoded);
+                    }
+                } catch (\Exception $e) {
+                    // Just continue if decode fails
+                }
+            }
+            return $reason;
+        }, $reasons);
+        
+        // Join with commas
+        return implode(', ', $processed);
+    }
+
+    public function chargeSlips()
+    {
+        return $this->hasMany(ChargeSlip::class);
+    }
+
+    public function findings()
+    {
+        return $this->hasMany(Finding::class);
     }
 }

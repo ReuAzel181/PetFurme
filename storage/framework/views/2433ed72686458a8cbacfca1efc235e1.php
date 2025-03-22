@@ -1,150 +1,445 @@
 <?php $__env->startSection('content'); ?>
-<div class="page">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="container-xl">
-            <div class="row">
-                <div class="col">
-                    <?php echo $__env->make('partials._page_header', [
-                        'title' => __('Edit Appointment'),
-                        'section' => 'APPOINTMENT'
-                    ], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<div class="page-header d-print-none">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    Edit Appointment
+                </h2>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <a href="<?php echo e(route('appointment.index')); ?>" class="btn btn-secondary d-none d-sm-inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-back" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1"></path>
+                        </svg>
+                        Back to Appointments
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="page-body">
-        <div class="container-xl">
-            <div class="card">
-                <div class="card-body">
-                    <form action="<?php echo e(route('appointment.update', $appointment->id)); ?>" method="POST">
-                        <?php echo csrf_field(); ?>
-                        <?php echo method_field('PUT'); ?>
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-cards">
+            <div class="col-12">
+                <form action="<?php echo e(route('appointment.update', $appointment->id)); ?>" method="POST" class="card">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PUT'); ?>
+                    
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Owner and Pet Selection Row -->
+                            <div class="col-12">
+                                <div class="row g-3">
+                                    <!-- Pet Owner Selection -->
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <!-- Owner Avatar Display -->
+                                                    <div class="avatar-wrapper me-3">
+                                                        <img src="<?php echo e($appointment->user && $appointment->user->photo_data ? 'data:image/jpeg;base64,' . base64_encode($appointment->user->photo_data) : ($appointment->user && $appointment->user->photo ? asset('storage/' . $appointment->user->photo) : asset('storage/defaults/avatar.png'))); ?>" 
+                                                             class="avatar avatar-lg" 
+                                                             id="owner_avatar"
+                                                             alt="Owner Avatar"
+                                                             style="width: 64px; height: 64px; object-fit: cover;">
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <label class="form-label required">Pet Owner</label>
+                                                        <select name="user_id" id="user_id" class="form-select" required>
+                                                            <option value="">Select Pet Owner</option>
+                                                            <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <option value="<?php echo e($user->id); ?>" <?php echo e($appointment->user_id == $user->id ? 'selected' : ''); ?>>
+                                                                    <?php echo e($user->name); ?>
 
-                        <!-- Pet Owner Selection -->
-                        <div class="mb-3">
-                            <label for="user_id" class="form-label">Pet Owner</label>
-                            <select name="user_id" id="user_id" class="form-select" required>
-                                <option value="">Select Pet Owner</option>
-                                <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <option value="<?php echo e($user->id); ?>" <?php echo e($appointment->user_id == $user->id ? 'selected' : ''); ?>>
-                                        <?php echo e($user->name); ?>
-
-                                    </option>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </select>
-                        </div>
-
-                        <!-- Pet Selection -->
-                        <div class="mb-3" id="pet_selection_group">
-                            <label for="pet_id" class="form-label">Select Pet</label>
-                            <select name="pet_id" id="pet_id" class="form-select" required>
-                                <option value="">Choose a pet</option>
-                                <?php if($appointment->pet_id): ?>
-                                    <option value="<?php echo e($appointment->pet_id); ?>" selected>
-                                        <?php echo e($appointment->pet_name); ?>
-
-                                    </option>
-                                <?php endif; ?>
-                            </select>
-                        </div>
-
-                        <!-- Pet Details -->
-                        <div id="pet_details">
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="pet_name" class="form-label">Pet Name</label>
-                                    <input type="text" id="pet_name" class="form-control" value="<?php echo e($appointment->pet_name); ?>" readonly>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="pet_type" class="form-label">Pet Type</label>
-                                    <input type="text" id="pet_type" class="form-control" value="<?php echo e($appointment->pet_type); ?>" readonly>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="pet_breed" class="form-label">Pet Breed</label>
-                                    <input type="text" id="pet_breed" class="form-control" value="<?php echo e($appointment->pet_breed); ?>" readonly>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="pet_age" class="form-label">Pet Age</label>
-                                    <input type="text" id="pet_age" name="pet_age" class="form-control" value="<?php echo e($appointment->pet_age); ?>" readonly>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="pet_weight" class="form-label">Pet Weight</label>
-                                    <input type="text" id="pet_weight" name="pet_weight" class="form-control" value="<?php echo e($appointment->pet_weight); ?>" readonly>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Appointment Timing -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="appointment_date" class="form-label">Date</label>
-                                <input type="date" name="appointment_date" id="appointment_date" 
-                                       class="form-control" value="<?php echo e($appointment->appointment_date->format('Y-m-d')); ?>" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="appointment_time" class="form-label">Time</label>
-                                <input type="time" name="appointment_time" id="appointment_time" 
-                                       class="form-control" value="<?php echo e($appointment->appointment_time); ?>" required>
-                            </div>
-                        </div>
-
-                        <!-- Reasons for Visit -->
-                        <div class="mb-3">
-                            <label class="form-label">Reasons for Visit</label>
-                            <div class="d-flex flex-wrap gap-2">
-                                <?php
-                                    $selectedReasons = $appointment->reason_for_visit;
-                                ?>
-                                <button type="button" class="btn <?php echo e(in_array('Check-up', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Routine Check-up">
-                                    Routine Check-up
-                                </button>
-                                <button type="button" class="btn <?php echo e(in_array('Vaccination', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Vaccination">
-                                    Vaccination
-                                </button>
-                                <button type="button" class="btn <?php echo e(in_array('Emergency', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Emergency">
-                                    Emergency
-                                </button>
-                                <button type="button" class="btn <?php echo e(in_array('Grooming', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Grooming">
-                                    Grooming
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" id="other-reason-btn">
-                                    Other
-                                </button>
-                            </div>
-
-                            <input type="hidden" name="reason_for_visit" id="reason_for_visit" value="<?php echo e(json_encode($appointment->reason_for_visit)); ?>" required>
-
-                            <!-- Selected Reasons Display -->
-                            <div class="mt-3">
-                                <label class="form-label">Selected Reasons:</label>
-                                <div id="selected-reasons" class="d-flex flex-wrap gap-2">
-                                    <?php $__currentLoopData = $selectedReasons; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $reason): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <div class="badge bg-primary d-flex align-items-center gap-2 p-2">
-                                            <?php echo e($reason); ?>
-
-                                            <button type="button" class="btn-close btn-close-white" aria-label="Remove"></button>
+                                                                </option>
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </div>
+
+                                    <!-- Pet Selection -->
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <!-- Pet Avatar Display -->
+                                                    <div class="avatar-wrapper me-3">
+                                                        <img src="<?php echo e($appointment->pet && $appointment->pet->photo_data ? 'data:image/jpeg;base64,' . base64_encode($appointment->pet->photo_data) : ($appointment->pet && $appointment->pet->photo ? asset('storage/' . $appointment->pet->photo) : asset('storage/defaults/paw.png'))); ?>" 
+                                                             class="avatar avatar-lg" 
+                                                             id="pet_avatar"
+                                                             alt="Pet Avatar"
+                                                             style="width: 64px; height: 64px; object-fit: cover;">
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <label for="pet_id" class="form-label required">Select Pet</label>
+                                                        <select name="pet_id" id="pet_id" class="form-select" required>
+                                                            <option value="">Choose a pet</option>
+                                                            <?php if($appointment->pet_id): ?>
+                                                                <option value="<?php echo e($appointment->pet_id); ?>" selected>
+                                                                    <?php echo e($appointment->pet_name); ?>
+
+                                                                </option>
+                                                            <?php endif; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Other Reason Input -->
-                            <div class="mb-3" id="other_reason_group" style="display: none;">
-                                <label for="other_reason" class="form-label">Specify Other Reason</label>
-                                <div class="input-group">
-                                    <input type="text" id="other_reason" class="form-control" value="<?php echo e($appointment->other_reason); ?>">
-                                    <button type="button" class="btn btn-primary" id="add-other-reason">Add</button>
+                            <!-- Pet Details Row -->
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Pet Details</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-dog-bowl" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M10 15l5.586 -5.585a2 2 0 1 1 3.414 -1.415a2 2 0 1 1 -1.413 3.414l-3.587 3.586"></path>
+                                                        <path d="M12 13l-3.586 -3.585a2 2 0 1 0 -3.414 -1.415a2 2 0 1 0 1.413 3.414l3.587 3.586"></path>
+                                                        <path d="M3 20h18c-.175 -1.423 -.963 -2.674 -2 -3.5"></path>
+                                                        <path d="M16 18.5c-1.175 .847 -2.608 1.5 -4 1.5h-4c-1.392 0 -2.825 -.653 -4 -1.5"></path>
+                                                    </svg>
+                                                    Pet Name
+                                                </label>
+                                                <input type="text" id="pet_name" class="form-control" value="<?php echo e($appointment->pet_name); ?>" readonly>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-category" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M4 4h6v6h-6z"></path>
+                                                        <path d="M14 4h6v6h-6z"></path>
+                                                        <path d="M4 14h6v6h-6z"></path>
+                                                        <path d="M14 14h6v6h-6z"></path>
+                                                    </svg>
+                                                    Pet Type
+                                                </label>
+                                                <input type="text" id="pet_type" class="form-control" value="<?php echo e($appointment->pet_type); ?>" readonly>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-paw" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M14.7 13.5c-1.1 -2 -1.441 -5.5 -1.7 -7.5c-.259 -1.909 -1.437 -3.4 -3 -3c-1.954 .5 -3 2.827 -3 3.75c0 .9 1.052 2.75 2 3.75c1.385 1.455 1.7 5.5 1.7 5.5s1.374 -1.084 3 -.5c1.916 .686 3 1.75 3 1.75s.078 -2.5 1.7 -5.5c.433 -.804 2 -2.75 2 -3.75c0 -1 -1 -3.25 -3 -3.75c-1.587 -.4 -2.259 1.4 -3 3c-.741 1.6 -1.7 5.5 -1.7 7.5"></path>
+                                                    </svg>
+                                                    Pet Breed
+                                                </label>
+                                                <input type="text" id="pet_breed" class="form-control" value="<?php echo e($appointment->pet_breed); ?>" readonly>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <circle cx="12" cy="12" r="9"></circle>
+                                                        <polyline points="12 7 12 12 15 15"></polyline>
+                                                    </svg>
+                                                    Pet Age
+                                                </label>
+                                                <input type="text" id="pet_age" name="pet_age" class="form-control" value="<?php echo e($appointment->pet_age); ?>" readonly>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-scale" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M7 20l10 0"></path>
+                                                        <path d="M6 6l6 -1l6 1"></path>
+                                                        <path d="M12 3l0 17"></path>
+                                                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"></path>
+                                                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"></path>
+                                                    </svg>
+                                                    Pet Weight
+                                                </label>
+                                                <input type="text" id="pet_weight" name="pet_weight" class="form-control" value="<?php echo e($appointment->pet_weight); ?>" readonly>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-gender-bigender" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M11 11m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+                                                        <path d="M19 3l-5 5"></path>
+                                                        <path d="M15 3h4v4"></path>
+                                                        <path d="M11 16v6"></path>
+                                                        <path d="M8 19h6"></path>
+                                                    </svg>
+                                                    Gender
+                                                </label>
+                                                <input type="text" id="pet_gender" class="form-control" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Appointment Date/Time Row -->
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Appointment Details</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="appointment_date" class="form-label required">Date</label>
+                                                <input type="date" name="appointment_date" id="appointment_date" 
+                                                       class="form-control" value="<?php echo e($appointment->appointment_date->format('Y-m-d')); ?>" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="appointment_time" class="form-label required">Time</label>
+                                                <select name="appointment_time" id="appointment_time" class="form-select" required>
+                                                    <option value="">Select Time</option>
+                                                    <optgroup label="Morning">
+                                                        <?php $__currentLoopData = ['09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $time): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($time); ?>" <?php echo e($appointment->appointment_time == $time ? 'selected' : ''); ?>>
+                                                                <?php echo e($time); ?>
+
+                                                            </option>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                    </optgroup>
+                                                    <optgroup label="Afternoon">
+                                                        <?php $__currentLoopData = ['01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $time): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($time); ?>" <?php echo e($appointment->appointment_time == $time ? 'selected' : ''); ?>>
+                                                                <?php echo e($time); ?>
+
+                                                            </option>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                    </optgroup>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reasons for Visit -->
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Reason for Visit</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label required">Select Reasons</label>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <?php
+                                                    $selectedReasons = $appointment->reason_for_visit;
+                                                ?>
+                                                <button type="button" class="btn <?php echo e(in_array('Vaccination', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Vaccination">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-vaccine" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M17 3l4 4"></path>
+                                                        <path d="M19 5l-4.5 4.5"></path>
+                                                        <path d="M11.5 6.5l6 6"></path>
+                                                        <path d="M16.5 11.5l-6.5 6.5h-4v-4l6.5 -6.5"></path>
+                                                        <path d="M7.5 12.5l1.5 1.5"></path>
+                                                        <path d="M10.5 9.5l1.5 1.5"></path>
+                                                        <path d="M3 21l3 -3"></path>
+                                                    </svg>
+                                                    Vaccination
+                                                </button>
+                                                <button type="button" class="btn <?php echo e(in_array('Check-up', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Check-up">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-stethoscope" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M6 4h-1a2 2 0 0 0 -2 2v3.5h0a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1"></path>
+                                                        <path d="M8 15a6 6 0 1 0 12 0v-3"></path>
+                                                        <path d="M11 3v2"></path>
+                                                        <path d="M6 3v2"></path>
+                                                        <circle cx="20" cy="10" r="2"></circle>
+                                                    </svg>
+                                                    Check-up
+                                                </button>
+                                                <button type="button" class="btn <?php echo e(in_array('Grooming', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Grooming">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cut" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <circle cx="6" cy="7" r="3"></circle>
+                                                        <circle cx="6" cy="17" r="3"></circle>
+                                                        <line x1="8.7" y1="8.7" x2="19" y2="19"></line>
+                                                        <line x1="8.7" y1="15.3" x2="19" y2="5"></line>
+                                                    </svg>
+                                                    Grooming
+                                                </button>
+                                                <button type="button" class="btn <?php echo e(in_array('Surgery', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Surgery">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-scalpel" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M19 5l-12.5 12.5a4.95 4.95 0 0 1 -7 -7l12.5 -12.5a1 1 0 0 1 1.414 0l5.586 5.586a1 1 0 0 1 0 1.414z"></path>
+                                                        <path d="M18 6l-11.5 11.5"></path>
+                                                    </svg>
+                                                    Surgery
+                                                </button>
+                                                <button type="button" class="btn <?php echo e(in_array('Laboratory', $selectedReasons) ? 'btn-primary' : 'btn-outline-primary'); ?> reason-btn" data-reason="Laboratory">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-test-pipe" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path d="M20 8.04l-12.122 12.124a2.857 2.857 0 1 1 -4.041 -4.04l12.122 -12.124"></path>
+                                                        <path d="M7 13h8"></path>
+                                                        <path d="M19 15l1.5 1.6a2 2 0 1 1 -3 0l1.5 -1.6z"></path>
+                                                        <path d="M15 3l6 6"></path>
+                                                    </svg>
+                                                    Laboratory
+                                                </button>
+                                            </div>
+
+                                            <input type="hidden" name="reason_for_visit" id="reason_for_visit" value="<?php echo e(json_encode($appointment->reason_for_visit)); ?>" required>
+
+                                            <!-- Selected Reasons Display -->
+                                            <div class="mt-3">
+                                                <div id="selected-reasons" class="d-flex flex-wrap gap-2">
+                                                    <?php $__currentLoopData = $selectedReasons; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $reason): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <div class="badge bg-primary d-flex align-items-center gap-2 p-2" data-reason="<?php echo e($reason); ?>">
+                                                            <?php echo e($reason); ?>
+
+                                                            <button type="button" class="btn-close btn-close-white" aria-label="Remove"></button>
+                                                        </div>
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                </div>
+                                                <div id="empty-reason-text" class="text-muted mt-2" style="<?php echo e(count($selectedReasons) > 0 ? 'display: none;' : ''); ?>">No reasons selected</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Vaccination Details Form (hidden by default) -->
+                                        <div id="vaccination-details" class="mt-4" style="<?php echo e(in_array('Vaccination', $selectedReasons) ? 'display: block;' : 'display: none;'); ?>">
+                                            <div class="card">
+                                                <div class="card-header bg-light d-flex align-items-center">
+                                                    <h3 class="card-title mb-0">Vaccination Details</h3>
+                                                    <button type="button" class="ms-auto btn-close" aria-label="Close" data-bs-dismiss="card"></button>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="vaccine_type" class="form-label required">Vaccine Type</label>
+                                                            <select name="vaccine_type" id="vaccine_type" class="form-select">
+                                                                <option value="">Select Vaccine</option>
+                                                                <option value="Anti-rabies" <?php echo e(isset($appointment->vaccine_type) && $appointment->vaccine_type == 'Anti-rabies' ? 'selected' : ''); ?>>Anti-rabies</option>
+                                                                <option value="DHPP" <?php echo e(isset($appointment->vaccine_type) && $appointment->vaccine_type == 'DHPP' ? 'selected' : ''); ?>>DHPP</option>
+                                                                <option value="FVRCP" <?php echo e(isset($appointment->vaccine_type) && $appointment->vaccine_type == 'FVRCP' ? 'selected' : ''); ?>>FVRCP</option>
+                                                                <option value="Deworming" <?php echo e(isset($appointment->vaccine_type) && $appointment->vaccine_type == 'Deworming' ? 'selected' : ''); ?>>Deworming</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="batch_number" class="form-label required">Batch Number</label>
+                                                            <input type="text" id="batch_number" name="batch_number" class="form-control" value="<?php echo e($appointment->batch_number ?? ''); ?>">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="next_due_date" class="form-label required">Next Due Date</label>
+                                                            <input type="date" id="next_due_date" name="next_due_date" class="form-control" value="<?php echo e(isset($appointment->next_due_date) ? $appointment->next_due_date->format('Y-m-d') : ''); ?>">
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="administered_by" class="form-label required">Administered By</label>
+                                                            <input type="text" id="administered_by" name="administered_by" class="form-control" value="<?php echo e($appointment->administered_by ?? ''); ?>">
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="reactions" class="form-label">Reactions/Notes</label>
+                                                        <textarea id="reactions" name="reactions" class="form-control" rows="3"><?php echo e($appointment->reactions ?? ''); ?></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Vaccination History -->
+                                        <div id="vaccination-history" class="mt-4" style="<?php echo e(in_array('Vaccination', $selectedReasons) ? 'display: block;' : 'display: none;'); ?>">
+                                            <div class="card">
+                                                <div class="card-header d-flex align-items-center">
+                                                    <h3 class="card-title mb-0">Vaccination History</h3>
+                                                    <div class="ms-auto">
+                                                        <button type="button" class="btn btn-primary btn-sm">
+                                                            View All
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-0">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-vcenter card-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>DATE</th>
+                                                                    <th>VACCINE TYPE</th>
+                                                                    <th>BATCH NUMBER</th>
+                                                                    <th>NEXT DUE DATE</th>
+                                                                    <th>ADMINISTERED BY</th>
+                                                                    <th>REACTIONS</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php if(isset($vaccinationHistory) && count($vaccinationHistory) > 0): ?>
+                                                                    <?php $__currentLoopData = $vaccinationHistory; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $history): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <tr>
+                                                                            <td><?php echo e($history->date->format('M d, Y')); ?></td>
+                                                                            <td><?php echo e($history->vaccine_type); ?></td>
+                                                                            <td><?php echo e($history->batch_number); ?></td>
+                                                                            <td><?php echo e($history->next_due_date ? $history->next_due_date->format('M d, Y') : 'N/A'); ?></td>
+                                                                            <td><?php echo e($history->administered_by); ?></td>
+                                                                            <td><?php echo e($history->reactions); ?></td>
+                                                                        </tr>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php else: ?>
+                                                                    <tr>
+                                                                        <td colspan="6" class="text-center">
+                                                                            <div class="py-4">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-vaccine text-muted mb-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                                                    <path d="M17 3l4 4"></path>
+                                                                                    <path d="M19 5l-4.5 4.5"></path>
+                                                                                    <path d="M11.5 6.5l6 6"></path>
+                                                                                    <path d="M16.5 11.5l-6.5 6.5h-4v-4l6.5 -6.5"></path>
+                                                                                    <path d="M7.5 12.5l1.5 1.5"></path>
+                                                                                    <path d="M10.5 9.5l1.5 1.5"></path>
+                                                                                    <path d="M3 21l3 -3"></path>
+                                                                                </svg>
+                                                                                <p class="text-muted">No records found</p>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                <?php endif; ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Notes -->
+                                        <div class="mt-4">
+                                            <label for="notes" class="form-label">Additional Notes</label>
+                                            <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any additional information about the visit..."><?php echo e($appointment->notes ?? ''); ?></textarea>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="card-footer text-end">
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn btn-primary">Save Appointment</button>
                             <a href="<?php echo e(route('appointment.index')); ?>" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M11.5 21h-5.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v6"></path>
+                                    <path d="M16 3v4"></path>
+                                    <path d="M8 3v4"></path>
+                                    <path d="M4 11h16"></path>
+                                    <path d="M15 19l2 2l4 -4"></path>
+                                </svg>
+                                Update Appointment
+                            </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -164,6 +459,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const addOtherReasonBtn = document.getElementById('add-other-reason');
     const selectedReasonsContainer = document.getElementById('selected-reasons');
     const reasonForVisitInput = document.getElementById('reason_for_visit');
+    const emptyReasonText = document.getElementById('empty-reason-text');
+
+    // Default avatar paths
+    const defaultAvatarPath = "<?php echo e(asset('storage/defaults/avatar.png')); ?>";
+    const defaultPawPath = "<?php echo e(asset('storage/defaults/paw.png')); ?>";
 
     // Function to clear pet details
     function clearPetDetails() {
@@ -172,6 +472,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('pet_breed').value = '';
         document.getElementById('pet_age').value = '';
         document.getElementById('pet_weight').value = '';
+        document.getElementById('pet_gender').value = '';
+        document.getElementById('pet_avatar').src = defaultPawPath;
     }
 
     // Function to update pet details
@@ -181,6 +483,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('pet_breed').value = pet.breed || '';
         document.getElementById('pet_age').value = pet.age || '';
         document.getElementById('pet_weight').value = pet.weight || '';
+        document.getElementById('pet_gender').value = pet.gender || '';
+        
+        // Update pet avatar if available
+        if (pet.photo_data) {
+            document.getElementById('pet_avatar').src = `data:image/jpeg;base64,${pet.photo_data}`;
+        } else if (pet.photo) {
+            document.getElementById('pet_avatar').src = `<?php echo e(asset('storage/')); ?>/${pet.photo}`;
+        } else {
+            document.getElementById('pet_avatar').src = defaultPawPath;
+        }
     }
 
     // Handle Pet Owner Selection
@@ -188,6 +500,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const userId = this.value;
         petSelect.innerHTML = '<option value="">Loading pets...</option>';
         clearPetDetails();
+        
+        // Update owner avatar if available
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.dataset.photo) {
+            document.getElementById('owner_avatar').src = `<?php echo e(asset('storage/')); ?>/${selectedOption.dataset.photo}`;
+        } else {
+            document.getElementById('owner_avatar').src = defaultAvatarPath;
+        }
         
         if (!userId) {
             petSelect.innerHTML = '<option value="">Choose a pet</option>';
@@ -203,7 +523,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 category: '<?php echo e($appointment->pet_type); ?>',
                 breed: '<?php echo e($appointment->pet_breed); ?>',
                 age: '<?php echo e($appointment->pet_age); ?>',
-                weight: '<?php echo e($appointment->pet_weight); ?>'
+                weight: '<?php echo e($appointment->pet_weight); ?>',
+                gender: '<?php echo e($appointment->pet_gender ?? ""); ?>'
             };
             updatePetDetails(initialPet);
             petSelect.innerHTML = '<option value="<?php echo e($appointment->pet_id); ?>" selected><?php echo e($appointment->pet_name); ?></option>';
@@ -247,26 +568,62 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const pet = JSON.parse(selectedOption.dataset.pet);
-        updatePetDetails(pet);
+        if (selectedOption.dataset.pet) {
+            const pet = JSON.parse(selectedOption.dataset.pet);
+            updatePetDetails(pet);
+        }
     });
+
+    // Function to create a reason badge
+    function createReasonBadge(reason) {
+        const badge = document.createElement('div');
+        badge.className = 'badge bg-primary d-flex align-items-center gap-2 p-2';
+        badge.dataset.reason = reason;
+        badge.innerHTML = `
+            ${reason}
+            <button type="button" class="btn-close btn-close-white" aria-label="Remove"></button>
+        `;
+        
+        // Add remove handler
+        const closeBtn = badge.querySelector('.btn-close');
+        closeBtn.addEventListener('click', function() {
+            selectedReasons.delete(reason);
+            badge.remove();
+            updateReasonInput();
+            
+            // Toggle button state
+            const reasonBtn = document.querySelector(`.reason-btn[data-reason="${reason}"]`);
+            if (reasonBtn) {
+                reasonBtn.classList.remove('btn-primary');
+                reasonBtn.classList.add('btn-outline-primary');
+            }
+            
+            // Show empty text if no reasons selected
+            if (selectedReasons.size === 0) {
+                emptyReasonText.style.display = 'block';
+            }
+        });
+        
+        return badge;
+    }
 
     // Function to update the hidden input with selected reasons
     function updateReasonInput() {
         reasonForVisitInput.value = JSON.stringify(Array.from(selectedReasons));
+        
+        // Update visibility of empty reason text
+        emptyReasonText.style.display = selectedReasons.size === 0 ? 'block' : 'none';
+        
+        // Update service-specific details
+        updateServiceDetails();
     }
 
     // Initialize existing reasons
-    let initialReasons = <?php echo json_encode($selectedReasons, 15, 512) ?>;
+    let initialReasons = <?php echo json_encode($appointment->reason_for_visit, 15, 512) ?>;
     initialReasons.forEach(reason => {
         if (reason && reason.trim()) {
             const trimmedReason = reason.trim();
             selectedReasons.add(trimmedReason);
-            const button = document.querySelector(`.reason-btn[data-reason="${trimmedReason}"]`);
-            if (button) {
-                button.classList.remove('btn-outline-primary');
-                button.classList.add('btn-primary');
-            }
         }
     });
     updateReasonInput();
@@ -289,7 +646,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.add('btn-primary');
                 
                 const badge = createReasonBadge(reason);
-                badge.dataset.reason = reason;
                 selectedReasonsContainer.appendChild(badge);
             }
             
@@ -309,7 +665,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!selectedReasons.has(customReason)) {
                 selectedReasons.add(customReason);
                 const badge = createReasonBadge(customReason);
-                badge.dataset.reason = customReason;
                 selectedReasonsContainer.appendChild(badge);
                 updateReasonInput();
             }
@@ -329,6 +684,53 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize pet details and selected user
     userSelect.value = <?php echo e($appointment->user_id); ?>;
     userSelect.dispatchEvent(new Event('change'));
+
+    // Service-specific details toggle
+    function updateServiceDetails() {
+        // Hide all service details first
+        document.getElementById('vaccination-details').style.display = 'none';
+        document.getElementById('vaccination-history').style.display = 'none';
+        
+        // Show relevant service details based on selected reasons
+        if(selectedReasons.has('Vaccination')) {
+            document.getElementById('vaccination-details').style.display = 'block';
+            document.getElementById('vaccination-history').style.display = 'block';
+            
+            // Make vaccination fields required
+            document.getElementById('vaccine_type').setAttribute('required', '');
+            document.getElementById('batch_number').setAttribute('required', '');
+            document.getElementById('next_due_date').setAttribute('required', '');
+            document.getElementById('administered_by').setAttribute('required', '');
+        } else {
+            // Remove required attribute when vaccination is not selected
+            document.getElementById('vaccine_type').removeAttribute('required');
+            document.getElementById('batch_number').removeAttribute('required');
+            document.getElementById('next_due_date').removeAttribute('required');
+            document.getElementById('administered_by').removeAttribute('required');
+        }
+        
+        // Add other service-specific toggles here as needed
+    }
+    
+    // Call updateServiceDetails on page load
+    updateServiceDetails();
+    
+    // Close button for service detail cards
+    document.querySelectorAll('[data-bs-dismiss="card"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const card = this.closest('.card');
+            if (card) {
+                card.parentElement.style.display = 'none';
+                
+                // Find which service this relates to and deselect it
+                if (card.closest('#vaccination-details')) {
+                    const vaccinationBtn = document.querySelector('.reason-btn[data-reason="Vaccination"]');
+                    if (vaccinationBtn) vaccinationBtn.click();
+                }
+                // Add similar logic for other service types
+            }
+        });
+    });
 });
 </script>
 <?php $__env->stopPush(); ?>

@@ -1,5 +1,38 @@
 @extends('layouts.tabler')
 
+@push('page-styles')
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<style>
+    .row.g-4 {
+        --bs-gutter-y: 0.5rem !important;
+    }
+    
+    /* Reduce padding in card body */
+    .card-body.p-4 {
+        padding: 0.75rem !important;
+    }
+    
+    /* Reduce spacing in summary section */
+    .border-top.pt-4 {
+        padding-top: 0.75rem !important;
+    }
+    
+    /* Reduce spacing between sections */
+    .mb-4 {
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* Keep header sticky */
+    #servicesTable thead,
+    #productsTable thead {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 2;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="page-wrapper">
     <div class="container-xl">
@@ -62,12 +95,23 @@
                                     <th width="12%">Reason</th>
                                     <th width="12%">Status</th>
                                     <th width="12%">Created By</th>
+                                    <th width="8%">Created At</th>
                                     <th width="8%">Complete</th>
                                     <th width="15%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($appointments as $appointment)
+                                    @php
+                                        $appointmentDate = \Carbon\Carbon::parse($appointment->appointment_date);
+                                        $today = \Carbon\Carbon::now()->startOfDay();
+                                        
+                                        // Skip past appointments - they should be in archives
+                                        if ($appointmentDate->lt($today)) {
+                                            continue;
+                                        }
+                                    @endphp
+                                    
                                     <tr style="cursor: pointer" 
                                         data-appointment="{{ htmlspecialchars(json_encode($appointment), ENT_QUOTES, 'UTF-8') }}"
                                         class="appointment-row">
@@ -175,13 +219,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="d-flex flex-wrap gap-1">
-                                                @forelse($appointment->reason_for_visit as $reason)
-                                                    <span class="badge bg-primary-lt">{{ $reason }}</span>
-                                                @empty
-                                                    <span class="text-muted">No reasons specified</span>
-                                                @endforelse
-                                            </div>
+                                            {{ $appointment->formatted_reason }}
                                         </td>
                                         <td>
                                             <div class="dropdown">
@@ -243,17 +281,39 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <div class="d-flex flex-column">
-                                                <div class="text-dark">{{ $appointment->creator->name ?? 'N/A' }}</div>
-                                                <div class="text-muted small">
-                                                    {{ $appointment->created_at->format('M d, Y g:i A') }}
-                                                </div>
-                                            </div>
+                                            @if($appointment->created_by_type && $appointment->created_by_id)
+                                                @php
+                                                    $creator = \App\Models\User::find($appointment->created_by_id);
+                                                    $roleLabel = '';
+                                                    
+                                                    if ($creator) {
+                                                        if ($creator->hasRole('admin') || $creator->is_admin) {
+                                                            $roleLabel = '<span class="badge bg-danger-lt ms-1">Admin</span>';
+                                                        } elseif ($creator->hasRole('staff') || $creator->is_staff) {
+                                                            $roleLabel = '<span class="badge bg-purple-lt ms-1">Staff</span>';
+                                                        } elseif ($appointment->created_by_type == 'user') {
+                                                            $roleLabel = '<span class="badge bg-blue-lt ms-1">User</span>';
+                                                        }
+                                                    }
+                                                @endphp
+                                                
+                                                @if($appointment->created_by_type == 'staff')
+                                                    {{ $creator->name ?? 'Staff Member' }} {!! $roleLabel !!}
+                                                @elseif($appointment->created_by_type == 'user')
+                                                    {{ $creator->name ?? 'User' }} {!! $roleLabel !!}
+                                                @else
+                                                    {{ $appointment->created_by_type }} {!! $roleLabel !!}
+                                                @endif
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{ $appointment->created_at ? $appointment->created_at->format('M d, Y g:i A') : 'N/A' }}
                                         </td>
                                         <td>
                                             @if($appointment->status !== 'completed')
                                                 @php
-                                                    // Convert the appointment to an array and remove any circular references
                                                     $appointmentData = [
                                                         'id' => $appointment->id,
                                                         'user_id' => $appointment->user_id,
@@ -268,6 +328,7 @@
                                                 @endphp
                                                 <button type="button" 
                                                         class="btn btn-primary btn-sm complete-btn"
+                                                        onclick="handleCompleteClick({{ $appointment->id }}, {{ json_encode($appointmentData) }})"
                                                         data-appointment='{{ json_encode($appointmentData) }}'>
                                                     <i class="fas fa-clipboard-check me-1"></i>
                                                     Complete
@@ -294,7 +355,7 @@
                                                         </form>
                                                     @endcan
                                                 @endif
-                                                
+
                                                 @if(in_array($appointment->status, ['pending', 'confirmed']))
                                                     <a href="{{ route('appointment.edit', $appointment->id) }}" class="btn btn-icon btn-warning" title="Edit">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -303,7 +364,8 @@
                                                         </svg>
                                                     </a>
                                                 @endif
-                                                
+
+                                                <!-- Delete Button -->
                                                 <form action="{{ route('appointment.destroy', $appointment->id) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -327,16 +389,17 @@
                                                 <div class="empty-icon">
                                                     <i class="fas fa-calendar-times fa-3x text-muted"></i>
                                                 </div>
-                                                <p class="empty-title">No appointments found</p>
+                                                <p class="empty-title">No upcoming appointments found</p>
                                                 <p class="empty-subtitle text-muted">
-                                                    Start by adding a new appointment using the button above.
+                                                    Start by adding a new appointment using the button above.<br>
+                                                    Past appointments can be found in the <a href="{{ route('analytics.archives') }}">Archives</a>.
                                                 </p>
                                             </div>
                                         </td>
                                     </tr>
                                 @endforelse
-                            </tbody>
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -571,6 +634,9 @@
                     <!-- Footer Buttons with more spacing -->
                     <div class="modal-footer px-0 pb-0 border-0 mt-4 pt-2">
                         <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-info px-4 me-2" onclick="openDiagnosisForm()">
+                            <i class="fas fa-stethoscope me-1"></i>Add Diagnosis
+                        </button>
                         <button type="button" class="btn btn-primary px-4" onclick="saveMedicalRecord()">Complete</button>
                     </div>
                 </form>
@@ -674,822 +740,15 @@
     </div>
 </div>
 
-@endsection
-
-@section('scripts')
-<script>
-    // Removed unnecessary custom logic for "reason for visit"
-    // If additional interactive functionality is required, 
-    // add it here in a streamlined way.
-</script>
-@endsection
-
-@push('page-styles')
-<style>
-    .table-vcenter td {
-        vertical-align: middle;
-    }
-    
-    .badge {
-        font-weight: 500;
-        padding: 0.5em 0.75em;
-    }
-    
-    .btn-icon {
-        padding: 0.5rem;
-        width: 36px;
-        height: 36px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .btn-icon svg {
-        width: 20px;
-        height: 20px;
-        stroke-width: 2;
-    }
-    
-    .table td {
-        padding: 0.75rem 1rem;
-        vertical-align: middle;
-    }
-    
-    .table th {
-        padding: 0.75rem 1rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.04em;
-        color: var(--tblr-muted);
-    }
-    
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-    }
-    
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.35em 0.65em;
-    }
-    
-    .d-flex.flex-column {
-        gap: 0.25rem;
-    }
-    
-    .text-muted.small {
-        font-size: 0.75rem;
-    }
-    
-    .d-flex.gap-2.justify-content-end {
-        padding-right: 0.5rem;
-    }
-    
-    .table-striped > tbody > tr:nth-of-type(odd) {
-        background-color: rgba(0, 0, 0, 0.02);
-    }
-    
-    .empty {
-        text-align: center;
-        padding: 2rem;
-    }
-    
-    .empty-icon {
-        margin-bottom: 1rem;
-    }
-    
-    .empty-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-    
-    .empty-subtitle {
-        font-size: 0.875rem;
-    }
-    
-    .fw-medium {
-        font-weight: 500;
-    }
-    
-    .gap-1 {
-        gap: 0.25rem;
-    }
-    
-    .d-flex.gap-2 {
-        gap: 0.75rem !important;
-    }
-
-    .appointment-row:hover {
-        background-color: rgba(var(--tblr-primary-rgb), 0.05) !important;
-    }
-
-    .modal-body .form-control-plaintext {
-        padding: 0.5rem;
-        background-color: var(--tblr-bg-surface);
-        border-radius: 4px;
-        min-height: 40px;
-    }
-
-    /* Add these modal styles */
-    .modal-backdrop {
-        display: none !important;
-    }
-
-    .modal {
-        background: rgba(0, 0, 0, 0.5);
-        padding-top: 60px; /* Add padding to prevent header overlap */
-    }
-
-    .modal-dialog {
-        margin: 1.75rem auto; /* Center horizontally */
-        max-width: 95%; /* Limit width on larger screens */
-    }
-
-    @media (min-width: 992px) {
-        .modal-dialog {
-            max-width: 900px; /* Set max width for larger screens */
-        }
-    }
-
-    .modal-content {
-        border: none;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        margin: 0 auto; /* Center the content */
-        max-height: calc(100vh - 120px); /* Prevent modal from being too tall */
-        overflow-y: auto; /* Add scroll if content is too long */
-    }
-
-    .modal-body {
-        height: auto;
-        max-height: none;
-        overflow-y: visible;
-        padding: 1.5rem;
-    }
-
-    .input-group-flat .form-control {
-        border-right: 0;
-    }
-
-    .input-group-flat .input-group-text {
-        background: #fff;
-        border-left: 0;
-    }
-
-    .nav-tabs .nav-link {
-        color: #666;
-    }
-
-    .nav-tabs .nav-link.active {
-        font-weight: 600;
-        color: var(--tblr-primary);
-    }
-
-    .tab-content {
-        padding: 1rem 0;
-    }
-
-    .modal-lg {
-        max-width: 850px;
-    }
-    
-    .form-section {
-        min-height: auto; /* Remove fixed height */
-        max-height: calc(100vh - 250px); /* Adjust max height */
-        overflow-y: auto;
-        padding: 1rem;
-    }
-    
-    .form-section .card {
-        margin-bottom: 1rem;
-        height: auto; /* Remove fixed height */
-    }
-    
-    .form-section .card-body {
-        height: auto; /* Remove fixed height */
-        overflow-y: visible;
-    }
-    
-    .btn-group .btn {
-        flex: 1;
-    }
-    
-    .form-control-plaintext {
-        padding: 0.75rem;
-        background-color: #f8f9fa;
-        border-radius: 4px;
-        min-height: 60px;
-    }
-
-    .card-body {
-        padding: 1.25rem;
-    }
-
-    textarea.form-control {
-        min-height: 65px;
-    }
-
-    .mb-3 {
-        margin-bottom: 1rem !important;
-    }
-
-    .row.g-3 {
-        --bs-gutter-y: 1rem;
-    }
-
-    .form-control, .form-select {
-        min-height: 36px;
-        padding: 0.4rem 0.75rem;
-    }
-
-    .diagnosis-group {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    .avatar-sm {
-        width: 32px;
-        height: 32px;
-        line-height: 32px;
-        font-size: 0.875rem;
-    }
-
-    .bg-primary-lt {
-        background-color: rgba(32, 107, 196, 0.1);
-        color: #206bc4;
-    }
-
-    .d-flex.align-items-center.gap-2 {
-        gap: 0.5rem !important;
-    }
-
-    .avatar {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        vertical-align: middle;
-        font-weight: 500;
-        text-align: center;
-        text-transform: uppercase;
-        user-select: none;
-        background: #f8f9fa;
-        border-radius: 50%;
-    }
-
-    /* Add padding to the page wrapper to prevent modal overlap */
-    .page-wrapper {
-        padding-bottom: 2rem;
-    }
-
-    /* Add these styles to your existing CSS */
-    .modal-footer {
-        padding: 1rem 1.5rem;
-        background-color: #f8f9fa;
-        border-top: 1px solid #e9ecef;
-    }
-
-    textarea.form-control {
-        resize: vertical;
-        min-height: 100px;
-    }
-
-    .form-control[readonly] {
-        background-color: #f8f9fa;
-        opacity: 1;
-    }
-
-    /* Add to your existing styles */
-    .modal-header {
-        border-bottom: 0;
-        padding: 1.5rem;
-    }
-
-    .modal-header .modal-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .form-control, .form-select {
-        border-color: #e5e7eb;
-        background-color: #fff;
-        transition: border-color 0.15s ease-in-out;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: var(--tblr-primary);
-        box-shadow: 0 0 0 0.25rem rgba(32, 107, 196, 0.1);
-    }
-
-    .form-control-lg {
-        font-size: 1.25rem;
-        font-weight: 500;
-    }
-
-    .table thead th {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        font-weight: 600;
-        color: #6b7280;
-    }
-
-    .btn-light {
-        background-color: #f9fafb;
-        border-color: #e5e7eb;
-    }
-
-    .btn-light:hover {
-        background-color: #f3f4f6;
-        border-color: #d1d5db;
-    }
-
-    .bg-light {
-        background-color: #f9fafb !important;
-    }
-
-    .text-primary {
-        color: var(--tblr-primary) !important;
-    }
-
-    .shadow-sm {
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-    }
-
-    .form-label.text-muted.small {
-        font-size: 0.75rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-    }
-
-    .input-group-text {
-        color: #6b7280;
-    }
-
-    /* Update modal styles */
-    .modal-dialog.modal-xl {
-        max-width: 1300px;
-        width: 95%;
-        margin: 1.75rem auto;
-    }
-
-    .modal-content {
-        border-radius: 8px;
-    }
-
-    .modal-header {
-        background-color: #0054a6 !important;
-    }
-
-    .modal-header .logo-wrapper {
-        background: white;
-        border-radius: 4px;
-        padding: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .form-control, .form-select {
-        height: 36px;
-        padding: 6px 12px;
-        font-size: 14px;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-    }
-
-    .form-control:read-only {
-        background-color: #f8f9fa;
-    }
-
-    .input-group-text {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        font-size: 14px;
-    }
-
-    .table thead th {
-        border-bottom: 1px solid #dee2e6;
-        padding: 8px 12px;
-        font-size: 12px;
-        font-weight: 500;
-        text-transform: uppercase;
-    }
-
-    .table td {
-        padding: 8px 12px;
-        vertical-align: middle;
-    }
-
-    .btn-sm {
-        padding: 4px 8px;
-        font-size: 13px;
-    }
-
-    .btn-link {
-        text-decoration: none;
-    }
-
-    textarea.form-control {
-        min-height: 80px;
-        resize: vertical;
-    }
-
-    .form-label.small {
-        color: #6c757d;
-        font-weight: 500;
-        font-size: 12px;
-    }
-
-    /* Improve spacing and alignment */
-    .modal-body {
-        padding: 24px;
-    }
-
-    .row.g-4 {
-        --bs-gutter-y: 1rem;
-        --bs-gutter-x: 1rem;
-    }
-
-    /* Make the form more compact */
-    .form-group {
-        margin-bottom: 0;
-    }
-
-    /* Improve total section appearance */
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
-
-    #total {
-        font-size: 16px;
-    }
-
-    /* Add subtle shadows */
-    .modal-content {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Update modal styles */
-    .logo-wrapper {
-        background: white;
-        border-radius: 50%;
-        padding: 2px;
-        width: 42px;
-        height: 42px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .logo-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .table tfoot tr:last-child {
-        border-top: 2px solid #dee2e6;
-    }
-
-    .table tfoot td {
-        padding: 12px;
-    }
-
-    .form-select {
-        background-color: #fff;
-    }
-
-    .input-group-sm > .form-control,
-    .input-group-sm > .form-select,
-    .input-group-sm > .input-group-text {
-        min-width: 60px;
-        text-align: right;
-    }
-    
-    .input-group-text.border-0 {
-        padding: 0.375rem 0.5rem;
-        display: flex;
-        align-items: center;
-        height: 100%;
-    }
-
-    .input-group > .input-group-text {
-        display: flex;
-        align-items: center;
-    }
-
-    /* Ensure input groups maintain proper height */
-    .input-group {
-        align-items: center;
-        height: 36px;
-    }
-
-    /* Adjust amount input padding to accommodate the peso symbol */
-    .service-amount,
-    .product-amount {
-        padding-left: 1.5rem !important;
-    }
-
-    /* Position the peso symbol absolutely within the input group */
-    .input-group.has-peso {
-        position: relative;
-    }
-
-    /* Ensure input fields have proper width for numbers */
-    .input-group.has-peso {
-        position: relative;
-        min-width: 120px; /* Set minimum width */
-    }
-    
-    /* Make amount inputs wider to prevent number cutoff */
-    .service-amount,
-    .product-amount {
-        padding-left: 1.5rem !important;
-        min-width: 100px; /* Minimum width for number inputs */
-    }
-    
-    /* Update the peso symbol positioning */
-    .input-group-text.bg-transparent {
-        position: absolute;
-        z-index: 4;
-        background: transparent !important;
-        border: none;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        padding-left: 0.75rem;
-        margin-top: 0; /* Ensure vertical alignment */
-    }
-    
-    /* Make sure the remove buttons have enough space */
-    .btn-sm.btn-link.text-danger {
-        padding: 0.25rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 28px;
-        min-height: 28px;
-    }
-
-    /* Fix field alignment in product table */
-    #productsTable th, #productsTable td {
-        padding: 0.5rem;
-        vertical-align: middle;
-    }
-    
-    /* Make quantity input wider */
-    .product-qty {
-        min-width: 70px;
-        width: 100%;
-    }
-    
-    /* Ensure consistent spacing */
-    #productsTable tr {
-        display: table-row;
-    }
-    
-    #productsTable td {
-        display: table-cell;
-    }
-    
-    /* Align amount column to the right */
-    #productsTable th:nth-child(3), 
-    #productsTable td:nth-child(3) {
-        text-align: right;
-    }
-    
-    /* Ensure service table has matching alignment */
-    #servicesTable th, #servicesTable td {
-        padding: 0.5rem;
-        vertical-align: middle;
-    }
-
-    /* Fixed width columns to prevent shifting */
-    #productsTable {
-        table-layout: fixed;
-        width: 100%;
-    }
-    
-    /* Ensure product table cells maintain fixed width */
-    #productsTable th:nth-child(1), 
-    #productsTable td:nth-child(1) {
-        width: 45%;
-    }
-    
-    #productsTable th:nth-child(2), 
-    #productsTable td:nth-child(2) {
-        width: 20%;
-        text-align: center;
-    }
-    
-    #productsTable th:nth-child(3), 
-    #productsTable td:nth-child(3) {
-        width: 25%;
-        text-align: right;
-    }
-    
-    /* Fix action buttons position */
-    .delete-product-btn {
-        position: relative;
-        width: 28px;
-        height: 28px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* Fix product qty input to prevent layout shifts */
-    .product-qty {
-        width: 70px;
-        min-width: 70px;
-        text-align: center;
-    }
-
-    /* Ensure all form elements in product table are aligned */
-    #productsTable .form-select,
-    #productsTable .form-control,
-    #productsTable .input-group {
-        margin-bottom: 0 !important;
-        height: 36px !important;
-    }
-    
-    /* Remove extra margin from the select dropdown that's causing misalignment */
-    #productsTable .form-select-sm.mb-2 {
-        margin-bottom: 0 !important;
-        vertical-align: middle;
-    }
-    
-    /* Make sure all cells are vertically aligned */
-    #productsTable td {
-        vertical-align: middle !important;
-        padding: 0.5rem;
-    }
-    
-    /* Ensure consistent sizing for all input elements */
-    #productsTable input,
-    #productsTable select {
-        height: 36px !important;
-        line-height: 1.5;
-        box-sizing: border-box;
-    }
-
-    /* Center the peso symbol */
-    .input-group-text.bg-transparent {
-        position: absolute;
-        z-index: 4;
-        background: transparent !important;
-        border: none;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 25px;
-        padding: 0;
-        left: 0;
-        text-align: center;
-    }
-    
-    /* Center percentage symbol in dropdown */
-    #discountType {
-        text-align: center;
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    /* Make services table scrollable */
-    #servicesTable {
-        width: 100%;
-        margin-bottom: 0;
-        table-layout: fixed;
-    }
-    
-    /* Ensure table cells have proper width */
-    #servicesTable th, 
-    #servicesTable td {
-        vertical-align: middle;
-    }
-    
-    /* Fix tbody display to not be a block element */
-    #servicesTable tbody {
-        display: table-row-group; /* Reset to default table display */
-    }
-    
-    /* Fix header position */
-    #servicesTable thead {
-        position: sticky;
-        top: 0;
-        background: white;
-        z-index: 1;
-        display: table-header-group;
-    }
-    
-    /* Ensure consistent styling for table footer */
-    #servicesTable tfoot {
-        display: table-footer-group;
-    }
-    
-    /* Remove unnecessary flex properties that may affect layout */
-    .services-section {
-        height: auto;
-        display: block;
-    }
-    
-    /* Ensure table cells have proper width */
-    #servicesTable th, 
-    #servicesTable td {
-        vertical-align: middle;
-    }
-
-    /* Fix modal to have a consistent height without scrolling */
-    .modal-dialog.modal-xl {
-        max-width: 1300px;
-        width: 95%;
-        margin: 1.75rem auto;
-    }
-    
-    /* Remove scrolling from modal body */
-    .modal-body {
-        overflow-y: initial !important;
-        height: auto !important;
-        padding: 1rem !important;
-    }
-    
-    /* Make only the services container scrollable */
-    .services-table-container {
-        height: 220px !important; /* Reduced from 300px */
-        max-height: 220px !important;
-        overflow-y: auto;
-        overflow-x: hidden;
-        border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 0.25rem;
-    }
-    
-    /* Ensure tables inside the scrollable container work properly */
-    .services-table-container #servicesTable {
-        margin-bottom: 0;
-    }
-    
-    /* Fix services section layout */
-    .services-section {
-        display: block;
-        height: auto;
-    }
-    
-    /* Keep the header at the top when scrolling */
-    #servicesTable thead {
-        position: sticky;
-        top: 0;
-        background: white;
-        z-index: 2;
-    }
-
-    /* Reduce products section height */
-    #productsTable {
-        margin-bottom: 0;
-    }
-    
-    /* Reduce products container height */
-    .table-responsive[style*="max-height: 400px"] {
-        max-height: 220px !important; /* Reduced from 400px */
-    }
-    
-    /* Reduce spacing in form sections */
-    .row.g-4 {
-        --bs-gutter-y: 0.5rem !important;
-    }
-    
-    /* Reduce padding in card body */
-    .card-body.p-4 {
-        padding: 0.75rem !important;
-    }
-    
-    /* Reduce spacing in summary section */
-    .border-top.pt-4 {
-        padding-top: 0.75rem !important;
-    }
-    
-    /* Reduce spacing between sections */
-    .mb-4 {
-        margin-bottom: 0.75rem !important;
-    }
-    
-    /* Keep header sticky */
-    #servicesTable thead,
-    #productsTable thead {
-        position: sticky;
-        top: 0;
-        background: white;
-        z-index: 2;
-    }
-</style>
-@endpush
+<!-- Include modals inside content section -->
+@include('components.findings-modal')
+@include('components.findings-history-modal')
+
+@endsection  {{-- Close the content section --}}
 
 @push('page-scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('js/findings.js') }}"></script>
 <script>
 // Define functions first
 function showAppointmentDetails(appointment) {
@@ -1519,24 +778,85 @@ function showAppointmentDetails(appointment) {
     modal.show();
 }
 
-function handleCompleteClick(appointment) {
-    console.log('HandleCompleteClick called with:', appointment);
+function handleCompleteClick(appointmentId, appointmentData) {
+    console.log('Complete button clicked:', { id: appointmentId, data: appointmentData });
     
-    // Show the modal first
-    const modalElement = document.getElementById('medicalRecordModal');
-    if (!modalElement) {
-        console.error('Modal element not found!');
-        return;
+    try {
+        // Validate appointment ID
+        if (!appointmentId) {
+            throw new Error('Invalid appointment ID');
+        }
+
+        // Show the modal
+        const modalElement = document.getElementById('medicalRecordModal');
+        if (!modalElement) {
+            throw new Error('Modal element not found');
+        }
+
+        const modal = new bootstrap.Modal(modalElement);
+        
+        // Set the appointment ID first
+        const appointmentIdInput = document.getElementById('appointment_id');
+        if (!appointmentIdInput) {
+            throw new Error('Appointment ID input not found');
+        }
+        appointmentIdInput.value = appointmentId;
+
+        // Verify the appointment ID was set
+        if (!appointmentIdInput.value) {
+            throw new Error('Failed to set appointment ID');
+        }
+
+        // Initialize other form fields
+        document.getElementById('patientName').value = appointmentData.display_name || '';
+        document.getElementById('invoiceNumber').textContent = generateInvoiceNumber();
+        document.querySelector('input[name="attending_physician"]').value = '';
+        
+        // Show the modal
+        modal.show();
+        
+        // Reset form elements
+        document.getElementById('discountAmount').value = '0';
+        document.getElementById('discountType').value = 'fixed';
+        document.querySelector('textarea[name="notes"]').value = '';
+        
+        // Clear and reset products table
+        resetProductsTable();
+        
+        // Update totals
+        updateTotals();
+        
+        console.log('Modal initialized successfully with appointment ID:', appointmentId);
+    } catch (error) {
+        console.error('Error in handleCompleteClick:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message,
+        });
+    }
+}
+
+// Helper function to reset products table
+function resetProductsTable() {
+    const productsTbody = document.querySelector('#productsTable tbody');
+    if (!productsTbody) return;
+    
+    // Keep only first row
+    while (productsTbody.rows.length > 1) {
+        productsTbody.deleteRow(1);
     }
     
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
-    
-    // Then try to initialize with appointment data
-    try {
-        initializeMedicalRecord(appointment);
-    } catch (error) {
-        console.error('Error in initializeMedicalRecord:', error);
+    // Reset first row
+    const firstRow = productsTbody.rows[0];
+    if (firstRow) {
+        const select = firstRow.querySelector('select');
+        const qtyInput = firstRow.querySelector('.product-qty');
+        const amountInput = firstRow.querySelector('.product-amount');
+        
+        if (select) select.selectedIndex = 0;
+        if (qtyInput) qtyInput.value = '1';
+        if (amountInput) amountInput.value = '0';
     }
 }
 
@@ -1646,7 +966,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const appointment = JSON.parse(appointmentData);
                 console.log('Parsed appointment:', appointment);
                 
-                handleCompleteClick(appointment);
+                handleCompleteClick(appointment.id, appointment);
             } catch (error) {
                 console.error('Error details:', {
                     message: error.message,
@@ -1940,5 +1260,546 @@ function removeProductRow(button) {
     }
     updateTotals();
 }
+
+function updateTotals() {
+    // Initialize variables
+    let servicesTotal = 0;
+    let productsTotal = 0;
+
+    // Calculate services total
+    document.querySelectorAll('#servicesTable .service-amount').forEach(input => {
+        servicesTotal += parseFloat(input.value) || 0;
+    });
+
+    // Calculate products total
+    document.querySelectorAll('#productsTable .product-amount').forEach(input => {
+        productsTotal += parseFloat(input.value) || 0;
+    });
+
+    // Calculate discount
+    const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+    const discountType = document.getElementById('discountType').value;
+    let discountValue = 0;
+
+    const subtotal = servicesTotal + productsTotal;
+
+    if (discountType === 'percentage') {
+        discountValue = (subtotal * (discountAmount / 100));
+    } else { // fixed amount
+        discountValue = discountAmount;
+    }
+
+    // Calculate final total
+    const total = subtotal - discountValue;
+
+    // Update display values
+    document.getElementById('servicesSubtotal').textContent = servicesTotal.toFixed(2);
+    document.getElementById('productsSubtotal').textContent = productsTotal.toFixed(2);
+    document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+    document.getElementById('discountDisplay').textContent = `₱${discountValue.toFixed(2)}`;
+    
+    // Update the grand total
+    const grandTotalElement = document.querySelector('#total');
+    if (grandTotalElement) {
+        grandTotalElement.textContent = `₱${total.toFixed(2)}`;
+    }
+
+    // Update printable version totals if they exist
+    const printElements = {
+        'printServicesSubtotal': servicesTotal,
+        'printProductsSubtotal': productsTotal,
+        'printDiscount': discountValue,
+        'printTotal': total
+    };
+
+    for (const [id, value] of Object.entries(printElements)) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value.toFixed(2);
+        }
+    }
+}
+
+// Add event listeners for amount inputs
+document.addEventListener('DOMContentLoaded', function() {
+    // Add input event listeners to all amount fields
+    document.querySelectorAll('.service-amount, .product-amount').forEach(input => {
+        input.addEventListener('input', updateTotals);
+    });
+
+    // Add input event listener to discount field
+    const discountInput = document.getElementById('discountAmount');
+    if (discountInput) {
+        discountInput.addEventListener('input', updateTotals);
+    }
+
+    // Add change event listener to discount type dropdown
+    const discountType = document.getElementById('discountType');
+    if (discountType) {
+        discountType.addEventListener('change', updateTotals);
+    }
+});
+
+// Add this function to save the medical record
+function saveMedicalRecord() {
+    // Debug log the form data before submission
+    const appointmentId = document.getElementById('appointment_id').value;
+    console.log('Saving medical record for appointment:', appointmentId);
+
+    // Collect services
+    const services = collectServices();
+    if (services.length === 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please add at least one service',
+        });
+        return;
+    }
+
+    // Calculate totals
+    let servicesTotal = 0;
+    let productsTotal = 0;
+    
+    // Sum up services and ensure amounts are formatted as numbers
+    services.forEach(service => {
+        service.amount = parseFloat(parseFloat(service.amount || 0).toFixed(2));
+        servicesTotal += service.amount;
+    });
+    
+    // Collect and sum up products
+    const products = collectProducts();
+    products.forEach(product => {
+        product.amount = parseFloat(parseFloat(product.amount || 0).toFixed(2));
+        productsTotal += product.amount;
+    });
+
+    // Format totals as numbers
+    servicesTotal = parseFloat(parseFloat(servicesTotal).toFixed(2));
+    productsTotal = parseFloat(parseFloat(productsTotal).toFixed(2));
+
+    // Calculate discount as number
+    const discountAmount = parseFloat(parseFloat(document.getElementById('discountAmount').value || 0).toFixed(2));
+    const discountType = document.getElementById('discountType').value;
+    
+    // Calculate grand total as number
+    const subtotal = servicesTotal + productsTotal;
+    const discount = discountType === 'percentage' ? 
+        parseFloat((subtotal * (discountAmount / 100)).toFixed(2)) : 
+        discountAmount;
+    const grandTotal = parseFloat((subtotal - discount).toFixed(2));
+
+    // Create the form data with numeric values
+    const formData = {
+        appointment_id: parseInt(appointmentId),
+        invoice_number: document.getElementById('invoiceNumber').textContent.trim(),
+        patient_name: document.getElementById('patientName').value.trim(),
+        attending_physician: document.querySelector('input[name="attending_physician"]').value.trim(),
+        services: services,
+        products: products,
+        services_total: servicesTotal,
+        products_total: productsTotal,
+        discount_amount: discountAmount,
+        discount_type: discountType,
+        grand_total: grandTotal,
+        notes: document.querySelector('textarea[name="notes"]').value.trim() || null
+    };
+
+    // Log the exact data being sent
+    console.log('Form data being sent (with types):', {
+        ...formData,
+        services_total_type: typeof formData.services_total,
+        products_total_type: typeof formData.products_total,
+        discount_amount_type: typeof formData.discount_amount,
+        grand_total_type: typeof formData.grand_total
+    });
+
+    // Validate required fields and number formats
+    if (!formData.patient_name || !formData.attending_physician) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Please fill in all required fields',
+        });
+        return;
+    }
+
+    // Additional validation for numeric values
+    if (isNaN(formData.services_total) || 
+        isNaN(formData.products_total) || 
+        isNaN(formData.discount_amount) || 
+        isNaN(formData.grand_total)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'Invalid numeric values detected',
+        });
+        return;
+    }
+
+    // Show loading state
+    Swal.fire({
+        title: 'Saving...',
+        text: 'Please wait while we process your request',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    // Submit the data
+    fetch('/charge-slips', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw {
+                    status: response.status,
+                    errors: err.errors || {},
+                    message: err.message || 'An error occurred while saving the charge slip'
+                };
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('medicalRecordModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
+            // Show success message
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Charge slip has been saved successfully.',
+                showConfirmButton: true,
+                confirmButtonText: 'View Invoice',
+                showCancelButton: true,
+                cancelButtonText: 'Close'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/settings/invoice';
+                } else {
+                    location.reload();
+                }
+            });
+        } else {
+            throw new Error(data.message || 'Error saving charge slip');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        console.error('Full error details:', error);
+        
+        let errorMessage = 'There was an error saving the charge slip.';
+        
+        if (error.errors && Object.keys(error.errors).length > 0) {
+            errorMessage = Object.values(error.errors).flat().join('\n');
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorMessage,
+        });
+    });
+}
+
+// Helper functions to collect form data
+function collectServices() {
+    const services = [];
+    document.querySelectorAll('#servicesTable tbody tr').forEach(row => {
+        const select = row.querySelector('select[name="services[]"]');
+        const customInput = row.querySelector('.custom-service');
+        const amountInput = row.querySelector('.service-amount');
+        
+        if ((select.value && select.value !== '') || (customInput && !customInput.classList.contains('d-none') && customInput.value)) {
+            services.push({
+                description: select.value === 'custom' ? customInput.value : select.value,
+                amount: parseFloat(parseFloat(amountInput.value || 0).toFixed(2))
+            });
+        }
+    });
+    return services;
+}
+
+function collectProducts() {
+    const products = [];
+    document.querySelectorAll('#productsTable tbody tr').forEach(row => {
+        const select = row.querySelector('select[name="products[]"]');
+        const customInput = row.querySelector('.custom-product');
+        const qtyInput = row.querySelector('.product-qty');
+        const amountInput = row.querySelector('.product-amount');
+        
+        if ((select.value && select.value !== '') || (customInput && !customInput.classList.contains('d-none') && customInput.value)) {
+            products.push({
+                item: select.value === 'custom' ? customInput.value : select.value,
+                quantity: parseInt(qtyInput.value) || 0,
+                amount: parseFloat(parseFloat(amountInput.value || 0).toFixed(2))
+            });
+        }
+    });
+    return products;
+}
+
+// Replace the existing cleanupModals function and event listeners with this updated version:
+
+function cleanupModals() {
+    // Remove all backdrops first
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+        backdrop.remove();
+    });
+
+    // Get all visible modals
+    const visibleModals = Array.from(document.querySelectorAll('.modal')).filter(
+        modal => modal.classList.contains('show')
+    );
+
+    if (visibleModals.length === 0) {
+        // No visible modals, clean up completely
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('padding-right');
+        document.body.style.removeProperty('overflow');
+        return;
+    }
+
+    // Handle single visible modal
+    if (visibleModals.length === 1) {
+        const modal = visibleModals[0];
+        modal.style.zIndex = '1055';
+        // Create a single backdrop if needed
+        if (!document.querySelector('.modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.style.zIndex = '1054';
+            document.body.appendChild(backdrop);
+        }
+        return;
+    }
+
+    // Handle multiple modals
+    visibleModals.forEach((modal, index) => {
+        modal.style.zIndex = `${1055 + (index * 10)}`;
+    });
+}
+
+// Add global click handler for modal triggers
+document.addEventListener('click', function(e) {
+    // Handle complete button
+    if (e.target.closest('.btn-success')) {
+        const completeBtn = e.target.closest('.btn-success');
+        if (completeBtn.textContent.trim().toLowerCase().includes('complete')) {
+            // Force close all modals
+            document.querySelectorAll('.modal.show').forEach(modal => {
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            });
+            
+            // Remove all backdrops
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                backdrop.remove();
+            });
+            
+            // Clean up body
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('padding-right');
+            document.body.style.removeProperty('overflow');
+            return;
+        }
+    }
+
+    // Handle modal triggers
+    if (e.target.closest('[data-bs-toggle="modal"]')) {
+        setTimeout(cleanupModals, 10);
+    }
+});
+
+// Add modal event handlers
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('show.bs.modal', () => setTimeout(cleanupModals, 10));
+        modal.addEventListener('hidden.bs.modal', () => setTimeout(cleanupModals, 10));
+        
+        // Add click handler to close button if exists
+        const closeBtn = modal.querySelector('[data-bs-dismiss="modal"]');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+                setTimeout(cleanupModals, 10);
+            });
+        }
+    });
+});
+
+// Add style to ensure proper modal display
+const style = document.createElement('style');
+style.textContent = `
+    .modal-backdrop.show {
+        opacity: 0.5;
+        pointer-events: auto;
+    }
+    .modal {
+        background: transparent !important;
+    }
+    .modal-dialog {
+        pointer-events: auto;
+    }
+`;
+document.head.appendChild(style);
+
+function openDiagnosisForm() {
+    // Remove any existing backdrops first
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+        backdrop.remove();
+    });
+
+    // Hide the charge slip modal without removing it from the DOM
+    const medicalRecordModal = document.getElementById('medicalRecordModal');
+    medicalRecordModal.classList.remove('show');
+    medicalRecordModal.style.display = 'none';
+    medicalRecordModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+
+    const appointmentId = document.getElementById('appointment_id').value;
+    if (!appointmentId) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Could not find appointment information',
+        });
+        return;
+    }
+
+    // First try to get data from the complete button that opened the charge slip
+    const completeBtn = document.querySelector(`.complete-btn[data-appointment*='"id":${appointmentId}']`);
+    let appointmentData;
+    
+    if (completeBtn && completeBtn.dataset.appointment) {
+        try {
+            appointmentData = JSON.parse(completeBtn.dataset.appointment);
+        } catch (e) {
+            console.error('Error parsing appointment data from complete button:', e);
+        }
+    }
+    
+    // If not found in complete button, try table row
+    if (!appointmentData) {
+        const appointmentRow = document.querySelector(`tr[data-appointment*='"id":${appointmentId}']`);
+        if (appointmentRow && appointmentRow.dataset.appointment) {
+            try {
+                appointmentData = JSON.parse(appointmentRow.dataset.appointment);
+            } catch (e) {
+                console.error('Error parsing appointment data from row:', e);
+            }
+        }
+    }
+
+    // If we still don't have the data, try to get it from the form fields
+    if (!appointmentData) {
+        appointmentData = {
+            id: appointmentId,
+            pet_id: document.getElementById('pet_id').value,
+            display_name: document.getElementById('patientName').value,
+            reason_for_visit: ['Consultation'] // Default reason
+        };
+    }
+
+    if (!appointmentData) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Could not find appointment details',
+        });
+        return;
+    }
+
+    // Clean up reason_for_visit
+    let reasons = appointmentData.reason_for_visit;
+    if (typeof reasons === 'string') {
+        try {
+            reasons = JSON.parse(reasons);
+        } catch (e) {
+            reasons = [reasons];
+        }
+    }
+    
+    if (!Array.isArray(reasons)) {
+        reasons = [reasons];
+    }
+
+    // Clean up any nested arrays or JSON strings
+    reasons = reasons.map(reason => {
+        if (typeof reason === 'string') {
+            try {
+                const parsed = JSON.parse(reason);
+                return Array.isArray(parsed) ? parsed[0] : reason;
+            } catch (e) {
+                return reason;
+            }
+        }
+        return reason;
+    }).filter(Boolean); // Remove any null/undefined values
+
+    if (reasons.length === 0) {
+        reasons = ['Consultation']; // Default fallback
+    }
+
+    console.log('Opening diagnosis form with data:', {
+        appointmentId,
+        reasons
+    });
+    
+    // Show the findings modal with the cleaned up data
+    showFindingsModal(appointmentId, reasons);
+
+    // Add event listener to handle modal cleanup when findings modal is hidden
+    const findingsModal = document.getElementById('findingsModal');
+    findingsModal.addEventListener('hidden.bs.modal', function () {
+        // Show the charge slip modal again
+        medicalRecordModal.classList.add('show');
+        medicalRecordModal.style.display = 'block';
+        medicalRecordModal.removeAttribute('aria-hidden');
+        medicalRecordModal.setAttribute('aria-modal', 'true');
+        medicalRecordModal.setAttribute('role', 'dialog');
+        document.body.classList.add('modal-open');
+    }, { once: true }); // Remove listener after it's triggered once
+
+    // Add close button handler for findings modal
+    const closeBtn = findingsModal.querySelector('[data-bs-dismiss="modal"]');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            findingsModal.classList.remove('show');
+            findingsModal.style.display = 'none';
+            findingsModal.setAttribute('aria-hidden', 'true');
+            
+            // Show the charge slip modal again
+            medicalRecordModal.classList.add('show');
+            medicalRecordModal.style.display = 'block';
+            medicalRecordModal.removeAttribute('aria-hidden');
+            medicalRecordModal.setAttribute('aria-modal', 'true');
+            medicalRecordModal.setAttribute('role', 'dialog');
+            document.body.classList.add('modal-open');
+        }, { once: true });
+    }
+}
 </script>
 @endpush
+
