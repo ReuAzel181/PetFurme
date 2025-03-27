@@ -772,3 +772,8 @@ Route::post('/appointments/archive-past', [AppointmentController::class, 'archiv
     ->name('appointments.archive-past');
 
 Route::post('/charge-slips', [ChargeSlipController::class, 'store'])->name('charge-slips.store');
+
+Route::middleware(['auth', 'can:manage-pets'])->group(function () {
+    Route::resource('pets', PetController::class);
+    // Add any other pet-related routes here
+});

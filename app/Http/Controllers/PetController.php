@@ -10,19 +10,122 @@ use Illuminate\Support\Facades\Storage;
 
 class PetController extends Controller
 {
+    public function __construct()
+    {
+        // Comment out or modify the middleware
+        // $this->middleware('can:manage-pets');
+        
+        // Instead, use auth middleware if you just want to ensure users are logged in
+        $this->middleware('auth');
+    }
+
     // Display a listing of the pets
     public function index()
     {
-        $pendingPets = Pet::whereNull('verified_by')
-                          ->with(['user', 'creator'])
-                          ->latest()
-                          ->get();
-                          
-        $pets = Pet::whereNotNull('verified_by')
-                   ->with(['user', 'appointments', 'creator', 'verifier'])
-                   ->get();
+        try {
+            // Get filter type from request
+            $filterType = request()->get('filter', 'all'); // Default to 'all'
+            
+            // Base query with common eager loading
+            $query = Pet::with([
+                'user:id,name,email',
+                'creator:id,name',
+                'verifier:id,name',
+                'appointments' => function($query) {
+                    $query->whereNull('deleted_at')
+                        ->orderBy('appointment_date', 'desc');
+                }
+            ])->whereNull('deleted_at'); // Only get non-deleted pets
 
-        return view('pet.index', compact('pets', 'pendingPets'));
+            // Apply filters
+            switch ($filterType) {
+                case 'staff':
+                    $query->whereNotNull('created_by');
+                    break;
+                case 'owners':
+                    $query->whereNull('created_by');
+                    break;
+                // 'all' doesn't need additional filters
+            }
+
+            // Get all pets
+            $pets = $query->latest()
+                ->get()
+                ->map(function($pet) {
+                    return [
+                        'id' => $pet->id,
+                        'name' => $pet->name,
+                        'category' => $pet->category,
+                        'type' => $pet->type,
+                        'breed' => $pet->breed,
+                        'gender' => $pet->gender,
+                        'age' => $pet->age,
+                        'weight' => $pet->weight ? number_format($pet->weight, 2) : null,
+                        'allergies' => $pet->allergies,
+                        'notes' => $pet->notes,
+                        'owner' => $pet->user ? [
+                            'id' => $pet->user->id,
+                            'name' => $pet->user->name,
+                            'email' => $pet->user->email
+                        ] : [
+                            'name' => $pet->owner_name ?? 'No Owner'
+                        ],
+                        'created_by' => $pet->creator ? [
+                            'id' => $pet->creator->id,
+                            'name' => $pet->creator->name
+                        ] : null,
+                        'verified_by' => $pet->verifier ? [
+                            'id' => $pet->verifier->id,
+                            'name' => $pet->verifier->name
+                        ] : null,
+                        'photo_url' => $this->getPhotoUrl($pet),
+                        'created_at' => $pet->created_at?->format('Y-m-d H:i:s'),
+                        'status' => $pet->verified_by ? 'Verified' : 'Pending',
+                        'appointments_count' => $pet->appointments->count(),
+                        'latest_appointment' => $pet->appointments->first()
+                    ];
+                });
+
+            // Separate pets into pending and verified collections
+            $pendingPets = $pets->where('status', 'Pending')->values();
+            $verifiedPets = $pets->where('status', 'Verified')->values();
+
+            \Log::info('Fetched pets data:', [
+                'total_count' => $pets->count(),
+                'pending_count' => $pendingPets->count(),
+                'verified_count' => $verifiedPets->count(),
+                'filter_type' => $filterType
+            ]);
+
+            return view('pet.index', compact('pendingPets', 'verifiedPets', 'filterType'));
+
+        } catch (\Exception $e) {
+            \Log::error('Error fetching pets:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return view('pet.index')->with('error', 'Error loading pets data');
+        }
+    }
+
+    // Helper method to get photo URL
+    private function getPhotoUrl($pet)
+    {
+        if ($pet->photo_data) {
+            return 'data:image/jpeg;base64,' . base64_encode($pet->photo_data);
+        }
+        
+        if ($pet->photo) {
+            if (filter_var($pet->photo, FILTER_VALIDATE_URL)) {
+                return $pet->photo;
+            }
+            return Storage::disk('public')->exists($pet->photo) 
+                ? asset('storage/' . $pet->photo)
+                : asset('storage/defaults/paw.png');
+        }
+        
+        return asset('storage/defaults/paw.png');
     }
 
     public function edit(Pet $pet)
@@ -37,14 +140,24 @@ class PetController extends Controller
     // Show the form for creating a new pet
     public function create()
     {
-        // Fetch all users for the dropdown
-        $users = User::all();
-        
-        // Initialize an empty Pet model
-        $pet = new Pet();
-        
-        // Use 'pet.create' instead of 'pets.create'
-        return view('pet.create', compact('users', 'pet'));
+        try {
+            // Fetch active users for the dropdown
+            $users = User::select('id', 'name', 'email')
+                ->whereNull('deleted_at')
+                ->orderBy('name')
+                ->get();
+            
+            // Initialize an empty Pet model
+            $pet = new Pet();
+            
+            return view('pet.create', compact('users', 'pet'));
+
+        } catch (\Exception $e) {
+            \Log::error('Error in pet create form:', [
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->route('pets.index')->with('error', 'Error loading create form');
+        }
     }
     // Store a newly created pet in storage
     public function store(Request $request)
@@ -284,14 +397,40 @@ class PetController extends Controller
 
     public function verify(Request $request, Pet $pet)
     {
-        if ($request->status === 'approved') {
-            $pet->update([
-                'verified_by' => auth()->id()
+        try {
+            if ($request->status === 'approved') {
+                $pet->update([
+                    'verified_by' => auth()->id(),
+                    'verified_at' => now()
+                ]);
+
+                \Log::info('Pet verified successfully', [
+                    'pet_id' => $pet->id,
+                    'verified_by' => auth()->id()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pet verified successfully'
+                ]);
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid verification status'
+            ], 422);
+
+        } catch (\Exception $e) {
+            \Log::error('Pet verification failed', [
+                'pet_id' => $pet->id,
+                'error' => $e->getMessage()
             ]);
-            return response()->json(['success' => true]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to verify pet'
+            ], 500);
         }
-        
-        return response()->json(['success' => false], 422);
     }
 
     public function getAppointments($id)

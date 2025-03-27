@@ -1432,7 +1432,30 @@
     <?php echo $__env->yieldPushContent('page-styles'); ?>
     <?php echo \Livewire\Mechanisms\FrontendAssets\FrontendAssets::styles(); ?>
 
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <?php
+        function vite_assets() {
+            $manifestPath = public_path('build/manifest.json');
+            
+            if (!file_exists($manifestPath)) {
+                return [
+                    'css' => asset('css/app.css'),
+                    'js' => asset('js/app.js')
+                ];
+            }
+            
+            $manifest = json_decode(file_get_contents($manifestPath), true);
+            
+            return [
+                'css' => asset('build/' . $manifest['resources/css/app.css']['file']),
+                'js' => asset('build/' . $manifest['resources/js/app.js']['file'])
+            ];
+        }
+        
+        $assets = vite_assets();
+    ?>
+
+    <link rel="stylesheet" href="<?php echo e($assets['css']); ?>">
+    <script src="<?php echo e($assets['js']); ?>" defer></script>
 </head>
 
 <body>

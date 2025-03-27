@@ -181,4 +181,9 @@ class User extends Authenticatable implements MustVerifyEmail
             })
             ->exists();
     }
+
+    public function canManagePets()
+    {
+        return in_array($this->role, ['admin', 'staff']); // Adjust roles as needed
+    }
 }

@@ -12,6 +12,8 @@ class DatabaseServiceProvider extends ServiceProvider
         // Switch database connection based on environment
         if (app()->environment('production')) {
             Config::set('database.default', 'mysql_production');
+        } elseif (app()->environment('local')) {
+            Config::set('database.default', 'mysql');
         }
     }
 

@@ -43,16 +43,18 @@ class DashboardController extends Controller
             });
 
         // Get messages
-        $unreadMessages = Message::where('receiver_id', $user->id)
+        $unreadMessages = Message::where(function($query) use ($user) {
+            $query->whereJsonContains('receivers', ['id' => $user->id]);
+        })
             ->whereNull('read_at')
             ->count();
 
         $latestMessage = Message::where(function($query) use ($user) {
-                $query->where('receiver_id', $user->id)
-                      ->orWhere('sender_id', $user->id);
-            })
-            ->latest()
-            ->first();
+            $query->whereJsonContains('receivers', ['id' => $user->id])
+                  ->orWhere('sender_id', $user->id);
+        })
+        ->latest()
+        ->first();
 
         return view('pet-owner.dashboard', compact(
             'pets',

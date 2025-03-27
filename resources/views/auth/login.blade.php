@@ -269,8 +269,8 @@
         --mint-blue: #a8e6cf;
         --primary-blue: #3a7bd5;
         --primary-gradient: linear-gradient(135deg, var(--mint-blue) 0%, var(--primary-blue) 100%);
-        --auth-card-width: 1300px;  /* Increased by 20% */
-        --auth-card-height: 720px;  /* Increased by 20% */
+        --auth-card-width: 1300px;
+        --auth-card-height: 720px;
         --indicator-size: 6px;
         --font-heading: 'Inter', sans-serif;
     }
@@ -278,25 +278,33 @@
     body {
         background: var(--primary-gradient);
         min-height: 100vh;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
     }
 
     .page-center {
         min-height: 100vh;
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: auto;
+        padding: 2rem 0;
     }
 
     .container-xl {
         max-width: var(--auth-card-width);
         width: 100%;
         padding: 0 2rem;
+        margin: auto;
     }
 
     .auth-card {
         width: var(--auth-card-width);
         min-width: var(--auth-card-width);
         height: var(--auth-card-height);
+        min-height: var(--auth-card-height);
         background: rgba(255, 255, 255, 0.98);
         border: none;
         box-shadow: 
@@ -306,7 +314,7 @@
         border-radius: 24px;
         overflow: hidden;
         position: relative;
-        margin: 2rem auto;
+        margin: auto;
     }
 
     .carousel-side {
@@ -570,111 +578,42 @@
             --auth-card-height: 100vh;
         }
 
-        body {
-            overflow: hidden; /* Prevent body scrolling */
-        }
-
         .page-center {
-            align-items: flex-start;
             padding: 0;
-            height: 100vh;
-            overflow: hidden; /* Prevent page scrolling */
+            height: 100%;
         }
 
         .container-xl {
             padding: 0;
-            height: 100vh;
-            overflow: hidden; /* Prevent container scrolling */
+            height: 100%;
         }
-        
+
         .auth-card {
-            margin: 0;
-            min-width: unset;
-            width: 100%;
-            height: 100vh;
+            min-height: 100vh;
+            height: 100%;
             border-radius: 0;
-            overflow: hidden; /* Changed from auto to hidden */
-            position: relative;
-        }
-
-        .login-section {
-            padding: 0 1.5rem;
-            height: 100vh; /* Changed from min-height to fixed height */
-            display: flex;
-            flex-direction: column;
-            margin-top: 120px;
-            overflow-y: auto; /* Only allow scrolling here if needed */
-        }
-
-        .form-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            padding: 1rem 0.5rem;
-            overflow: visible; /* Ensure no scrolling here */
-        }
-
-        .form-header {
-            padding-top: 0;
-            margin-bottom: 1rem !important;
-        }
-
-        .form-header.text-center {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        .navbar-brand-image {
-            height: 70px;
-            margin: 0 0 0.5rem 0 !important;
-        }
-
-        .form-header h2 {
-            margin-bottom: 0.25rem !important;
-        }
-
-        .form-header p {
-            margin-bottom: 0 !important;
-        }
-
-        .login-form-container {
-            position: relative;
-            transform: none;
-            left: auto;
-            padding: 0;
-            opacity: 1;
-            visibility: visible;
-            margin-top: 1rem;
-        }
-
-        .form-control {
-            height: 48px;
-            font-size: 16px;
-        }
-
-        .btn-primary {
-            height: 48px;
-        }
-
-        .background-shapes {
-            opacity: 0.3;
-        }
-
-        .carousel-side {
-            display: none;
+            margin: 0;
         }
     }
 
-    @media (min-height: 800px) and (max-width: 991.98px) {
-        .login-section {
-            margin-top: 120px;
+    @media (max-height: 720px) {
+        .page-center {
+            align-items: flex-start;
+        }
+
+        .auth-card {
+            margin: 2rem auto;
         }
     }
 
-    @media (max-height: 600px) and (max-width: 991.98px) {
-        .login-section {
-            margin-top: 120px;
+    @media (min-width: 1920px) {
+        .page-center {
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            transform: scale(1);
+            transform-origin: center;
         }
     }
 
