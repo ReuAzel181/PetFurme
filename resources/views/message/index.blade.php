@@ -45,12 +45,26 @@
                                    class="chat-user-item position-relative d-flex align-items-center text-decoration-none p-4 border-bottom
                                           {{ $hasUnreadMessages ? 'unread-messages' : '' }}">
                                     <div class="me-3 position-relative">
-                                        @if($user->photo)
-                                            <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}" 
-                                                 class="rounded-circle shadow-sm" width="64" height="64" style="object-fit: cover;">
+                                        @if($user->photo_data)
+                                            <img src="data:image/jpeg;base64,{{ base64_encode($user->photo_data) }}" 
+                                                 alt="{{ $user->name }}" 
+                                                 class="rounded-circle shadow-sm" 
+                                                 width="64" 
+                                                 height="64" 
+                                                 style="object-fit: cover;">
+                                        @elseif($user->photo)
+                                            <img src="{{ asset('storage/' . $user->photo) }}" 
+                                                 alt="{{ $user->name }}" 
+                                                 class="rounded-circle shadow-sm" 
+                                                 width="64" 
+                                                 height="64" 
+                                                 style="object-fit: cover;">
                                         @else
-                                            <img src="{{ asset('assets/img/default-avatar.png') }}" alt="No Profile" 
-                                                 class="rounded-circle shadow-sm" width="64" height="64">
+                                            <img src="{{ asset('assets/img/default-avatar.png') }}" 
+                                                 alt="No Profile" 
+                                                 class="rounded-circle shadow-sm" 
+                                                 width="64" 
+                                                 height="64">
                                         @endif
                                     </div>    
                                     <div class="flex-grow-1 min-width-0">
@@ -70,12 +84,12 @@
                                             </small>
                                         </div>
                                         <p class="mb-0 text-truncate {{ $hasUnreadMessages ? 'fw-semibold' : '' }}" 
-                                           style="font-size: 1.15rem;">
+                                           style="font-size: 1.15rem; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                             @if($user->lastMessage)
                                                 @if($user->lastMessage->sender_id === auth()->id())
-                                                    You: {{ $user->lastMessage->message }}
+                                                    You: {{ Str::limit($user->lastMessage->message, 30) }}
                                                 @else
-                                                    {{ $user->lastMessage->message }}
+                                                    {{ Str::limit($user->lastMessage->message, 35) }}
                                                 @endif
                                             @else
                                                 No messages yet

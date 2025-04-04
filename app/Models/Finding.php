@@ -2,22 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Finding extends Model
 {
-    protected $fillable = [
-        'appointment_id',
-        'pet_id',
-        'created_by',
-        'findings_data',
-        'additional_notes',
-        'recommendations',
-        'diagnosis',
-        'treatment_plan',
-        'follow_up_date',
-        'status'
-    ];
+    use HasFactory;
+
+    protected $guarded = [];
 
     protected $casts = [
         'findings_data' => 'array',
@@ -27,5 +19,10 @@ class Finding extends Model
     public function appointment()
     {
         return $this->belongsTo(Appointment::class);
+    }
+
+    public function pet()
+    {
+        return $this->belongsTo(Pet::class);
     }
 } 

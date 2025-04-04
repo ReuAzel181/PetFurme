@@ -30,6 +30,15 @@
         background: white;
         z-index: 2;
     }
+
+    /* Add this CSS to center the empty message */
+    .empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
 </style>
 @endpush
 
@@ -88,7 +97,7 @@
                         <table class="table table-vcenter card-table table-striped">
                             <thead>
                                 <tr>
-                                    <th width="5%">ID</th>
+                                    <th width="5%">Reminder</th>
                                     <th width="12%">Owner Details</th>
                                     <th width="12%">Pet Details</th>
                                     <th width="12%">Schedule</th>
@@ -115,8 +124,20 @@
                                     <tr style="cursor: pointer" 
                                         data-appointment="{{ htmlspecialchars(json_encode($appointment), ENT_QUOTES, 'UTF-8') }}"
                                         class="appointment-row">
-                                        <td class="text-muted">
-                                            #{{ str_pad($appointment->id, 5, '0', STR_PAD_LEFT) }}
+                                        <td>
+                                            @if($appointment->user && !empty($appointment->user->phone))
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-primary send-reminder-btn" 
+                                                        data-id="{{ $appointment->id }}" 
+                                                        data-phone="{{ $appointment->user->phone }}" 
+                                                        onclick="sendReminder(event, {{ $appointment->id }})">
+                                                    <i class="fas fa-bell me-1"></i>Send
+                                                </button>
+                                            @else
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" disabled title="No phone number available">
+                                                    <i class="fas fa-bell-slash me-1"></i>N/A
+                                                </button>
+                                            @endif
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column gap-1">
@@ -384,7 +405,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-4">
+                                        <td colspan="10" class="text-center py-4">
                                             <div class="empty">
                                                 <div class="empty-icon">
                                                     <i class="fas fa-calendar-times fa-3x text-muted"></i>
@@ -398,8 +419,8 @@
                                         </td>
                                     </tr>
                                 @endforelse
-                            </table>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1799,6 +1820,65 @@ function openDiagnosisForm() {
             document.body.classList.add('modal-open');
         }, { once: true });
     }
+}
+
+// Function to send appointment reminder
+function sendReminder(event, appointmentId) {
+    // Stop the click from propagating to the row click handler
+    event.stopPropagation();
+    
+    // Get the button element
+    const button = event.currentTarget;
+    
+    // Disable the button and show loading state
+    button.disabled = true;
+    const originalHtml = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    
+    // Show confirmation dialog
+    Swal.fire({
+        title: 'Send Reminder?',
+        text: 'An SMS reminder will be sent to the client about their upcoming appointment.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, send it',
+        cancelButtonText: 'Cancel',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            // Send AJAX request to send the reminder
+            return fetch(`/appointment/${appointmentId}/send-reminder`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(json => {
+                        throw new Error(json.message || 'Failed to send reminder');
+                    });
+                }
+                return response.json();
+            })
+            .catch(error => {
+                Swal.showValidationMessage(`Request failed: ${error.message}`);
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        // Reset button state
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+        
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Success!',
+                text: result.value.message || 'Reminder has been sent successfully!',
+                icon: 'success'
+            });
+        }
+    });
 }
 </script>
 @endpush

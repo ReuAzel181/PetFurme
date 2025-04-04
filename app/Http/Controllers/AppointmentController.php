@@ -96,23 +96,21 @@ class AppointmentController extends Controller
 
     public function create(Request $request)
     {
-        $owners = User::where('role', 'pet_owner')->get();
         $pet = null;
         $owner = null;
-        $ownerPets = collect();
+        $ownerPets = [];
 
-        if ($request->pet_id) {
-            $pet = Pet::with(['owner', 'vaccinations'])->findOrFail($request->pet_id);
-            $owner = $pet->owner;
-            $ownerPets = $owner->pets;
-        } elseif ($request->owner_id) {
-            $owner = User::with(['pets.vaccinations'])->findOrFail($request->owner_id);
-            $ownerPets = $owner->pets;
+        if ($request->has('pet_id') && $request->has('owner_id')) {
+            $pet = \App\Models\Pet::find($request->input('pet_id'));
+            $owner = \App\Models\User::find($request->input('owner_id'));
             
-            if ($request->pet_id) {
-                $pet = $ownerPets->firstWhere('id', $request->pet_id);
+            if ($owner) {
+                // Get all pets for this owner
+                $ownerPets = $owner->pets;
             }
         }
+
+        $owners = User::where('role', 'pet_owner')->get();
 
         return view('appointment.create', compact('pet', 'owner', 'owners', 'ownerPets'));
     }
@@ -836,6 +834,173 @@ class AppointmentController extends Controller
             ]);
             
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Send an SMS reminder for the appointment.
+     *
+     * @param  \App\Models\Appointment  $appointment
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sendReminder(Appointment $appointment)
+    {
+        try {
+            // Log the start of the reminder process with appointment details
+            \Log::info("Starting reminder process", [
+                'appointment_id' => $appointment->id,
+                'appointment_date' => $appointment->appointment_date,
+                'appointment_time' => $appointment->appointment_time,
+                'status' => $appointment->status,
+                'user_id' => $appointment->user_id,
+            ]);
+
+            // Check if the appointment has a user with a phone number
+            if (!$appointment->user) {
+                \Log::warning("No user associated with appointment", [
+                    'appointment_id' => $appointment->id,
+                    'owner_name' => $appointment->owner_name
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No user account found for this appointment'
+                ], 400);
+            }
+            
+            // Log user details
+            \Log::info("User details for reminder", [
+                'user_id' => $appointment->user->id,
+                'name' => $appointment->user->name,
+                'phone' => $appointment->user->phone,
+                'has_phone' => !empty($appointment->user->phone)
+            ]);
+
+            if (empty($appointment->user->phone)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No phone number available for this client'
+                ], 400);
+            }
+
+            // Format the appointment date and time
+            $appointmentDate = \Carbon\Carbon::parse($appointment->appointment_date)->format('l, F j, Y');
+            $appointmentTime = \Carbon\Carbon::parse($appointment->appointment_time)->format('g:i A');
+            
+            // Construct the message
+            $message = "Hi {$appointment->user->name}, {$appointment->pet_name}'s VetCare appointment is tomorrow at {$appointmentTime}, {$appointmentDate}. See you!";
+
+
+            // Log the prepared message
+            \Log::info("Prepared reminder message", [
+                'to_user' => $appointment->user->name,
+                'to_phone' => $appointment->user->phone,
+                'message_content' => $message,
+                'appointment_date_formatted' => $appointmentDate,
+                'appointment_time_formatted' => $appointmentTime,
+            ]);
+
+            // Check if Twilio credentials are configured
+            $sid = config('services.twilio.sid');
+            $token = config('services.twilio.token');
+            $from = config('services.twilio.phone');
+            
+            // Log Twilio configuration status (without exposing sensitive data)
+            \Log::info("Twilio configuration", [
+                'sid_configured' => !empty($sid),
+                'token_configured' => !empty($token),
+                'phone_configured' => !empty($from),
+                'from_phone' => $from ?? 'Not configured'
+            ]);
+            
+            if (!$sid || !$token || !$from) {
+                \Log::warning("Twilio credentials not configured. SMS not sent.", [
+                    'appointment_id' => $appointment->id,
+                    'user_phone' => $appointment->user->phone
+                ]);
+                
+                // For development, simulate a successful send
+                // Update the appointment record to indicate a reminder was sent
+                $actions = json_decode($appointment->actions, true) ?: [];
+                $actions['reminder_sent'] = true;
+                $actions['reminder_sent_at'] = now()->toDateTimeString();
+                $actions['reminder_sent_by'] = auth()->id();
+                $actions['reminder_simulated'] = true; // Flag that this was simulated
+                $appointment->actions = json_encode($actions);
+                $appointment->save();
+                
+                \Log::info("Reminder simulation recorded in appointment", [
+                    'appointment_id' => $appointment->id,
+                    'actions' => $actions
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Reminder simulated successfully (Twilio credentials not configured)',
+                    'development_message' => $message
+                ]);
+            }
+            
+            // Initialize Twilio client
+            $twilio = new \Twilio\Rest\Client($sid, $token);
+            
+            // Format the phone number to E.164 format (Philippines)
+            $phoneNumber = $appointment->user->phone;
+
+            // If phone number starts with '0', replace with '+63'
+            if (substr($phoneNumber, 0, 1) === '0') {
+                $phoneNumber = '+63' . substr($phoneNumber, 1);
+            }
+            
+            \Log::info("Sending SMS via Twilio", [
+                'to_number' => $phoneNumber,
+                'from_number' => $from,
+                'message_length' => strlen($message)
+            ]);
+            
+            // Send the message
+            $twilioResponse = $twilio->messages->create(
+                $phoneNumber,
+                [
+                    'from' => $from,
+                    'body' => $message
+                ]
+            );
+            
+            // Log the Twilio response
+            \Log::info("Twilio SMS Response:", [
+                'sid' => $twilioResponse->sid,
+                'status' => $twilioResponse->status,
+                'error_code' => $twilioResponse->errorCode,
+                'error_message' => $twilioResponse->errorMessage
+            ]);
+            
+            // Update the appointment record to indicate a reminder was sent
+            $actions = json_decode($appointment->actions, true) ?: [];
+            $actions['reminder_sent'] = true;
+            $actions['reminder_sent_at'] = now()->toDateTimeString();
+            $actions['reminder_sent_by'] = auth()->id();
+            $actions['twilio_sid'] = $twilioResponse->sid;
+            $actions['twilio_status'] = $twilioResponse->status;
+            $appointment->actions = json_encode($actions);
+            $appointment->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment reminder has been sent successfully!'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("Failed to send reminder: " . $e->getMessage(), [
+                'appointment_id' => $appointment->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString(),
+                'user_id' => $appointment->user->id ?? 'unknown',
+                'user_phone' => $appointment->user->phone ?? 'unknown'
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send reminder: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -115,16 +115,27 @@
                             <!-- Profile Photo -->
                             <div class="mb-4">
                                 <label class="form-label">Profile Photo</label>
-                                @if($user->photo)
-                                    <div class="mb-3">
-                                        <img src="{{ asset('storage/' . $user->photo) }}" 
-                                             alt="Current Profile Photo" 
-                                             class="avatar avatar-xl mb-3">
+                                <div class="mb-3">
+                                    <div style="width: 96px; height: 96px; overflow: hidden; border-radius: 50%;">
+                                        @if($user->photo_data)
+                                            <img src="data:image/jpeg;base64,{{ base64_encode($user->photo_data) }}"
+                                                 alt="Current Profile Photo"
+                                                 style="width: 100%; height: 100%; object-fit: cover;">
+                                        @elseif($user->photo)
+                                            <img src="{{ asset('storage/' . $user->photo) }}"
+                                                 alt="Current Profile Photo"
+                                                 style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            <img src="{{ asset('storage/defaults/no-avatar.jpg') }}"
+                                                 alt="Default Profile Photo"
+                                                 style="width: 100%; height: 100%; object-fit: cover;">
+                                        @endif
                                     </div>
-                                @endif
+                                </div>
                                 <input type="file" class="form-control @error('photo') is-invalid @enderror" 
-                                       id="photo" name="photo" accept="image/*">
+                                       id="photo" name="photo" accept="image/*" onchange="validateFileSize(this)">
                                 <small class="form-text text-muted">Leave blank to keep current photo</small>
+                                <small class="text-muted d-block">Maximum file size: 2MB</small>
                                 @error('photo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -132,16 +143,18 @@
 
                             <!-- Submit Button -->
                             <div class="form-footer">
-                                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancel</a>
-                                <button type="submit" class="btn btn-primary ms-auto">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
-                                        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
-                                        <path d="M16 5l3 3" />
-                                    </svg>
-                                    Update User
-                                </button>
+                                <div class="ms-auto">
+                                    <button type="submit" class="btn btn-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                                            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+                                            <path d="M16 5l3 3" />
+                                        </svg>
+                                        Update User
+                                    </button>
+                                    <a href="{{ route('users.index') }}" class="btn btn-secondary ms-2">Cancel</a>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -163,4 +176,16 @@
         border-top: 1px solid #e6e7e9;
     }
 </style>
+
+@section('scripts')
+<script>
+function validateFileSize(input) {
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (input.files[0] && input.files[0].size > maxSize) {
+        alert('File size must be less than 2MB');
+        input.value = '';
+    }
+}
+</script>
+@endsection
 @endsection

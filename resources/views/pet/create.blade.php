@@ -12,7 +12,7 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ route('pets.store') }}" enctype="multipart/form-data" id="petForm">
+                    <form method="POST" action="{{ route('pets.store') }}" enctype="multipart/form-data" id="petForm" data-binary="true">
                         @csrf
 
                         <!-- Pet Owner Selection -->
@@ -44,7 +44,7 @@
                                             <div class="position-relative">
                                                 <label for="photo" class="photo-upload-label cursor-pointer">
                                                     <div class="position-relative">
-                                                        <img id="preview" src="{{ asset('images/default-pet-avatar.png') }}" 
+                                                        <img id="preview" src="{{ asset('storage/defaults/paw.png') }}" 
                                                              class="rounded-circle shadow-sm" 
                                                              style="width: 300px; height: 300px; object-fit: cover; border: 3px solid #e4e6ef;">
                                                         <div class="upload-overlay rounded-circle">
@@ -56,7 +56,7 @@
                                                     </div>
                                                 </label>
                                                 <input type="file" name="photo" id="photo" class="d-none" 
-                                                       onchange="previewImage(this)" accept="image/*" disabled>
+                                                       onchange="previewImage(this)" accept="image/*">
                                             </div>
                                             <div class="text-center mt-3">
                                                 <span class="text-muted fs-6">
@@ -199,6 +199,7 @@
 .photo-upload-label {
     display: inline-block;
     position: relative;
+    cursor: pointer;
 }
 
 .upload-overlay {
@@ -207,17 +208,16 @@
     left: 0;
     width: 300px;
     height: 300px;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border: 2px dashed #fff;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
 }
 
-.photo-upload-label:not(:has(img[src*="default-pet-avatar"])) .upload-overlay {
-    background-color: rgba(0, 0, 0, 0.4);
+.photo-upload-label:hover .upload-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .upload-text {
@@ -232,10 +232,6 @@
     font-size: 2.5rem;
     margin-bottom: 1rem;
     display: block;
-}
-
-.photo-upload-label:hover .upload-overlay {
-    opacity: 1;
 }
 
 .row.g-4 {
@@ -278,15 +274,37 @@ document.getElementById('ownerSelect').addEventListener('change', function() {
             element.setAttribute('disabled', 'disabled');
         }
     });
+
+    // Enable the file input specifically
+    document.getElementById('photo').removeAttribute('disabled');
 });
 
 function previewImage(input) {
     if (input.files && input.files[0]) {
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('preview').src = e.target.result;
-            input.closest('.photo-upload-label').querySelector('.upload-text').innerHTML = 
-                '<i class="fas fa-camera fs-2 mb-2"></i><br>Change Photo';
+            
+            // Fix the querySelector error by checking if element exists
+            const uploadText = document.querySelector('.upload-text');
+            if (uploadText) {
+                uploadText.innerHTML = '<i class="fas fa-camera fs-2 mb-2"></i><br>Change Photo';
+            }
+            
+            // Store the binary data in a hidden input
+            let binaryInput = document.querySelector('input[name="photo_data"]');
+            if (!binaryInput) {
+                binaryInput = document.createElement('input');
+                binaryInput.type = 'hidden';
+                binaryInput.name = 'photo_data';
+                document.getElementById('petForm').appendChild(binaryInput);
+            }
+            
+            // Get the base64 data without prefix
+            binaryInput.value = e.target.result.split(',')[1];
+            
+            // Debug to verify binary data is being set
+            console.log("Binary data length:", binaryInput.value.length);
         }
         reader.readAsDataURL(input.files[0]);
     }
@@ -302,61 +320,97 @@ document.getElementById('petForm').addEventListener('submit', async function(e) 
     
     const formData = new FormData(this);
     
-    // Show loading state
-    const submitButton = this.querySelector('button[type="submit"]');
-    const originalText = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Registering...';
+    // Check if an image has been uploaded
+    const fileInput = document.getElementById('photo');
+    if (!fileInput.files || !fileInput.files[0]) {
+        // Show error message for missing image
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback d-block text-center mt-2';
+        errorDiv.textContent = 'Please select an image for the pet.';
+        fileInput.parentNode.appendChild(errorDiv);
+        
+        // Scroll to error
+        fileInput.parentNode.scrollIntoView({ behavior: 'smooth' });
+        
+        return;
+    }
+    
+    // Ensure photo_data is included in the submission
+    const binaryInput = document.querySelector('input[name="photo_data"]');
+    if (binaryInput && binaryInput.value) {
+        console.log("Submitting with binary data, length:", binaryInput.value.length);
+    } else {
+        console.warn("No binary data found, reading image again");
+        // If photo_data is missing, read it again from the file
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const base64Data = e.target.result.split(',')[1];
+            formData.append('photo_data', base64Data);
+            await submitForm(formData);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+        return;
+    }
+    
+    await submitForm(formData);
+    
+    async function submitForm(formData) {
+        // Show loading state
+        const submitButton = document.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Registering...';
 
-    try {
-        const response = await fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            credentials: 'same-origin',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            await Toast.fire({
-                icon: 'success',
-                title: 'Pet registered successfully'
+        try {
+            const response = await fetch('{{ route('pets.store') }}', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
             });
-            window.location.href = data.redirect || '/pets';
-        } else {
+
+            const data = await response.json();
+
+            if (data.success) {
+                await Toast.fire({
+                    icon: 'success',
+                    title: 'Pet registered successfully'
+                });
+                window.location.href = data.redirect || '/pets';
+            } else {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+                
+                if (data.errors) {
+                    Object.keys(data.errors).forEach(field => {
+                        const input = document.querySelector(`[name="${field}"]`);
+                        if (input) {
+                            input.classList.add('is-invalid');
+                            const feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback';
+                            feedback.textContent = data.errors[field][0];
+                            input.parentNode.appendChild(feedback);
+                        }
+                    });
+                }
+
+                await Toast.fire({
+                    icon: 'error',
+                    title: data.message || 'Failed to register pet'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
             submitButton.disabled = false;
             submitButton.innerHTML = originalText;
             
-            if (data.errors) {
-                Object.keys(data.errors).forEach(field => {
-                    const input = document.querySelector(`[name="${field}"]`);
-                    if (input) {
-                        input.classList.add('is-invalid');
-                        const feedback = document.createElement('div');
-                        feedback.className = 'invalid-feedback';
-                        feedback.textContent = data.errors[field][0];
-                        input.parentNode.appendChild(feedback);
-                    }
-                });
-            }
-
             await Toast.fire({
                 icon: 'error',
-                title: data.message || 'Failed to register pet'
+                title: 'An error occurred'
             });
         }
-    } catch (error) {
-        console.error('Error:', error);
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
-        
-        await Toast.fire({
-            icon: 'error',
-            title: 'An error occurred'
-        });
     }
 });
 </script>

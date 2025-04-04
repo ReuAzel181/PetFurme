@@ -97,9 +97,9 @@
                                                              style="width: 64px; height: 64px; object-fit: cover;">
                                                     </div>
                                                     <div class="flex-grow-1">
-                                                        <div id="pet_select_container">
+                                                        <div id="pet_select_container" style="{{ isset($owner) && $owner->id == 'no_account' ? 'display: none;' : '' }}">
                                                             <label class="form-label required">Select Pet</label>
-                                                            <select name="pet_id" id="pet_id" class="form-select" required>
+                                                            <select name="pet_id" id="pet_id" class="form-select" {{ isset($owner) && $owner->id == 'no_account' ? '' : 'required' }}>
                                                                 <option value="">Select Pet</option>
                                                                 @if(isset($ownerPets))
                                                                     @foreach($ownerPets as $petOption)
@@ -139,7 +139,7 @@
                                 </div>
                             </div>
 
-                            <div id="walkin_pet_group" class="col-12" style="display: none;">
+                            <div id="walkin_pet_group" class="col-12" style="{{ isset($owner) && $owner->id == 'no_account' ? '' : 'display: none;' }}">
                                 <div class="card h-100">
                                     <div class="card-header bg-primary-soft d-flex align-items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-paw-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -288,7 +288,7 @@
                                 </div>
                             </div>
 
-                            <div id="registered_pet_details" class="col-12" style="min-height: 300px; margin-bottom: 1.5rem;">
+                            <div id="registered_pet_details" class="col-12" style="{{ isset($pet) && isset($owner) && $owner->id != 'no_account' ? '' : 'display: none;' }}; min-height: 300px; margin-bottom: 1.5rem;">
                                 <div class="card h-100">
                                     <div class="card-header bg-primary-soft d-flex align-items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-paw-filled" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -315,7 +315,8 @@
                                                     </svg>
                                                     Pet Name
                                                 </label>
-                                                <input type="text" id="pet_name" class="form-control" readonly>
+                                                <input type="text" id="pet_name" class="form-control" readonly 
+                                                       value="{{ isset($pet) ? $pet->name : '' }}">
                                             </div>
 
                                             <div class="col-md-6">
@@ -329,7 +330,8 @@
                                                     </svg>
                                                         Pet Type
                                                 </label>
-                                                <input type="text" id="pet_category" class="form-control" readonly>
+                                                <input type="text" id="pet_category" class="form-control" readonly
+                                                               value="{{ isset($pet) ? $pet->category : '' }}">
                                             </div>
 
                                             <div class="col-md-6">
@@ -342,7 +344,8 @@
                                                     </svg>
                                                     Breed
                                                 </label>
-                                                <input type="text" id="pet_breed" class="form-control" readonly>
+                                                <input type="text" id="pet_breed" class="form-control" readonly
+                                                               value="{{ isset($pet) ? $pet->breed : '' }}">
                                             </div>
 
                                             <div class="col-md-6">
@@ -359,10 +362,11 @@
                                                     Pet Age
                                                 </label>
                                                 <div class="input-group p-0">
-                                                    <input type="number" id="pet_age" class="form-control" readonly>
+                                                    <input type="number" id="pet_age" class="form-control" readonly
+                                                                   value="{{ isset($pet) ? $pet->age : '' }}">
                                                     <select id="age_unit" class="form-select" style="max-width: 100px;" disabled>
-                                                        <option value="years">Years</option>
-                                                        <option value="months">Months</option>
+                                                        <option value="years" {{ isset($pet) && $pet->age_unit == 'years' ? 'selected' : '' }}>Years</option>
+                                                        <option value="months" {{ isset($pet) && $pet->age_unit == 'months' ? 'selected' : '' }}>Months</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -379,7 +383,8 @@
                                                     </svg>
                                                     Weight (kg)
                                                 </label>
-                                                <input type="number" id="pet_weight" class="form-control" step="0.01" readonly>
+                                                <input type="number" id="pet_weight" class="form-control" step="0.01" readonly
+                                                               value="{{ isset($pet) ? $pet->weight : '' }}">
                                             </div>
 
                                             <div class="col-md-6">
@@ -394,7 +399,52 @@
                                                     </svg>
                                                     Gender
                                                 </label>
-                                                <input type="text" id="pet_gender" class="form-control" readonly>
+                                                <input type="text" id="pet_gender" class="form-control" readonly
+                                                               value="{{ isset($pet) ? ucfirst(strtolower($pet->gender)) : '' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pet History Card - This will appear when a pet is selected -->
+                            <div id="pet_history_card" class="col-12" style="display: none; margin-bottom: 1.5rem;">
+                                <div class="card">
+                                    <div class="card-header bg-primary-soft d-flex align-items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-history" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M12 8l0 4l2 2"></path>
+                                            <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
+                                        </svg>
+                                        <h3 class="card-title mb-0">Pet History</h3>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div id="pet_history_loading" class="d-flex justify-content-center align-items-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <span class="ms-2">Loading pet history...</span>
+                                        </div>
+                                        <div id="pet_history_content" style="display: none;">
+                                            <div id="no_history_message" class="alert alert-info m-3" style="display: none;">
+                                                No previous appointments or findings for this pet.
+                                            </div>
+                                            <div id="appointment_history_container">
+                                                <div class="table-responsive">
+                                                    <table class="table table-vcenter card-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Reason</th>
+                                                                <th>Status</th>
+                                                                <th>Findings</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="appointment_history_list">
+                                                            <!-- Appointment history will be populated here -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -567,22 +617,158 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    // Add this at the beginning of your script
+    window.addEventListener('error', function(e) {
+        console.error('JavaScript error occurred:', e.message);
+        console.error('File:', e.filename);
+        console.error('Line:', e.lineno);
+        console.error('Column:', e.colno);
+    });
+
+    // Define global variables and functions first
+    let reasonButtons;
+    let selectedReasons = new Set();
+    
+    // Define clearPetDetails function globally so it's available across all event handlers
+    function clearPetDetails() {
+        console.log('Clearing pet details');
+        
+        // Clear form fields
+        const fieldsToReset = [
+            'pet_name', 'pet_type', 'pet_category', 'pet_breed', 'pet_age', 
+            'pet_weight', 'pet_gender'
+        ];
+        
+        fieldsToReset.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) field.value = '';
+        });
+        
+        // Reset pet avatar if it exists
+        const avatarField = document.getElementById('dynamic_avatar');
+        if (avatarField) {
+            avatarField.src = '/storage/defaults/paw.png';
+            avatarField.alt = 'Default Pet Avatar';
+        }
+    }
+    
+    // Error handling for external scripts
+    window.addEventListener('error', function(e) {
+        // This remains the same as your existing code
+        console.error('External script error:', e.message);
+        e.preventDefault();
+        e.stopPropagation();
+        return true; // Prevents the error from bubbling up
+    }, true);
+
+    // Also catch unhandled promise rejections (for fetch promises)
+    window.addEventListener('unhandledrejection', function(e) {
+        if (e.reason && (String(e.reason).includes('fetch') || String(e.reason).includes('Failed to'))) {
+            console.warn('Unhandled promise rejection suppressed:', e.reason);
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, true);
+
+    // DOM Content Loaded event - initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Document loaded, initializing appointment creation page');
+        
+        // Initialize variables at the beginning of the function
+        reasonButtons = document.querySelectorAll('.reason-btn');
+        const otherReasonBtn = document.getElementById('other-reason-btn');
+        const otherReasonGroup = document.getElementById('other_reason_group');
+        const otherReasonInput = document.getElementById('other_reason');
+        const addOtherReasonBtn = document.getElementById('add-other-reason');
+        const selectedReasonsContainer = document.getElementById('selected-reasons');
+        const reasonForVisitInput = document.getElementById('reason_for_visit');
+        const emptyReasonText = document.getElementById('empty-reason-text');
+        
+        // Immediately clean URL on page load
+        try {
+            const originalUrl = window.location.href;
+            const cleanUrl = originalUrl.split('?')[0];
+            console.log('Cleaning URL from', originalUrl, 'to', cleanUrl);
+            history.replaceState(null, document.title, cleanUrl);
+        } catch (e) {
+            console.error('Error cleaning URL:', e);
+        }
+        
+        try {
+            // Extract parameters before they're removed from URL
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const petId = urlSearchParams.get('pet_id');
+            const ownerId = urlSearchParams.get('owner_id');
+            
+            console.log('URL parameters detected:', { petId, ownerId });
+            
+            if (petId && ownerId) {
+                const ownerSelect = document.getElementById('owner_id');
+                if (ownerSelect) {
+                    console.log('Setting owner ID to', ownerId);
+                    ownerSelect.value = ownerId;
+                    
+                    // Create a promise-based approach to handle the sequential operations
+                    const loadPets = new Promise((resolve) => {
+                        // Set up one-time event listener for when pets are loaded
+                        document.addEventListener('pets-loaded', function handler() {
+                            document.removeEventListener('pets-loaded', handler);
+                            resolve();
+                        }, { once: true });
+                        
+                        // Trigger the owner change event
+                        ownerSelect.dispatchEvent(new Event('change'));
+                    });
+                    
+                    // Once pets are loaded, then set the pet
+                    loadPets.then(() => {
+                        const petSelect = document.getElementById('pet_id');
+                        if (petSelect) {
+                            console.log('Setting pet ID to', petId);
+                            petSelect.value = petId;
+                            petSelect.dispatchEvent(new Event('change'));
+                        } else {
+                            console.warn('Pet select not found');
+                        }
+                    });
+                } else {
+                    console.warn('Owner select not found');
+                }
+            }
+        } catch (e) {
+            console.error('Error processing URL parameters:', e);
+        }
+    });
+
+    // Prevent query parameters from persisting in navigation
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (link && link.href && !link.href.startsWith('javascript:') && !link.href.startsWith('#')) {
+            try {
+                const url = new URL(link.href);
+                if (!url.search) return; // No query params to clean
+                
+                // Don't modify URLs that need their parameters
+                const preserveParamsPatterns = [
+                    '/appointments/create', 
+                    '/pets/edit/',
+                    '/users/edit/'
+                ];
+                
+                const shouldPreserveParams = preserveParamsPatterns.some(pattern => 
+                    url.pathname.includes(pattern));
+                
+                if (!shouldPreserveParams) {
+                    link.href = url.origin + url.pathname;
+                }
+            } catch (e) {
+                console.error('Error processing link:', e);
+            }
+        }
+    });
+
     const userSelect = document.getElementById('owner_id');
     const petSelect = document.getElementById('pet_id');
-    const selectedReasons = new Set();
-    const reasonButtons = document.querySelectorAll('.reason-btn');
-    const otherReasonBtn = document.getElementById('other-reason-btn');
-    const otherReasonGroup = document.getElementById('other_reason_group');
-    const otherReasonInput = document.getElementById('other_reason');
-    const addOtherReasonBtn = document.getElementById('add-other-reason');
-    const selectedReasonsContainer = document.getElementById('selected-reasons');
-    const reasonForVisitInput = document.getElementById('reason_for_visit');
-    const ownerNameGroup = document.getElementById('owner_name_group');
-    const ownerNameInput = document.getElementById('owner_name');
-    const petSelectionGroup = document.getElementById('pet_selection_group');
-    const appointmentDate = document.getElementById('appointment_date');
-    const appointmentTime = document.getElementById('appointment_time');
 
     const existingUserId = '{{ old("owner_id", $appointment->owner_id ?? "") }}';
     const existingOwnerName = '{{ old("owner_name", $appointment->owner_name ?? "") }}';
@@ -595,15 +781,6 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (existingUserId) {
         userSelect.value = existingUserId;
         userSelect.dispatchEvent(new Event('change'));
-    }
-
-    function clearPetDetails() {
-        document.getElementById('pet_name').value = '';
-        document.getElementById('pet_category').value = '';
-        document.getElementById('pet_breed').value = '';
-        document.getElementById('pet_age').value = '';
-        document.getElementById('pet_weight').value = '';
-        document.getElementById('pet_gender').value = '';
     }
 
     userSelect.addEventListener('change', function() {
@@ -817,41 +994,97 @@ document.addEventListener('DOMContentLoaded', function() {
         return badge;
     }
 
-    reasonButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const reason = this.dataset.reason;
-            
-            if (this.classList.contains('active')) {
-                this.classList.remove('active');
-                selectedReasons.delete(reason);
-            } else {
-                this.classList.add('active');
-                selectedReasons.add(reason);
-            }
-
-            updateReasonInput();
-        });
-    });
-
-    function updateSelectedReasonsDisplay() {
-        const selectedReasonsContainer = document.getElementById('selected-reasons');
-        const emptyReasonText = document.getElementById('empty-reason-text');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Define reasonButtons inside the DOMContentLoaded event to ensure elements are loaded
+        const reasonButtons = document.querySelectorAll('.reason-btn');
+        console.log('Found reason buttons:', reasonButtons.length);
         
-        selectedReasonsContainer.innerHTML = '';
-        
-        const reasonsArray = Array.from(selectedReasons);
-        
-        if (reasonsArray.length > 0) {
-            emptyReasonText.style.display = 'none';
-            
-            reasonsArray.forEach(reason => {
-                const badge = createReasonBadge(reason);
-                selectedReasonsContainer.appendChild(badge);
-            });
-        } else {
-            emptyReasonText.style.display = 'block';
+        if (reasonButtons.length === 0) {
+            console.error('No reason buttons found. Check class names.');
         }
-    }
+        
+        // Initialize selectedReasons set
+        let selectedReasons = new Set();
+        
+        // Get the hidden input for storing reasons
+        const reasonForVisitInput = document.getElementById('reason_for_visit');
+        
+        reasonButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const reason = this.dataset.reason;
+                console.log(`Reason button clicked: ${reason}`);
+                
+                if (this.classList.contains('active')) {
+                    this.classList.remove('active');
+                    selectedReasons.delete(reason);
+                    console.log(`Removed reason: ${reason}`);
+                } else {
+                    this.classList.add('active');
+                    selectedReasons.add(reason);
+                    console.log(`Added reason: ${reason}`);
+                }
+
+                updateReasonInput();
+            });
+        });
+        
+        function updateReasonInput() {
+            const reasonsArray = Array.from(selectedReasons);
+            reasonForVisitInput.value = reasonsArray.join(', ');
+            
+            updateSelectedReasonsDisplay();
+            
+            const emptyReasonText = document.getElementById('empty-reason-text');
+            if (reasonsArray.length > 0) {
+                emptyReasonText.style.display = 'none';
+            } else {
+                emptyReasonText.style.display = 'block';
+            }
+        }
+        
+        function updateSelectedReasonsDisplay() {
+            const selectedReasonsContainer = document.getElementById('selected-reasons');
+            const emptyReasonText = document.getElementById('empty-reason-text');
+            
+            selectedReasonsContainer.innerHTML = '';
+            
+            const reasonsArray = Array.from(selectedReasons);
+            
+            if (reasonsArray.length > 0) {
+                emptyReasonText.style.display = 'none';
+                
+                reasonsArray.forEach(reason => {
+                    const badge = createReasonBadge(reason);
+                    selectedReasonsContainer.appendChild(badge);
+                });
+            } else {
+                emptyReasonText.style.display = 'block';
+            }
+        }
+        
+        function createReasonBadge(reason) {
+            const badge = document.createElement('div');
+            badge.className = 'badge d-flex align-items-center gap-2';
+            badge.innerHTML = `
+                ${reason}
+                <button type="button" class="btn-close btn-close-white" aria-label="Remove"></button>
+            `;
+
+            badge.querySelector('.btn-close').addEventListener('click', function() {
+                selectedReasons.delete(reason);
+                badge.remove();
+                
+                const button = document.querySelector(`.reason-btn[data-reason="${reason}"]`);
+                if (button) {
+                    button.classList.remove('active');
+                }
+                
+                updateReasonInput();
+            });
+
+            return badge;
+        }
+    });
 
     otherReasonBtn.addEventListener('click', function() {
         otherReasonGroup.style.display = otherReasonGroup.style.display === 'none' ? 'block' : 'none';
@@ -1044,6 +1277,11 @@ function updatePetsDropdown(pets) {
         
         petSelect.appendChild(option);
     });
+    
+    console.log(`Pet dropdown updated with ${pets.length} pets`);
+    
+    // Add this line to signal that pets are loaded
+    document.dispatchEvent(new CustomEvent('pets-loaded'));
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1088,63 +1326,101 @@ document.addEventListener('DOMContentLoaded', function() {
     const defaultAvatarPath = '/storage/defaults/avatar.png';
     const defaultPawPath = '/storage/defaults/paw.png';
 
-    ownerSelect.addEventListener('change', function() {
+    // Remove all existing change event listeners (important to avoid duplicates)
+    const newOwnerSelect = ownerSelect.cloneNode(true);
+    ownerSelect.parentNode.replaceChild(newOwnerSelect, ownerSelect);
+    
+    // Single, consolidated event listener
+    newOwnerSelect.addEventListener('change', async function() {
+        const selectedOption = this.options[this.selectedIndex];
         const isWalkIn = this.value === 'no_account';
         
-        petSelectContainer.style.display = isWalkIn ? 'none' : 'block';
-        ownerNameContainer.style.display = isWalkIn ? 'block' : 'none';
-        walkinPetGroup.style.display = isWalkIn ? 'block' : 'none';
-        registeredPetDetails.style.display = isWalkIn ? 'none' : 'block';
-        
+        // First, immediately update UI without waiting for fetch
         if (isWalkIn) {
             ownerAvatar.src = defaultAvatarPath;
             ownerAvatar.alt = 'Default Owner Avatar';
-            dynamicAvatar.src = defaultAvatarPath;
-            dynamicAvatar.alt = 'Walk-in Owner Avatar';
-        } else {
-            const selectedOption = this.options[this.selectedIndex];
-            ownerAvatar.src = selectedOption.dataset.avatar || defaultAvatarPath;
-            ownerAvatar.alt = selectedOption.text + ' Avatar';
             
-            dynamicAvatar.src = defaultPawPath;
-            dynamicAvatar.alt = 'Select Pet Avatar';
-        }
-        
-        const ownerNameInput = document.getElementById('owner_name');
-        const petSelect = document.getElementById('pet_id');
-        
-        if (isWalkIn) {
-            ownerNameInput.setAttribute('required', 'required');
-            petSelect.removeAttribute('required');
+            if (dynamicAvatar) {
+                dynamicAvatar.src = defaultPawPath;
+                dynamicAvatar.alt = 'Walk-in Pet Avatar';
+            }
             
-            ownerNameInput.addEventListener('input', function() {
-                if (this.value) {
-                    dynamicAvatar.alt = `${this.value}'s Avatar`;
-                } else {
-                    dynamicAvatar.alt = 'Walk-in Owner Avatar';
+            if (petSelectContainer) petSelectContainer.style.display = 'none';
+            if (ownerNameContainer) ownerNameContainer.style.display = 'block';
+            if (walkinPetGroup) walkinPetGroup.style.display = 'block';
+            if (registeredPetDetails) registeredPetDetails.style.display = 'none';
+            
+            const ownerNameInput = document.getElementById('owner_name');
+            const petSelect = document.getElementById('pet_id');
+            
+            if (ownerNameInput) ownerNameInput.setAttribute('required', 'required');
+            if (petSelect) petSelect.removeAttribute('required');
+        } 
+        else if (selectedOption && this.value) {
+            // Get avatar from data attribute first (for immediate display)
+            const avatarFromData = selectedOption.getAttribute('data-avatar');
+            if (avatarFromData) {
+                ownerAvatar.src = avatarFromData;
+                ownerAvatar.alt = selectedOption.text + ' Avatar';
+            }
+            
+            if (petSelectContainer) petSelectContainer.style.display = 'block';
+            if (ownerNameContainer) ownerNameContainer.style.display = 'none';
+            if (walkinPetGroup) walkinPetGroup.style.display = 'none';
+            if (registeredPetDetails) registeredPetDetails.style.display = 'block';
+            
+            const ownerNameInput = document.getElementById('owner_name');
+            const petSelect = document.getElementById('pet_id');
+            
+            if (ownerNameInput) ownerNameInput.removeAttribute('required');
+            if (petSelect) petSelect.setAttribute('required', 'required');
+            
+            // Then do the API call to get pets
+            try {
+                console.log('Fetching pets for owner ID:', this.value);
+                const response = await fetch(`/api/owners/${this.value}/pets`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch pets data');
                 }
-            });
-        } else {
-            ownerNameInput.removeAttribute('required');
-            petSelect.setAttribute('required', 'required');
+                
+                const petsData = await response.json();
+                updatePetsDropdown(petsData);
+            } catch (error) {
+                console.error('Error fetching pets:', error);
+                
+                if (petSelect) {
+                    petSelect.innerHTML = '<option value="">Error loading pets</option>';
+                }
+            }
+        } 
+        else {
+            // No selection
+            ownerAvatar.src = defaultAvatarPath;
+            ownerAvatar.alt = 'Default Owner Avatar';
+            
+            if (dynamicAvatar) {
+                dynamicAvatar.src = defaultPawPath;
+                dynamicAvatar.alt = 'Default Pet Avatar';
+            }
+            
+            if (petSelectContainer) petSelectContainer.style.display = 'block';
+            if (ownerNameContainer) ownerNameContainer.style.display = 'none';
+            if (walkinPetGroup) walkinPetGroup.style.display = 'none';
+            if (registeredPetDetails) registeredPetDetails.style.display = 'block';
+            
+            if (petSelect) {
+                petSelect.innerHTML = '<option value="">Select Pet</option>';
+            }
         }
     });
 
-    if (ownerSelect.value === 'no_account') {
-        ownerSelect.dispatchEvent(new Event('change'));
+    // If there's an initial selection, trigger the change event
+    if (newOwnerSelect.value) {
+        newOwnerSelect.dispatchEvent(new Event('change'));
     }
-
-    const petSelect = document.getElementById('pet_id');
-    petSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        if (selectedOption && selectedOption.value) {
-            dynamicAvatar.src = selectedOption.dataset.photo || defaultPawPath;
-            dynamicAvatar.alt = selectedOption.text + ' Avatar';
-        } else {
-            dynamicAvatar.src = defaultPawPath;
-            dynamicAvatar.alt = 'Default Pet Avatar';
-        }
-    });
+    
+    // Rest of your initialization code...
 });
 
 function updatePetDetails(selectedOption) {
@@ -1177,91 +1453,6 @@ document.getElementById('pet_id').addEventListener('change', function(e) {
     const selectedOption = e.target.options[e.target.selectedIndex];
     updatePetDetails(selectedOption);
 });
-
-function updateServiceDetailsForm(reasons) {
-    const serviceDetailsCard = document.getElementById('service-details-card');
-    
-    if (!serviceDetailsCard) {
-        console.error('Service details card element not found!');
-        return;
-    }
-    
-    if (typeof reasons === 'string') {
-        reasons = [reasons];
-    }
-    
-    serviceDetailsCard.innerHTML = '';
-    
-    reasons.forEach((reason, index) => {
-        let formFields = '';
-        
-        
-    if (formFields) {
-            console.log(`Creating card for ${reason}`);
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card mb-3';
-            cardDiv.innerHTML = `
-                <div class="card-header bg-primary-soft d-flex align-items-center justify-content-between">
-                    <h3 class="card-title">${reason} Details</h3>
-                    <button type="button" class="btn-close" aria-label="Close"></button>
-                </div>
-                <div class="card-body">
-                    ${formFields}
-            </div>
-        `;
-
-            cardDiv.querySelector('.btn-close').addEventListener('click', function() {
-                cardDiv.remove();
-                const reasonBtn = document.querySelector(`.reason-btn[data-reason="${reason}"]`);
-                if (reasonBtn) {
-                    reasonBtn.classList.remove('active');
-                }
-                updateReasonInput();
-            });
-
-            console.log(`Appending ${reason} card to service details container`);
-            serviceDetailsCard.appendChild(cardDiv);
-    } else {
-            console.warn(`No form fields generated for ${reason}`);
-    }
-    });
-    
-    serviceDetailsCard.style.display = reasons.length > 0 ? 'block' : 'none';
-    console.log('Service details form update complete');
-}
-
-reasonButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-        const reason = this.dataset.reason;
-
-        if (this.classList.contains('active')) {
-            this.classList.remove('active');
-            selectedReasons.delete(reason);
-        } else {
-            this.classList.add('active');
-            selectedReasons.add(reason);
-        }
-
-        updateReasonInput();
-
-        const activeReasons = Array.from(selectedReasons);
-        if (activeReasons.length > 0) {
-            updateServiceDetailsForm(activeReasons);
-            updateServiceHistoryTable(reason);
-            document.getElementById('service-history-section').style.display = 'block';
-        } else {
-            document.getElementById('service-details-card').style.display = 'none';
-            document.getElementById('service-history-section').style.display = 'none';
-        }
-
-        const petId = document.getElementById('pet_id').value;
-        if (petId && this.dataset.reason.toLowerCase().includes('check-up')) {
-            const serviceType = this.dataset.reason.replace('Check-up', '').trim();
-            loadServiceHistory(petId, serviceType);
-        }
-    });
-});
-
 
 document.getElementById('pet_id').addEventListener('change', async function() {
     const petId = this.value;
@@ -1310,14 +1501,6 @@ document.getElementById('pet_id').addEventListener('change', async function() {
         }
         
         updatePetDetails(petData);
-        
-        const selectedReasons = Array.from(document.querySelectorAll('.reason-btn.active'))
-            .map(btn => btn.dataset.reason);
-            
-        selectedReasons.forEach(reason => {
-            loadServiceHistory(petId, reason);
-        });
-        
     } catch (error) {
         console.error('Error fetching pet data:', error);
         petAvatar.src = defaultPawImage;
@@ -1342,101 +1525,228 @@ function updatePetDetails(petData) {
     });
 }
 
+// Find the function that updates pet details (it might have a name like updatePetDetails)
+function updatePetDetails(option) {
+    console.log('Updating pet details from option:', option);
+    
+    if (!option || option.value === '') {
+        console.log('No pet selected or invalid option');
+        return;
+    }
+    
+    // Log all data attributes before using them
+    const dataAttrs = {
+        photo: option.getAttribute('data-photo'),
+        name: option.getAttribute('data-name'),
+        category: option.getAttribute('data-category'),
+        breed: option.getAttribute('data-breed'),
+        age: option.getAttribute('data-age'),
+        weight: option.getAttribute('data-weight'),
+        gender: option.getAttribute('data-gender')
+    };
+    console.log('Pet data attributes:', dataAttrs);
+    
+    // Added check for each input element before setting value
+    const nameField = document.getElementById('pet_name');
+    if (nameField) {
+        nameField.value = dataAttrs.name || '';
+        console.log('Set pet name:', nameField.value);
+    } else {
+        console.warn('pet_name field not found');
+    }
+    
+    const categoryField = document.getElementById('pet_category');
+    if (categoryField) {
+        categoryField.value = dataAttrs.category || '';
+        console.log('Set pet category:', categoryField.value);
+    } else {
+        console.warn('pet_category field not found');
+    }
+    
+    const breedField = document.getElementById('pet_breed');
+    if (breedField) {
+        breedField.value = dataAttrs.breed || '';
+        console.log('Set pet breed:', breedField.value);
+    } else {
+        console.warn('pet_breed field not found');
+    }
+    
+    const ageField = document.getElementById('pet_age');
+    if (ageField) {
+        ageField.value = dataAttrs.age || '';
+        console.log('Set pet age:', ageField.value);
+    } else {
+        console.warn('pet_age field not found');
+    }
+    
+    const weightField = document.getElementById('pet_weight');
+    if (weightField) {
+        weightField.value = dataAttrs.weight || '';
+        console.log('Set pet weight:', weightField.value);
+    } else {
+        console.warn('pet_weight field not found');
+    }
+    
+    const genderField = document.getElementById('pet_gender');
+    if (genderField) {
+        genderField.value = dataAttrs.gender || '';
+        console.log('Set pet gender:', genderField.value);
+    } else {
+        console.warn('pet_gender field not found');
+    }
+    
+    // Get the dynamic avatar element
+    const dynamicAvatar = document.getElementById('dynamic_avatar');
+    if (dynamicAvatar && dataAttrs.photo) {
+        dynamicAvatar.src = dataAttrs.photo;
+        console.log('Set pet avatar src:', dynamicAvatar.src);
+    } else {
+        console.warn('dynamic_avatar element not found or no photo attribute');
+    }
+}
+
+// Make sure this function is called when a pet is selected
+document.getElementById('pet_id').addEventListener('change', function() {
+    console.log('Pet select changed to:', this.value);
+    if (this.value) {
+        const selectedOption = this.options[this.selectedIndex];
+        console.log('Selected option:', selectedOption);
+        updatePetDetails(selectedOption);
+    } else {
+        console.log('No pet selected, clearing details');
+        // Add your code to clear pet details
+    }
+});
+
+// Add this new code for appointment type selection
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all appointment type buttons
+    const appointmentButtons = document.querySelectorAll('[data-appointment-type]');
+    
+    // Add click event listener to each button
+    appointmentButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get the appointment type
+            const appointmentType = this.getAttribute('data-appointment-type');
+            console.log('Appointment type selected:', appointmentType);
+            
+            // Remove 'active' class from all buttons
+            appointmentButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-secondary');
+            });
+            
+            // Add 'active' class to the clicked button
+            this.classList.add('active');
+            this.classList.remove('btn-outline-secondary');
+            this.classList.add('btn-primary');
+            
+            // Set the hidden input value
+            document.getElementById('appointment_type').value = appointmentType;
+            
+            // Load the appropriate service form if needed
+            loadServiceForm(appointmentType);
+        });
+    });
+});
+
+function loadServiceForm(serviceType) {
+    // existing code...
+}
 </script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ownerSelect = document.getElementById('owner_id');
-    const ownerAvatar = document.getElementById('owner_avatar');
     const petSelect = document.getElementById('pet_id');
-    const petAvatar = document.getElementById('pet_avatar');
-    const ownerNameGroup = document.getElementById('owner_name_group');
-    const petSelectionGroup = document.getElementById('pet_selection_group');
+    const petSelectContainer = document.getElementById('pet_select_container');
+    const ownerNameContainer = document.getElementById('owner_name_container');
     const walkinPetGroup = document.getElementById('walkin_pet_group');
     const registeredPetDetails = document.getElementById('registered_pet_details');
-
-    ownerSelect.addEventListener('change', async function() {
-        const selectedOption = this.options[this.selectedIndex];
+    const dynamicAvatar = document.getElementById('dynamic_avatar');
+    const ownerAvatar = document.getElementById('owner_avatar');
+    
+    // Initialize form state based on pre-selected values
+    updateFormState();
+    
+    // For pre-filled forms, also update pet details if pet is selected
+    if (petSelect.value) {
+        const selectedOption = petSelect.options[petSelect.selectedIndex];
+        if (selectedOption) {
+            updateRegisteredPetDetails(selectedOption);
+        }
+    }
+    
+    // Handle owner selection change
+    ownerSelect.addEventListener('change', function() {
+        updateFormState();
         
-        if (selectedOption.value === 'no_account') {
-            ownerAvatar.src = '/storage/defaults/avatar.png';
-            
-            const ownerNameGroup = document.getElementById('owner_name_group');
-            const petSelectionGroup = document.getElementById('pet_selection_group');
-            const walkinPetGroup = document.getElementById('walkin_pet_group');
-            const registeredPetDetails = document.getElementById('registered_pet_details');
-
-            if (ownerNameGroup) ownerNameGroup.style.display = 'block';
-            if (petSelectionGroup) petSelectionGroup.style.display = 'block';
-            if (walkinPetGroup) walkinPetGroup.style.display = 'block';
-            if (registeredPetDetails) registeredPetDetails.style.display = 'none';
-            
-            petSelect.innerHTML = '<option value="">Select Pet</option>';
-        } else if (selectedOption.value) {
-            try {
-                const response = await fetch(`/api/owners/${selectedOption.value}`);
-                
-                if (!response.ok) {
-                    throw new Error('Failed to fetch owner data');
-                }
-                
-                const ownerData = await response.json();
-                
-                if (ownerData.photo_data) {
-                    ownerAvatar.src = `data:image/jpeg;base64,${ownerData.photo_data}`;
-                } else if (ownerData.avatar_url) {
-                    ownerAvatar.src = ownerData.avatar_url;
-                } else {
-                    ownerAvatar.src = defaultAvatarPath;
-                }
-                
-                ownerAvatar.onerror = function() {
-                    this.src = defaultAvatarPath;
-                };
-                
-            } catch (error) {
+        // Update owner avatar
+        if (this.value !== 'no_account' && this.value !== '') {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption && selectedOption.dataset.avatar) {
+                ownerAvatar.src = selectedOption.dataset.avatar;
             }
         } else {
-            resetForm();
+            ownerAvatar.src = "{{ asset('storage/defaults/avatar.png') }}";
         }
     });
-
-    function updatePetsDropdown(pets) {
-        petSelect.innerHTML = '<option value="">Select Pet</option>';
-        pets.forEach(pet => {
-            const option = document.createElement('option');
-            option.value = pet.id;
-            option.textContent = `${pet.name} (${pet.category})`;
-            option.dataset.photo = pet.photo_url || '/img/default-pet.png';
-            option.dataset.name = pet.name;
-            option.dataset.category = pet.category;
-            option.dataset.breed = pet.breed;
-            option.dataset.age = pet.age;
-            option.dataset.weight = pet.weight;
-            option.dataset.gender = pet.gender.toLowerCase();
-            petSelect.appendChild(option);
-        });
+    
+    // Handle pet selection change
+    petSelect.addEventListener('change', function() {
+        if (this.value) {
+            const selectedOption = this.options[this.selectedIndex];
+            updateRegisteredPetDetails(selectedOption);
+        }
+    });
+    
+    function updateFormState() {
+        const isWalkin = ownerSelect.value === 'no_account';
+        
+        // Show/hide appropriate form sections
+        petSelectContainer.style.display = isWalkin ? 'none' : 'block';
+        ownerNameContainer.style.display = isWalkin ? 'block' : 'none';
+        walkinPetGroup.style.display = isWalkin ? 'block' : 'none';
+        registeredPetDetails.style.display = !isWalkin && petSelect.value ? 'block' : 'none';
+        
+        // Update required attributes
+        if (isWalkin) {
+            petSelect.removeAttribute('required');
+            document.getElementById('owner_name').setAttribute('required', 'required');
+            document.getElementById('walkin_pet_name').setAttribute('required', 'required');
+            document.getElementById('walkin_pet_type').setAttribute('required', 'required');
+            document.getElementById('walkin_pet_breed').setAttribute('required', 'required');
+            document.getElementById('walkin_pet_age').setAttribute('required', 'required');
+            document.getElementById('walkin_pet_weight').setAttribute('required', 'required');
+            document.getElementById('walkin_pet_gender').setAttribute('required', 'required');
+        } else {
+            petSelect.setAttribute('required', 'required');
+            document.getElementById('owner_name').removeAttribute('required');
+        }
     }
-
-    function resetForm() {
-        ownerAvatar.src = '/storage/defaults/avatar.png';
-        ownerNameGroup.style.display = 'none';
-        petSelectionGroup.style.display = 'block';
-        walkinPetGroup.style.display = 'none';
-        registeredPetDetails.style.display = 'none';
-        petSelect.innerHTML = '<option value="">Select Pet</option>';
-        resetPetDetails();
-    }
-
-    function showNotification(type, message) {
-        Swal.fire({
-            icon: type,
-            title: message,
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000
-        });
+    
+    function updateRegisteredPetDetails(selectedOption) {
+        if (selectedOption && selectedOption.dataset) {
+            // Update pet avatar
+            if (dynamicAvatar && selectedOption.dataset.photo) {
+                dynamicAvatar.src = selectedOption.dataset.photo;
+            }
+            
+            // Update pet details
+            document.getElementById('pet_name').value = selectedOption.dataset.name || '';
+            document.getElementById('pet_category').value = selectedOption.dataset.category || '';
+            document.getElementById('pet_breed').value = selectedOption.dataset.breed || '';
+            document.getElementById('pet_age').value = selectedOption.dataset.age || '';
+            document.getElementById('pet_weight').value = selectedOption.dataset.weight || '';
+            document.getElementById('pet_gender').value = selectedOption.dataset.gender ? 
+                (selectedOption.dataset.gender.charAt(0).toUpperCase() + selectedOption.dataset.gender.slice(1)) : '';
+            
+            // Show registered pet details
+            registeredPetDetails.style.display = 'block';
+        }
     }
 });
 </script>
@@ -1737,6 +2047,113 @@ document.addEventListener('DOMContentLoaded', function() {
             element.textContent = value || '-';
         });
     }
+
+    function updatePetDetails(pet) {
+        console.log('Updating pet details with full data:', pet);
+        
+        // Check if elements exist before updating
+        const nameField = document.getElementById('pet_name');
+        const typeField = document.getElementById('pet_type');
+        const breedField = document.getElementById('pet_breed');
+        const ageField = document.getElementById('pet_age');
+        const weightField = document.getElementById('pet_weight');
+        const genderField = document.getElementById('pet_gender');
+        const avatarField = document.getElementById('dynamic_avatar');
+        
+        // Log each element to verify it exists
+        console.log('Form elements:', {
+            nameField,
+            typeField,
+            breedField,
+            ageField,
+            weightField,
+            genderField,
+            avatarField
+        });
+        
+        // Only update if elements exist
+        if (nameField) nameField.value = pet.name || '';
+        if (typeField) typeField.value = pet.category || '';
+        if (breedField) breedField.value = pet.breed || '';
+        if (ageField) ageField.value = pet.age || '';
+        if (weightField) weightField.value = pet.weight || '';
+        if (genderField) genderField.value = pet.gender || '';
+        
+        // Update pet avatar if available and element exists
+        if (avatarField) {
+            if (pet.photo_data) {
+                console.log('Setting photo from photo_data');
+                avatarField.src = `data:image/jpeg;base64,${pet.photo_data}`;
+            } else if (pet.photo_url) {
+                console.log('Setting photo from photo_url:', pet.photo_url.substring(0, 50) + '...');
+                avatarField.src = pet.photo_url;
+            } else if (pet.photo) {
+                console.log('Setting photo from photo path');
+                avatarField.src = `{{ asset('storage/') }}/${pet.photo}`;
+            } else {
+                console.log('Setting default photo');
+                avatarField.src = "{{ asset('storage/defaults/paw.png') }}";
+            }
+        } else {
+            console.error('Avatar element not found!');
+        }
+        
+        // Log data after update
+        console.log('Pet details updated successfully');
+    }
+
+    // Update the updatePetsDropdown function for better error handling
+    function updatePetsDropdown(pets) {
+        const petSelect = document.getElementById('pet_id');
+        if (!petSelect) {
+            console.error('Pet select element not found');
+            return;
+        }
+        
+        // Only clear if we have valid data
+        if (Array.isArray(pets) && pets.length > 0) {
+            console.log(`Adding ${pets.length} pets to dropdown`);
+            
+            // Create a document fragment for better performance
+            const fragment = document.createDocumentFragment();
+            
+            // Add the default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.textContent = "Select Pet";
+            fragment.appendChild(defaultOption);
+            
+            // Add pet options
+            pets.forEach(pet => {
+                if (!pet || !pet.id) {
+                    console.warn('Invalid pet data:', pet);
+                    return; // Skip invalid pets
+                }
+                
+                const option = document.createElement('option');
+                option.value = pet.id;
+                option.textContent = `${pet.name || 'Unnamed Pet'} (${pet.category || 'Unknown'})`;
+                
+                // Safety check for each data attribute
+                option.setAttribute('data-photo', pet.photo ? '/storage/' + pet.photo : '/storage/defaults/paw.png');
+                option.setAttribute('data-name', pet.name || '');
+                option.setAttribute('data-category', pet.category || '');
+                option.setAttribute('data-breed', pet.breed || '');
+                option.setAttribute('data-age', pet.age ? pet.age.toString() : '');
+                option.setAttribute('data-weight', pet.weight ? pet.weight.toString() : '');
+                option.setAttribute('data-gender', pet.gender ? pet.gender.toLowerCase() : '');
+                
+                fragment.appendChild(option);
+            });
+            
+            // Replace all options at once
+            petSelect.innerHTML = '';
+            petSelect.appendChild(fragment);
+        } else {
+            console.warn('No valid pets data to update dropdown', pets);
+            petSelect.innerHTML = '<option value="">No pets available</option>';
+        }
+    }
 </script>
 @endpush
 
@@ -1943,14 +2360,6 @@ document.addEventListener('DOMContentLoaded', function() {
         defaultPetPhoto: '/images/default-pet-photo.png'
     };
 
-    const serviceTypeMapping = {
-        'checkup': 'appt_checkups',
-        'vaccination': 'appt_vaccinations',
-        'grooming': 'appt_grooming',
-        'surgery': 'appt_surgeries',
-        'laboratory': 'appt_laboratory'
-    };
-
     // DOM Elements
     const form = document.getElementById('appointment-form');
     const ownerSelect = document.getElementById('owner_id');
@@ -1966,7 +2375,6 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeFormValidation();
         initializeOwnerSelection();
         initializePetSelection();
-        initializeReasonForVisit();
         initializeDateTimeHandling();
     });
 
@@ -2029,16 +2437,6 @@ document.addEventListener('DOMContentLoaded', function() {
             petSelect.addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
                 updatePetDetails(selectedOption);
-            });
-        }
-    }
-
-    // Reason for Visit Handling
-    function initializeReasonForVisit() {
-        if (reasonSelect) {
-            reasonSelect.addEventListener('change', function() {
-                toggleVaccinationDetails();
-                loadServiceForm(this.value);
             });
         }
     }
@@ -2119,23 +2517,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return container;
     }
 
-    function toggleVaccinationDetails() {
-        const vaccinationDetails = document.getElementById('vaccination-details');
-        const selectedReason = reasonSelect.value;
-        
-        if (vaccinationDetails) {
-            if (selectedReason === 'Vaccination') {
-                vaccinationDetails.style.display = 'block';
-                const requiredFields = vaccinationDetails.querySelectorAll('input, select');
-                requiredFields.forEach(field => field.setAttribute('required', ''));
-            } else {
-                vaccinationDetails.style.display = 'none';
-                const requiredFields = vaccinationDetails.querySelectorAll('input, select');
-                requiredFields.forEach(field => field.removeAttribute('required'));
-            }
-        }
-    }
-
     function updateOwnerDetails(owner) {
         const ownerDetailsContainer = document.getElementById('owner-details');
         if (ownerDetailsContainer) {
@@ -2190,58 +2571,522 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
+</script>
+@endpush
 
-    function loadServiceForm(serviceType) {
-        const formContainer = document.getElementById('service-details-container');
-        if (formContainer) {
-            formContainer.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div><p>Loading form...</p></div>';
+@push('page-scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.clear();
+    console.log('Starting fresh implementation of reason buttons');
+    
+    // Select the actual buttons directly from the DOM
+    const reasonBtns = Array.from(document.querySelectorAll('button.reason-btn'));
+    console.log('Found reason buttons:', reasonBtns.length, reasonBtns);
+    
+    if (reasonBtns.length === 0) {
+        console.error('ERROR: No reason buttons found! Check your HTML structure.');
+        return;
+    }
+    
+    // Important elements
+    const selectedReasonsDiv = document.getElementById('selected-reasons');
+    const emptyReasonText = document.getElementById('empty-reason-text');
+    const reasonInput = document.getElementById('reason_for_visit');
+    
+    if (!selectedReasonsDiv || !emptyReasonText || !reasonInput) {
+        console.error('ERROR: Missing required elements!', {
+            selectedReasonsDiv,
+            emptyReasonText,
+            reasonInput
+        });
+        return;
+    }
+    
+    // Track selected reasons
+    const selectedReasons = new Set();
+    
+    // Create direct click handlers for each button
+    reasonBtns.forEach(btn => {
+        const reason = btn.getAttribute('data-reason');
+        console.log(`Setting up button for: ${reason}`);
+        
+        // Remove any possible existing event listeners
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        // Add a clean click handler
+        newBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             
-            let formUrl = '';
-            switch(serviceType) {
-                case 'Vaccination':
-                    formUrl = '/appointment/forms/vaccination';
-                    break;
-                case 'Check-up':
-                case 'Consultation':
-                    formUrl = '/appointment/forms/checkup';
-                    break;
-                case 'Grooming':
-                    formUrl = '/appointment/forms/grooming';
-                    break;
-                case 'Surgery':
-                    formUrl = '/appointment/forms/surgery';
-                    break;
-                case 'Laboratory':
-                    formUrl = '/appointment/forms/laboratory';
-                    break;
+            console.log(`Button clicked: ${reason}`);
+            
+            if (this.classList.contains('active')) {
+                // Remove reason
+                this.classList.remove('active');
+                selectedReasons.delete(reason);
+                console.log(`Removed reason: ${reason}`);
+            } else {
+                // Add reason
+                this.classList.add('active');
+                selectedReasons.add(reason);
+                console.log(`Added reason: ${reason}`);
             }
             
-            if (formUrl) {
-                fetch(formUrl)
-                    .then(response => response.text())
-                    .then(html => {
-                        formContainer.innerHTML = html;
-                    })
-                    .catch(error => {
-                        console.error('Error loading service form:', error);
-                        formContainer.innerHTML = '<div class="alert alert-danger">Error loading form. Please try again.</div>';
-                    });
+            // Update hidden input
+            reasonInput.value = Array.from(selectedReasons).join(', ');
+            console.log('Updated input value:', reasonInput.value);
+            
+            // Update UI
+            renderSelectedReasons();
+            
+            return false;
+        };
+    });
+    
+    function renderSelectedReasons() {
+        selectedReasonsDiv.innerHTML = '';
+        
+        if (selectedReasons.size === 0) {
+            emptyReasonText.style.display = 'block';
+            return;
+        }
+        
+        emptyReasonText.style.display = 'none';
+        
+        // Create badges for each selected reason
+        Array.from(selectedReasons).forEach(reason => {
+            const badge = document.createElement('div');
+            badge.className = 'badge d-flex align-items-center gap-2';
+            badge.innerHTML = `
+                ${reason}
+                <button type="button" class="btn-close btn-close-white" aria-label="Remove"></button>
+            `;
+            
+            // Add remove button handler
+            badge.querySelector('.btn-close').onclick = function() {
+                selectedReasons.delete(reason);
+                
+                // Find and update corresponding button
+                const btn = document.querySelector(`button.reason-btn[data-reason="${reason}"]`);
+                if (btn) btn.classList.remove('active');
+                
+                // Update hidden input
+                reasonInput.value = Array.from(selectedReasons).join(', ');
+                
+                // Re-render UI
+                renderSelectedReasons();
+            };
+            
+            selectedReasonsDiv.appendChild(badge);
+        });
+    }
+    
+    // Debug click events
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('button.reason-btn');
+        if (target) {
+            console.log('Button click detected via event delegation:', target.getAttribute('data-reason'));
+        }
+    });
+    
+});
+</script>
+@endpush
+
+@push('page-scripts')
+// ... existing scripts ...
+
+<script>
+    // Pet History functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const petSelect = document.getElementById('pet_id');
+        const historyCard = document.getElementById('pet_history_card');
+        const historyLoading = document.getElementById('pet_history_loading');
+        const historyContent = document.getElementById('pet_history_content');
+        const noHistoryMessage = document.getElementById('no_history_message');
+        const appointmentList = document.getElementById('appointment_history_list');
+        
+        if (petSelect) {
+            petSelect.addEventListener('change', function() {
+                const petId = this.value;
+                
+                // Clear previous history
+                if (appointmentList) {
+                    appointmentList.innerHTML = '';
+                }
+                
+                // Hide the history card if no pet is selected
+                if (!petId) {
+                    if (historyCard) historyCard.style.display = 'none';
+                    if (historyLoading) historyLoading.style.display = 'none'; // Ensure loading is hidden
+                    return;
+                }
+                
+                // Fetch pet's history (past appointments and findings)
+                fetchPetHistory(petId);
+            });
+        }
+        
+        // Function to fetch pet history
+        function fetchPetHistory(petId) {
+            // Clear previous history
+            if (appointmentList) {
+                appointmentList.innerHTML = '';
+            }
+            
+            // Show history card
+            if (historyCard) historyCard.style.display = 'block';
+            
+            // Show loading state initially
+            if (historyLoading) historyLoading.style.display = 'flex';
+            if (historyContent) historyContent.style.display = 'none';
+            if (noHistoryMessage) noHistoryMessage.style.display = 'none';
+            
+            // Set a timeout to force-hide the loading spinner after 5 seconds
+            // This ensures it doesn't get stuck in a loading state
+            const loadingTimeout = setTimeout(() => {
+                console.log('Force-hiding loading spinner after timeout');
+                if (historyLoading) historyLoading.style.display = 'none';
+                if (historyContent) historyContent.style.display = 'block';
+            }, 5000);
+            
+            // Use the simplified endpoint
+            fetch(`/api/pets/${petId}/simple-history`)
+                .then(response => {
+                    // Check if we got HTML instead of JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!response.ok || !contentType || !contentType.includes('application/json')) {
+                        // Instead of throwing an error, just show "No history" message
+                        clearTimeout(loadingTimeout); // Clear the timeout
+                        forceHideLoading();
+                        showNoHistoryMessage();
+                        return null; // Return null to skip the next then block
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Clear the timeout since we got a response
+                    clearTimeout(loadingTimeout);
+                    
+                    // Always hide loading state here
+                    forceHideLoading();
+                    
+                    if (data) {
+                        displayPetHistory(data);
+                    }
+                })
+                .catch(error => {
+                    // Clear the timeout
+                    clearTimeout(loadingTimeout);
+                    
+                    // Hide loading state on error too
+                    forceHideLoading();
+                    
+                    console.error('Error fetching pet history:', error);
+                    showNoHistoryMessage();
+                });
+        }
+        
+        // Function to show "No history" message
+        function showNoHistoryMessage() {
+            if (historyLoading) historyLoading.style.display = 'none';
+            if (historyContent) historyContent.style.display = 'block';
+            if (noHistoryMessage) {
+                noHistoryMessage.style.display = 'block';
+                noHistoryMessage.textContent = 'No previous appointments or findings for this pet.';
             }
         }
+        
+        // Function to display pet history
+        function displayPetHistory(data) {
+            // Make absolutely sure loading is hidden and content is shown
+            forceHideLoading();
+            
+            // Handle case with no history or failed response
+            if (!data || !data.success || !data.appointments || data.appointments.length === 0) {
+                if (noHistoryMessage) {
+                    noHistoryMessage.style.display = 'block';
+                    noHistoryMessage.textContent = 'No previous appointments or findings for this pet.';
+                }
+                return;
+            }
+            
+            // Hide no history message
+            if (noHistoryMessage) noHistoryMessage.style.display = 'none';
+            
+            // Sort appointments by date (newest first)
+            const sortedAppointments = data.appointments.sort((a, b) => {
+                // Use appointment_date for sorting instead of scheduled_at
+                const dateA = new Date(a.appointment_date);
+                const dateB = new Date(b.appointment_date);
+                return dateB - dateA;
+            });
+            
+            // Display appointments with completed status
+            const completedAppointments = sortedAppointments.filter(app => app.status === 'completed');
+            
+            if (completedAppointments.length === 0) {
+                if (noHistoryMessage) noHistoryMessage.style.display = 'block';
+                if (noHistoryMessage) noHistoryMessage.textContent = 'No completed appointments found for this pet.';
+                return;
+            }
+            
+            // Populate the appointment list
+            completedAppointments.forEach(appointment => {
+                // Find findings for this appointment
+                const findings = data.findings ? data.findings.filter(f => f.appointment_id === appointment.id) : [];
+                
+                // Format the findings data for display
+                let findingsHtml = '';
+                if (findings.length > 0) {
+                    findings.forEach(finding => {
+                        // Diagnosis
+                        if (finding.diagnosis) {
+                            findingsHtml += `<div><strong>Diagnosis:</strong> ${finding.diagnosis}</div>`;
+                        }
+                        
+                        // Recommendations
+                        if (finding.recommendations) {
+                            findingsHtml += `<div><strong>Recommendations:</strong> ${finding.recommendations}</div>`;
+                        }
+                        
+                        // Treatment plan
+                        if (finding.treatment_plan) {
+                            findingsHtml += `<div><strong>Treatment:</strong> ${finding.treatment_plan}</div>`;
+                        }
+                    });
+                } else {
+                    findingsHtml = '<em>No detailed findings recorded</em>';
+                }
+                
+                // Format appointment date - handle different date formats
+                let formattedDate = 'N/A';
+                let formattedTime = '';
+                
+                try {
+                    // Try to parse the date from appointment_date
+                    if (appointment.appointment_date) {
+                        const dateParts = appointment.appointment_date.split('-');
+                        if (dateParts.length === 3) {
+                            const year = parseInt(dateParts[0]);
+                            const month = parseInt(dateParts[1]) - 1; // JS months are 0-indexed
+                            const day = parseInt(dateParts[2]);
+                            
+                            const dateObj = new Date(year, month, day);
+                            
+                            formattedDate = dateObj.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                            });
+                        }
+                    }
+                    
+                    // Format time if available
+                    if (appointment.appointment_time) {
+                        formattedTime = appointment.appointment_time;
+                    }
+                } catch (e) {
+                    console.warn('Error formatting date:', e);
+                }
+                
+                // Format reason for visit
+                let reasonText = '';
+                try {
+                    const reasons = typeof appointment.reason_for_visit === 'string' 
+                        ? JSON.parse(appointment.reason_for_visit) 
+                        : appointment.reason_for_visit;
+                    
+                    reasonText = Array.isArray(reasons) ? reasons.join(', ') : reasons;
+                } catch (e) {
+                    reasonText = appointment.reason_for_visit || 'Not specified';
+                }
+                
+                // Create table row - show findings directly instead of using a button
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formattedDate}<br><small class="text-muted">${formattedTime}</small></td>
+                    <td>${reasonText}</td>
+                    <td><span class="badge bg-success text-white">Completed</span></td>
+                    <td>
+                        <div class="findings-content">
+                            ${findingsHtml}
+                        </div>
+                    </td>
+                `;
+                
+                appointmentList.appendChild(row);
+            });
+        }
+    });
+
+    // Add this helper function to force-hide the loading state
+    function forceHideLoading() {
+        console.log('Force-hiding loading spinner with aggressive approach');
+        
+        // Try multiple approaches to ensure the spinner is gone
+        
+        // 1. Try to get the element by ID
+        const loadingElement = document.getElementById('pet_history_loading');
+        if (loadingElement) {
+            // First try to hide it
+            loadingElement.style.display = 'none';
+            
+            // Then try to remove it completely from the DOM
+            try {
+                loadingElement.parentNode.removeChild(loadingElement);
+                console.log('Successfully removed loading element from DOM');
+            } catch (e) {
+                console.error('Failed to remove loading element:', e);
+            }
+        }
+        
+        // 2. Try using querySelector as a backup
+        const loadingElementAlt = document.querySelector('#pet_history_loading');
+        if (loadingElementAlt && loadingElementAlt !== loadingElement) {
+            loadingElementAlt.style.display = 'none';
+            try {
+                loadingElementAlt.parentNode.removeChild(loadingElementAlt);
+            } catch (e) {
+                console.error('Failed to remove loading element (alt):', e);
+            }
+        }
+        
+        // 3. Try to find all elements with similar classes
+        const spinners = document.querySelectorAll('.spinner-border');
+        spinners.forEach(spinner => {
+            const parent = spinner.closest('#pet_history_loading');
+            if (parent) {
+                parent.style.display = 'none';
+                try {
+                    parent.parentNode.removeChild(parent);
+                } catch (e) {
+                    console.error('Failed to remove spinner parent:', e);
+                }
+            }
+        });
+        
+        // 4. Show the content
+        const contentElement = document.getElementById('pet_history_content');
+        if (contentElement) {
+            contentElement.style.display = 'block';
+        }
+        
+        // 5. Add a direct style to the document to hide all loading spinners
+        const style = document.createElement('style');
+        style.textContent = `
+            #pet_history_loading { 
+                display: none !important; 
+                visibility: hidden !important;
+                opacity: 0 !important;
+                height: 0 !important;
+                overflow: hidden !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Update the pet selection event listener
+    if (petSelect) {
+        petSelect.addEventListener('change', function() {
+            const petId = this.value;
+            
+            // Get the parent container that holds the history card
+            const historyCardContainer = document.getElementById('pet_history_card').parentNode;
+            
+            // Remove the existing history card completely
+            if (historyCard) {
+                historyCard.remove();
+            }
+            
+            // Hide the history card if no pet is selected
+            if (!petId) {
+                return;
+            }
+            
+            // Create a new history card from scratch
+            const newHistoryCard = document.createElement('div');
+            newHistoryCard.id = 'pet_history_card';
+            newHistoryCard.className = 'col-12';
+            newHistoryCard.style.marginBottom = '1.5rem';
+            
+            newHistoryCard.innerHTML = `
+                <div class="card">
+                    <div class="card-header bg-primary-soft d-flex align-items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-history" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 8l0 4l2 2"></path>
+                            <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
+                        </svg>
+                        <h3 class="card-title mb-0">Pet History</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="pet_history_content">
+                            <div id="no_history_message" class="alert alert-info m-3" style="display: none;">
+                                No previous appointments or findings for this pet.
+                            </div>
+                            <div id="appointment_history_container">
+                                <div class="table-responsive">
+                                    <table class="table table-vcenter card-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Reason</th>
+                                                <th>Status</th>
+                                                <th>Findings</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="appointment_history_list">
+                                            <!-- Appointment history will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add the new card to the container
+            historyCardContainer.appendChild(newHistoryCard);
+            
+            // Update references to the new elements
+            historyCard = document.getElementById('pet_history_card');
+            historyContent = document.getElementById('pet_history_content');
+            noHistoryMessage = document.getElementById('no_history_message');
+            appointmentList = document.getElementById('appointment_history_list');
+            
+            // Fetch pet's history without showing a loading spinner
+            fetchPetHistoryWithoutLoading(petId);
+        });
+    }
+
+    // Add a new function that fetches history without showing a loading spinner
+    function fetchPetHistoryWithoutLoading(petId) {
+        // Use the simplified endpoint
+        fetch(`/api/pets/${petId}/simple-history`)
+            .then(response => {
+                // Check if we got HTML instead of JSON
+                const contentType = response.headers.get('content-type');
+                if (!response.ok || !contentType || !contentType.includes('application/json')) {
+                    showNoHistoryMessage();
+                    return null;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    displayPetHistory(data);
+                } else {
+                    showNoHistoryMessage();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching pet history:', error);
+                showNoHistoryMessage();
+            });
     }
 </script>
 @endpush
-</script>
-
-@if(isset($pet))
-    <div class="alert alert-info">
-        <p>Debug Info:</p>
-        <ul>
-            <li>Pet ID: {{ $pet->id }}</li>
-            <li>Pet Name: {{ $pet->name }}</li>
-            <li>Vaccination Count: {{ $pet->vaccinations()->count() }}</li>
-            <li>Vaccinations: <pre>{{ json_encode($pet->vaccinations()->get(), JSON_PRETTY_PRINT) }}</pre></li>
-            <li>Raw Query: <pre>SELECT * FROM appt_vaccinations WHERE pet_id = {{ $pet->id }} ORDER BY date_given DESC</pre></li>
-        </ul>
-    </div>
-@endif

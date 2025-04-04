@@ -338,3 +338,80 @@
         width: 60%;
     }
 }
+
+/* Extra strong button styles to ensure they override any other styles */
+.reason-btn {
+    position: relative;
+    transition: all 0.3s ease !important;
+    overflow: visible !important;
+    cursor: pointer !important;
+    z-index: 100 !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #ced4da !important;
+    padding: 0.5rem 1rem !important;
+    margin-bottom: 0.5rem !important;
+    min-width: 120px !important;
+    text-align: center !important;
+}
+
+.reason-btn:hover {
+    background-color: #e9ecef !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+}
+
+.reason-btn.active {
+    background-color: #0d6efd !important;
+    color: white !important;
+    border-color: #0953c6 !important;
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.4) !important;
+    transform: translateY(-3px) !important;
+}
+
+.reason-btn.active svg {
+    stroke: white !important;
+}
+
+/* Add a visual indicator for the active state */
+.reason-btn.active::before {
+    content: "✓";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #198754;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Styling for the selected reasons box */
+.selected-reasons-box {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    min-height: 50px;
+}
+
+#selected-reasons .badge {
+    background-color: #206bc4;
+    color: white;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 8px 12px;
+}
+
+#empty-reason-text {
+    color: #6c757d;
+    font-style: italic;
+}

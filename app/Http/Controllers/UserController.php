@@ -91,27 +91,34 @@ class UserController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
     
-        // Handle file upload
-        $photoPath = null;
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('user_photos', 'public');
+            $photo = $request->file('photo');
+            
+            // Store locally
+            $filename = 'user_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+            $localPath = 'user_photos/' . $filename;
+            $photo->storeAs('public/' . 'user_photos', $filename);
+            
+            // Read file contents for database storage
+            $photoData = file_get_contents($photo->getRealPath());
+            
+            // Create user with both photo storage methods
+            $user = User::create([
+                'username' => $request->username,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone ?? 'N/A',
+                'pet_name' => $request->pet_name ?? 'N/A',
+                'pet_type' => $request->pet_type ?? 'N/A',
+                'store_name' => $request->store_name ?? 'N/A',
+                'store_address' => $request->store_address ?? 'N/A',
+                'store_email' => $request->store_email ?? 'N/A',
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+                'photo' => $localPath,  // Store the file path
+                'photo_data' => $photoData  // Store the binary data
+            ]);
         }
-    
-        // Create the user
-        User::create([
-            'username' => $request->username,
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone ?? 'N/A',
-            'pet_name' => $request->pet_name ?? 'N/A',
-            'pet_type' => $request->pet_type ?? 'N/A',
-            'store_name' => $request->store_name ?? 'N/A',
-            'store_address' => $request->store_address ?? 'N/A',
-            'store_email' => $request->store_email ?? 'N/A',
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'photo' => $photoPath,
-        ]);
     
         return redirect()->route('user-management.index')->with('success', 'User created successfully.');
     }
@@ -152,8 +159,19 @@ class UserController extends Controller
                 Storage::disk('public')->delete($user->photo);
             }
             
-            // Store new photo
-            $user->photo = $request->file('photo')->store('user_photos', 'public');
+            $photo = $request->file('photo');
+            
+            // Store locally
+            $filename = 'user_' . time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+            $localPath = 'user_photos/' . $filename;
+            $photo->storeAs('public/' . 'user_photos', $filename);
+            
+            // Read file contents for database storage
+            $photoData = file_get_contents($photo->getRealPath());
+            
+            // Update photo fields
+            $user->photo = $localPath;
+            $user->photo_data = $photoData;
         }
 
         // Update user fields
@@ -161,6 +179,13 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
+        $user->role = $request->role;
+        
+        // Update password if provided
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+        
         $user->save();
 
         return redirect()

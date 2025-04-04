@@ -12,9 +12,13 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form action="{{ route('pets.update', $pet->id) }}" method="POST" enctype="multipart/form-data" id="petForm">
+                    <form action="{{ route('pets.update', $pet->id) }}" method="POST" enctype="multipart/form-data" id="petForm" data-binary="true">
                         @csrf
                         @method('PUT')
+
+                        @if($pet->photo_data)
+                            <input type="hidden" name="original_photo_data" value="1">
+                        @endif
 
                         <!-- Pet Owner Selection -->
                         <div class="row mb-4">
@@ -242,21 +246,88 @@
 </style>
 
 <script>
+document.getElementById('petForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalBtnContent = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+        <div class="spinner-border spinner-border-sm text-white" role="status">
+            <span class="visually-hidden">Saving...</span>
+        </div>
+        Saving...
+    `;
+
+    fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            Swal.fire({
+                title: 'Success!',
+                text: 'Pet details updated successfully',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = '{{ route("pets.index") }}';
+            });
+        } else {
+            throw new Error(data.message || 'Failed to update pet');
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            title: 'Error!',
+            text: error.message || 'Something went wrong',
+            icon: 'error'
+        });
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnContent;
+    });
+});
+
 function previewImage(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('preview').src = e.target.result;
             document.getElementById('removePhoto').value = '0';
+            
+            // Store the binary data in a hidden input
+            let binaryInput = document.querySelector('input[name="photo_data"]');
+            if (!binaryInput) {
+                binaryInput = document.createElement('input');
+                binaryInput.type = 'hidden';
+                binaryInput.name = 'photo_data';
+                document.getElementById('petForm').appendChild(binaryInput);
+            }
+            binaryInput.value = e.target.result.split(',')[1];
         }
         reader.readAsDataURL(input.files[0]);
     }
 }
 
 function removePhoto() {
-    document.getElementById('preview').src = "{{ asset('images/default-pet.png') }}";
+    document.getElementById('preview').src = "{{ asset('storage/defaults/paw.png') }}";
     document.getElementById('removePhoto').value = '1';
     document.getElementById('photo').value = '';
+    
+    // Also clear the photo_data input if it exists
+    const photoDataInput = document.querySelector('input[name="photo_data"]');
+    if (photoDataInput) {
+        photoDataInput.value = '';
+    }
 }
 
 document.getElementById('ownerSelect').addEventListener('change', function() {

@@ -1426,6 +1426,205 @@
                 padding-left: 0.5rem;
             }
         }
+
+        /* Ensure dropdowns display correctly */
+        .dropdown-menu {
+            display: none;
+            position: absolute !important;
+            z-index: 9999 !important;
+        }
+        
+        .dropdown-menu.show {
+            display: block !important;
+        }
+        
+        /* Fix any positioning issues */
+        .nav-item.dropdown {
+            position: relative !important;
+        }
+        
+        /* Ensure clickable area */
+        .user-menu {
+            cursor: pointer;
+        }
+
+        /* Enhanced dropdown menu styling */
+        .dropdown-menu {
+            display: none;
+            position: absolute !important;
+            z-index: 9999 !important;
+            min-width: 220px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 8px;
+            margin-top: 8px;
+            transform-origin: top right;
+            animation: dropdown-animation 0.2s ease forwards;
+            background-color: white;
+        }
+        
+        /* Animation for dropdown */
+        @keyframes dropdown-animation {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        [data-bs-theme="dark"] .dropdown-menu {
+            background-color: #2a2e37;
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        .dropdown-menu.show {
+            display: block !important;
+        }
+        
+        /* Improved dropdown items */
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 10px 12px;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            color: #3A4652;
+            font-weight: 500;
+        }
+        
+        .dropdown-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(58, 70, 82, 0.08);
+            transform: translateX(3px);
+        }
+        
+        [data-bs-theme="dark"] .dropdown-item {
+            color: rgba(255,255,255,0.85);
+        }
+        
+        [data-bs-theme="dark"] .dropdown-item:hover {
+            background-color: rgba(255,255,255,0.08);
+        }
+        
+        /* Dropdown item icons */
+        .dropdown-item-icon {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            color: #6c7a89;
+        }
+        
+        [data-bs-theme="dark"] .dropdown-item-icon {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* Divider styling */
+        .dropdown-divider {
+            margin: 8px 0;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        
+        [data-bs-theme="dark"] .dropdown-divider {
+            border-top-color: rgba(255,255,255,0.08);
+        }
+        
+        /* User menu trigger styling */
+        .user-menu {
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .user-menu:hover {
+            background-color: rgba(0,0,0,0.04);
+        }
+        
+        [data-bs-theme="dark"] .user-menu:hover {
+            background-color: rgba(255,255,255,0.08);
+        }
+        
+        /* Avatar styling improvements */
+        .avatar.avatar-sm {
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            width: 36px;
+            height: 36px;
+        }
+        
+        [data-bs-theme="dark"] .avatar.avatar-sm {
+            border-color: #2a2e37;
+        }
+        
+        /* User info text improvements */
+        .user-info {
+            line-height: 1.3;
+        }
+        
+        .user-info .fw-bold {
+            font-weight: 600 !important;
+            font-size: 14px;
+        }
+        
+        .user-info .small {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        /* Fix any positioning issues */
+        .nav-item.dropdown {
+            position: relative !important;
+        }
+
+        /* Add this to your styles section to make the logout button distinctive */
+        .logout-item {
+            color: #e63946 !important;
+        }
+        
+        .logout-item .dropdown-item-icon {
+            color: #e63946 !important;
+        }
+        
+        .logout-item:hover {
+            background-color: rgba(230, 57, 70, 0.08) !important;
+        }
+
+        /* Add these styles to fix the form display issue */
+        /* Fix logout form display */
+        #logout-form {
+            margin: 0;
+            padding: 0;
+            display: contents; /* Makes the form disappear from the flow */
+        }
+        
+        /* Ensure button fills the entire width */
+        #logout-form button {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            margin: 0;
+            padding: 10px 12px;
+        }
+        
+        /* Fix any outline issues */
+        #logout-form button:focus {
+            outline: none;
+        }
+        
+        /* Ensure the form doesn't show up in DevTools visual overlay */
+        #logout-form::before,
+        #logout-form::after {
+            display: none !important;
+        }
     </style>
 
     {{-- - Page Styles - --}}
@@ -1514,7 +1713,7 @@
                             
                             <!-- User Menu -->
                             <div class="nav-item dropdown">
-                                <a href="#" class="nav-link d-flex lh-1 text-reset p-0 user-menu" data-bs-toggle="dropdown">
+                                <a href="#" class="nav-link d-flex lh-1 text-reset p-0 user-menu" data-bs-toggle="dropdown" aria-expanded="false" onclick="console.log('User menu clicked')">
                                     @auth
                                         <span class="avatar avatar-sm" style="background-image: url('{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('assets/img2/default-avatar.png') }}')"></span>
                                         <div class="d-none d-xl-block ps-2 user-info">
@@ -1538,26 +1737,26 @@
                                             </svg>
                                             Account Settings
                                         </a>
-                                        <form action="{{ route('logout') }}" method="post">
+                                        <form action="{{ route('logout') }}" method="post" id="logout-form">
                                             @csrf
-                                            <button type="submit" class="dropdown-item">
+                                            <button type="submit" class="dropdown-item logout-item" onclick="console.log('Logout clicked')">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/>
                                                     <path d="M9 12h12l-3-3"/>
                                                     <path d="M18 15l3-3"/>
                                                 </svg>
-                                                Logout
+                                                <span>Logout</span>
                                             </button>
                                         </form>
                                     @else
-                                        <a href="{{ route('login') }}" class="dropdown-item">
+                                        <a href="{{ route('login') }}" class="dropdown-item" onclick="console.log('Login clicked')">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/>
                                                 <path d="M20 12h-13l3-3m0 6l-3-3"/>
                                             </svg>
                                             Login
                                         </a>
-                                        <a href="{{ route('register') }}" class="dropdown-item">
+                                        <a href="{{ route('register') }}" class="dropdown-item" onclick="console.log('Register clicked')">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/>
                                                 <path d="M16 19h6"/>
@@ -2037,6 +2236,84 @@
 
     <!-- Add SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Add this just before the closing </body> tag -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Log when user menu elements are found
+        const userMenu = document.querySelector('.user-menu');
+        console.log('User menu element found:', userMenu !== null);
+        
+        // Manually initialize Bootstrap dropdown
+        if (userMenu) {
+            // First ensure we have Bootstrap dropdown available
+            if (typeof bootstrap !== 'undefined') {
+                console.log('Bootstrap is available:', typeof bootstrap.Dropdown);
+                
+                // Create dropdown instance
+                const dropdown = new bootstrap.Dropdown(userMenu);
+                
+                // Track dropdown state
+                let dropdownVisible = false;
+                
+                userMenu.addEventListener('click', function(e) {
+                    console.log('User menu clicked via event listener');
+                    e.preventDefault(); // Prevent default action
+                    
+                    // Get the dropdown menu element
+                    const dropdownMenu = this.nextElementSibling || 
+                                        this.parentNode.querySelector('.dropdown-menu');
+                                        
+                    if (!dropdownMenu) {
+                        console.error('Dropdown menu element not found');
+                        return;
+                    }
+                    
+                    // Check current state and toggle
+                    if (dropdownMenu.classList.contains('show')) {
+                        console.log('Dropdown is visible, hiding it');
+                        dropdown.hide();
+                        dropdownVisible = false;
+                    } else {
+                        console.log('Dropdown is hidden, showing it');
+                        dropdown.show();
+                        dropdownVisible = true;
+                    }
+                    
+                    // Log the state after toggle
+                    setTimeout(() => {
+                        console.log('Dropdown visible state:', dropdownMenu.classList.contains('show'));
+                    }, 100);
+                });
+                
+                // Add a click handler to the document to close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (dropdownVisible && !userMenu.contains(e.target) && 
+                        !document.querySelector('.dropdown-menu').contains(e.target)) {
+                        dropdown.hide();
+                        dropdownVisible = false;
+                    }
+                });
+            } else {
+                console.error('Bootstrap is not available!');
+            }
+        }
+        
+        // Check if the logout form exists
+        const logoutForm = document.getElementById('logout-form');
+        console.log('Logout form found:', logoutForm !== null);
+        
+        // Check for any z-index issues in dropdown menu
+        const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+        dropdownMenus.forEach(menu => {
+            const zIndex = window.getComputedStyle(menu).zIndex;
+            console.log('Dropdown menu z-index:', zIndex);
+            
+            // Ensure high z-index
+            menu.style.zIndex = '9999';
+        });
+    });
+    </script>
 </body>
 
 </html>

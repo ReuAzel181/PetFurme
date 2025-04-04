@@ -54,6 +54,8 @@ use App\Http\Controllers\CheckupHistoryController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ChargeSlipController;
 
+use Illuminate\Support\Facades\Gate;
+
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 Route::get('/messages/chat/{id}', [MessageController::class, 'chat'])->name('messages.chat');
 Route::get('/messages/users', [MessageController::class, 'showUsers'])->name('messages.users');
@@ -773,7 +775,51 @@ Route::post('/appointments/archive-past', [AppointmentController::class, 'archiv
 
 Route::post('/charge-slips', [ChargeSlipController::class, 'store'])->name('charge-slips.store');
 
-Route::middleware(['auth', 'can:manage-pets'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::resource('pets', PetController::class);
-    // Add any other pet-related routes here
+    // Add any other pet-related routes here that should be accessible to all users
+});
+
+// Add this route to your web.php file
+Route::post('/appointment/{appointment}/send-reminder', [App\Http\Controllers\AppointmentController::class, 'sendReminder'])
+    ->name('appointment.sendReminder');
+
+// Temporary debug route - remove after fixing
+Route::get('/pets-debug', function() {
+    // Check if user is authenticated
+    if (auth()->check()) {
+        return "Logged in as: " . auth()->user()->email . 
+               " with ID: " . auth()->user()->id;
+    }
+    return "Not logged in";
+});
+
+// Permission debug route - remove after fixing
+Route::get('/permissions-debug', function() {
+    if (!auth()->check()) {
+        return "Not logged in";
+    }
+    
+    $user = auth()->user();
+    $gates = [
+        'manage-pets' => Gate::allows('manage-pets'),
+        'view-pets' => Gate::allows('view-pets'),
+        'create-pets' => Gate::allows('create-pets'),
+        'update-pets' => Gate::allows('update-pets'),
+        'delete-pets' => Gate::allows('delete-pets'),
+    ];
+    
+    return [
+        'user' => [
+            'id' => $user->id,
+            'email' => $user->email,
+            'role' => $user->role ?? 'No role assigned',
+        ],
+        'permissions' => $gates
+    ];
+});
+
+// Temporary workaround to access pets without permission checks
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pets-noauth', [PetController::class, 'index'])->name('pets.noauth');
 });

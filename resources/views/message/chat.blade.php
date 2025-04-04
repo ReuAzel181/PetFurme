@@ -34,10 +34,26 @@
                             @foreach ($users as $user)
                                 <a href="{{ route('messages.chat', $user->id) }}" class="chat-user-item d-flex align-items-center text-decoration-none text-dark p-4 border-bottom hover-bg-light {{ $user->id == $receiver->id ? 'active' : '' }}">
                                     <div class="me-3 position-relative">
-                                        @if($user->photo)
-                                            <img src="{{ asset('storage/' . $user->photo) }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm" width="64" height="64" style="object-fit: cover;">
+                                        @if($user->photo_data)
+                                            <img src="data:image/jpeg;base64,{{ base64_encode($user->photo_data) }}" 
+                                                 alt="{{ $user->name }}" 
+                                                 class="rounded-circle shadow-sm" 
+                                                 width="64" 
+                                                 height="64" 
+                                                 style="object-fit: cover;">
+                                        @elseif($user->photo)
+                                            <img src="{{ asset('storage/' . $user->photo) }}" 
+                                                 alt="{{ $user->name }}" 
+                                                 class="rounded-circle shadow-sm" 
+                                                 width="64" 
+                                                 height="64" 
+                                                 style="object-fit: cover;">
                                         @else
-                                            <img src="{{ asset('assets/img/default-avatar.png') }}" alt="No Profile" class="rounded-circle shadow-sm" width="64" height="64">
+                                            <img src="{{ asset('assets/img/default-avatar.png') }}" 
+                                                 alt="No Profile" 
+                                                 class="rounded-circle shadow-sm" 
+                                                 width="64" 
+                                                 height="64">
                                         @endif
                                     </div>    
                                     <div class="flex-grow-1 min-width-0">
@@ -65,10 +81,26 @@
                         <div class="chat-header bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
-                                    @if($receiver->photo)
-                                        <img src="{{ asset('storage/' . $receiver->photo) }}" alt="{{ $receiver->name }}" class="rounded-circle shadow-sm" width="64" height="64" style="object-fit: cover;">
+                                    @if($receiver->photo_data)
+                                        <img src="data:image/jpeg;base64,{{ base64_encode($receiver->photo_data) }}" 
+                                             alt="{{ $receiver->name }}" 
+                                             class="rounded-circle shadow-sm" 
+                                             width="64" 
+                                             height="64" 
+                                             style="object-fit: cover;">
+                                    @elseif($receiver->photo)
+                                        <img src="{{ asset('storage/' . $receiver->photo) }}" 
+                                             alt="{{ $receiver->name }}" 
+                                             class="rounded-circle shadow-sm" 
+                                             width="64" 
+                                             height="64" 
+                                             style="object-fit: cover;">
                                     @else
-                                        <img src="{{ asset('assets/img/default-avatar.png') }}" alt="No Profile" class="rounded-circle shadow-sm" width="64" height="64">
+                                        <img src="{{ asset('assets/img/default-avatar.png') }}" 
+                                             alt="No Profile" 
+                                             class="rounded-circle shadow-sm" 
+                                             width="64" 
+                                             height="64">
                                     @endif
                                 </div>
                                 <div>
@@ -82,15 +114,72 @@
                         <div class="chat-body flex-grow-1 p-4" style="background-color: #f8f9fa; overflow-y: auto;">
                             <div class="chat-messages" style="display: flex; flex-direction: column;">
                                 @foreach($messages as $message)
-                                    <div class="chat-bubble mb-3 {{ $message->sender_id === auth()->id() ? 'chat-bubble-me ms-auto' : '' }}" 
-                                         style="max-width: 80%; width: fit-content; {{ $message->sender_id === auth()->id() ? 'background-color: #206bc4; color: white;' : 'background-color: #fff;' }}">
-                                        <div class="chat-bubble-body">
-                                            {{ $message->message }}
+                                    <div class="chat-bubble mb-3 d-flex {{ $message->sender_id === auth()->id() ? 'flex-row-reverse ms-auto' : '' }}" 
+                                         style="max-width: 80%; width: fit-content; gap: 10px; align-items: flex-end;">
+                                        <!-- User Avatar -->
+                                        <div class="chat-avatar" style="min-width: 32px;">
+                                            @if($message->sender_id === auth()->id())
+                                                @if(auth()->user()->photo_data)
+                                                    <img src="data:image/jpeg;base64,{{ base64_encode(auth()->user()->photo_data) }}"
+                                                         alt="{{ auth()->user()->name }}"
+                                                         class="rounded-circle"
+                                                         width="32"
+                                                         height="32"
+                                                         style="object-fit: cover;">
+                                                @elseif(auth()->user()->photo)
+                                                    <img src="{{ asset('storage/' . auth()->user()->photo) }}"
+                                                         alt="{{ auth()->user()->name }}"
+                                                         class="rounded-circle"
+                                                         width="32"
+                                                         height="32"
+                                                         style="object-fit: cover;">
+                                                @else
+                                                    <img src="{{ asset('assets/img/default-avatar.png') }}"
+                                                         alt="No Profile"
+                                                         class="rounded-circle"
+                                                         width="32"
+                                                         height="32">
+                                                @endif
+                                            @else
+                                                @if($receiver->photo_data)
+                                                    <img src="data:image/jpeg;base64,{{ base64_encode($receiver->photo_data) }}"
+                                                         alt="{{ $receiver->name }}"
+                                                         class="rounded-circle"
+                                                         width="32"
+                                                         height="32"
+                                                         style="object-fit: cover;">
+                                                @elseif($receiver->photo)
+                                                    <img src="{{ asset('storage/' . $receiver->photo) }}"
+                                                         alt="{{ $receiver->name }}"
+                                                         class="rounded-circle"
+                                                         width="32"
+                                                         height="32"
+                                                         style="object-fit: cover;">
+                                                @else
+                                                    <img src="{{ asset('assets/img/default-avatar.png') }}"
+                                                         alt="No Profile"
+                                                         class="rounded-circle"
+                                                         width="32"
+                                                         height="32">
+                                                @endif
+                                            @endif
                                         </div>
-                                        <div class="chat-bubble-footer mt-2">
-                                            <small class="{{ $message->sender_id === auth()->id() ? 'text-white-50' : 'text-muted' }}">
-                                                {{ $message->created_at->format('M d, Y h:i A') }}
-                                            </small>
+
+                                        <!-- Message Content -->
+                                        <div class="chat-bubble-content" 
+                                             style="{{ $message->sender_id === auth()->id() ? 'background-color: #206bc4; color: white;' : 'background-color: #fff;' }} 
+                                                    padding: 0.75rem 1rem; 
+                                                    border-radius: 1rem;
+                                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                            <div class="chat-bubble-body">
+                                                {{ $message->message }}
+                                            </div>
+                                            <div class="chat-bubble-footer mt-1">
+                                                <small class="{{ $message->sender_id === auth()->id() ? 'text-white-50' : 'text-muted' }}" 
+                                                       style="font-size: 0.75rem;">
+                                                    {{ $message->created_at->format('h:i A') }}
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -216,20 +305,26 @@
         height: 85px;
     }
     .chat-bubble {
-        padding: 1rem;
-        border-radius: 1rem;
+        position: relative;
+    }
+    
+    .chat-avatar img {
+        border: 2px solid #fff;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .chat-bubble-me {
-        border-bottom-right-radius: 0.25rem;
+
+    .chat-bubble-content {
+        position: relative;
     }
-    .chat-bubble:not(.chat-bubble-me) {
-        border-bottom-left-radius: 0.25rem;
+
+    /* Sender's message */
+    .flex-row-reverse .chat-bubble-content {
+        border-bottom-right-radius: 0.25rem !important;
     }
-    .chat-messages {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+
+    /* Receiver's message */
+    .chat-bubble:not(.flex-row-reverse) .chat-bubble-content {
+        border-bottom-left-radius: 0.25rem !important;
     }
 </style>
 @endsection

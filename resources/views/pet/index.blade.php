@@ -50,7 +50,7 @@
                             </svg>
                             Pending Verification
                             @if($pendingPets->isNotEmpty())
-                                <span class="badge bg-red badge-notification badge-pill position-absolute top-0 start-100 translate-middle">
+                                <span class="badge bg-red text-white badge-notification badge-pill position-absolute top-0 start-100 translate-middle d-flex align-items-center justify-content-center" style="width: 20px; height: 20px;">
                                     {{ $pendingPets->count() }}
                                 </span>
                             @endif
@@ -108,7 +108,7 @@
                                             <th>Category</th>
                                             <th>Verified By</th>
                                             <th>Status</th>
-                                            <th class="w-1"></th>
+                                            <th class="w-1">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -143,8 +143,8 @@
                                                     <span class="badge bg-success">Verified</span>
                                                 </td>
                                                 <td>
-                                                    <div class="btn-group">
-                                                        <a href="{{ route('pets.edit', $pet['id']) }}" class="btn btn-icon btn-outline-primary">
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ route('pets.edit', $pet['id']) }}" class="btn btn-icon btn-warning">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                                                 <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
@@ -152,6 +152,16 @@
                                                                 <path d="M16 5l3 3" />
                                                             </svg>
                                                         </a>
+                                                        <button onclick="deletePet({{ $pet['id'] }})" class="btn btn-icon btn-danger">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                <path d="M4 7l16 0" />
+                                                                <path d="M10 11l0 6" />
+                                                                <path d="M14 11l0 6" />
+                                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                                            </svg>
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -188,7 +198,7 @@
                                             <th>Category</th>
                                             <th>Added By</th>
                                             <th>Status</th>
-                                            <th class="w-1"></th>
+                                            <th class="w-1">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -218,16 +228,36 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <span class="badge bg-yellow">Pending</span>
+                                                    <span class="badge bg-yellow text-white">Pending</span>
                                                 </td>
                                                 <td>
-                                                    <button onclick="verifyPet({{ $pet['id'] }})" class="btn btn-success">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
-                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                            <path d="M5 12l5 5l10 -10" />
-                                                        </svg>
-                                                        Verify
-                                                    </button>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ route('pets.edit', $pet['id']) }}" class="btn btn-icon btn-warning">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                                                                <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+                                                                <path d="M16 5l3 3" />
+                                                            </svg>
+                                                        </a>
+                                                        <button onclick="deletePet({{ $pet['id'] }})" class="btn btn-icon btn-danger">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                <path d="M4 7l16 0" />
+                                                                <path d="M10 11l0 6" />
+                                                                <path d="M14 11l0 6" />
+                                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                                            </svg>
+                                                        </button>
+                                                        <button onclick="verifyPet({{ $pet['id'] }})" class="btn btn-success d-flex align-items-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                                                <path d="M5 12l5 5l10 -10" />
+                                                            </svg>
+                                                            Verify
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -629,6 +659,29 @@
 .gap-1 {
     gap: 0.25rem !important;
 }
+
+.badge-notification {
+    min-width: 20px;
+    min-height: 20px;
+    padding: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.btn-outline-warning {
+    color: #f59f00;
+    border-color: #f59f00;
+}
+
+.btn-outline-warning:hover {
+    color: #fff;
+    background-color: #f59f00;
+    border-color: #f59f00;
+}
+
+.badge.bg-yellow {
+    background-color: #f59f00 !important;
+}
 </style>
 
 @push('scripts')
@@ -711,6 +764,85 @@ function verifyPet(petId) {
         button.innerHTML = originalContent;
         alert('Failed to verify pet. Please try again.');
         console.error('Error:', error);
+    });
+}
+
+function deletePet(petId) {
+    if (!confirm('Are you sure you want to delete this pet?')) {
+        return;
+    }
+
+    // Get the pet name for the toast message
+    const petRow = event.target.closest('tr');
+    const petName = petRow ? petRow.querySelector('.font-weight-medium')?.textContent.trim() : 'Pet';
+
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = `
+        <div class="spinner-border spinner-border-sm text-white" role="status">
+            <span class="visually-hidden">Deleting...</span>
+        </div>
+    `;
+
+    fetch(`/pets/${petId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Show success toast with pet name
+        const toast = document.createElement('div');
+        toast.className = 'toast position-fixed top-0 end-0 m-3';
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>${petName}</strong> has been successfully deleted from the system.
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+
+        // Refresh the page after a short delay
+        setTimeout(() => window.location.reload(), 1500);
+    })
+    .catch(error => {
+        button.disabled = false;
+        button.innerHTML = originalContent;
+        
+        // Show error toast but still refresh since deletion might have succeeded
+        const toast = document.createElement('div');
+        toast.className = 'toast position-fixed top-0 end-0 m-3';
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="toast-header bg-warning text-white">
+                <strong class="me-auto">Notice</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                <i class="fas fa-sync-alt me-2"></i>
+                The page will refresh to show updated pet list.
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        console.error('Error:', error);
+        
+        // Still refresh the page as the deletion might have succeeded
+        setTimeout(() => window.location.reload(), 2000);
     });
 }
 </script>

@@ -26,7 +26,8 @@ class AuthServiceProvider extends ServiceProvider
 
         // Add a gate for managing pets
         Gate::define('manage-pets', function ($user) {
-            return in_array($user->role, ['admin', 'staff']); // Adjust roles as needed
+            // Add more roles as needed
+            return in_array($user->role, ['admin', 'staff', 'pet_owner', 'customer']);
         });
     }
 }

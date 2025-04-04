@@ -113,7 +113,8 @@
                             <div class="mb-4">
                                 <label class="form-label required">Profile Photo</label>
                                 <input type="file" class="form-control @error('photo') is-invalid @enderror" 
-                                       id="photo" name="photo" required accept="image/*">
+                                       id="photo" name="photo" required accept="image/*" onchange="validateFileSize(this)">
+                                <small class="text-muted">Maximum file size: 2MB</small>
                                 @error('photo')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -121,15 +122,17 @@
 
                             <!-- Submit Button -->
                             <div class="form-footer">
-                                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancel</a>
-                                <button type="submit" class="btn btn-primary ms-auto">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <line x1="12" y1="5" x2="12" y2="19" />
-                                        <line x1="5" y1="12" x2="19" y2="12" />
-                                    </svg>
-                                    Create User
-                                </button>
+                                <div class="ms-auto">
+                                    <button type="submit" class="btn btn-success">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <line x1="12" y1="5" x2="12" y2="19" />
+                                            <line x1="5" y1="12" x2="19" y2="12" />
+                                        </svg>
+                                        Create User
+                                    </button>
+                                    <a href="{{ route('users.index') }}" class="btn btn-secondary ms-2">Cancel</a>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -151,4 +154,16 @@
         border-top: 1px solid #e6e7e9;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+function validateFileSize(input) {
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (input.files[0] && input.files[0].size > maxSize) {
+        alert('File size must be less than 2MB');
+        input.value = '';
+    }
+}
+</script>
 @endsection

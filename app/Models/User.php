@@ -30,6 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'address',
         'phone',
         'photo',
+        'photo_data',
         'store_name',
         'store_address',
         'store_email',

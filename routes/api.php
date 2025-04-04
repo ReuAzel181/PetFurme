@@ -14,6 +14,7 @@
     use App\Http\Controllers\Api\PetApiController;
     use App\Http\Controllers\Api\ProductImageController;
     use App\Http\Controllers\PetController;
+    use App\Models\User;
 
     // For the login and logout routes
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('api.login');
@@ -115,4 +116,111 @@
             'count' => count($results),
             'records' => $results
         ]);
+    });
+
+    // Route for checking user role
+    Route::post('/check-role', function (Request $request) {
+        $email = $request->input('email');
+        $user = User::where('email', $email)->first();
+        
+        if ($user) {
+            return response()->json([
+                'exists' => true,
+                'role' => $user->role
+            ]);
+        }
+        
+        return response()->json([
+            'exists' => false
+        ]);
+    });
+
+    // Make sure the test route comes BEFORE the main route and has a different pattern
+    Route::get('/pets/test-history/{id}', function ($id) {
+        try {
+            // Simple test with minimal dependencies
+            $pet = \App\Models\Pet::find($id);
+            
+            if (!$pet) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pet not found'
+                ]);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'pet_id' => $pet->id,
+                'pet_name' => $pet->name,
+                'test' => 'If you can see this, JSON responses are working'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Test failed: ' . $e->getMessage()
+            ]);
+        }
+    });
+
+    // Then the main route
+    Route::get('/pets/{id}/history', [App\Http\Controllers\PetController::class, 'getHistory']);
+
+    // Update the simplified history endpoint
+    Route::get('/pets/{id}/simple-history', function ($id) {
+        try {
+            // Get the pet
+            $pet = \App\Models\Pet::find($id);
+            if (!$pet) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pet not found'
+                ]);
+            }
+            
+            // Get completed appointments with more fields
+            $appointments = \App\Models\Appointment::where('pet_id', $id)
+                ->where('status', 'completed')
+                ->select('id', 'appointment_date', 'appointment_time', 'reason_for_visit', 'status', 'scheduled_at')
+                ->orderBy('appointment_date', 'desc')
+                ->get()
+                ->map(function($appointment) {
+                    // Format the date and time for easier use in JavaScript
+                    return [
+                        'id' => $appointment->id,
+                        'appointment_date' => $appointment->appointment_date,
+                        'appointment_time' => $appointment->appointment_time,
+                        'reason_for_visit' => $appointment->reason_for_visit,
+                        'status' => $appointment->status,
+                        'formatted_date' => $appointment->appointment_date ? date('M j, Y', strtotime($appointment->appointment_date)) : null,
+                        'formatted_time' => $appointment->appointment_time
+                    ];
+                });
+            
+            // Get findings (minimal fields)
+            $appointmentIds = collect($appointments)->pluck('id')->toArray();
+            $findings = \App\Models\Finding::whereIn('appointment_id', $appointmentIds)
+                ->select('id', 'appointment_id', 'diagnosis', 'recommendations', 'treatment_plan')
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'pet' => [
+                    'id' => $pet->id,
+                    'name' => $pet->name
+                ],
+                'appointments' => $appointments,
+                'findings' => $findings
+            ])->header('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+            \Log::error('Error in simple history endpoint', [
+                'pet_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500)->header('Content-Type', 'application/json');
+        }
     });

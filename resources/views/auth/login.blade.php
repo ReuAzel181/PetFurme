@@ -88,13 +88,14 @@
                                         <span class="input-icon-addon">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
                                         </span>
-                                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="your@email.com" value="{{ old('email') }}" required>
+                                        <input type="email" name="email" id="loginEmail" class="form-control @error('email') is-invalid @enderror" placeholder="your@email.com" value="{{ old('email') }}" required>
                                     </div>
                                     @error('email')
                                         <div class="invalid-feedback">
                                             The email or password you entered is incorrect. Please try again.
                                         </div>
                                     @enderror
+                                    <div class="invalid-feedback" id="roleError"></div>
                                 </div>
 
                                 <div class="mb-3">
@@ -130,7 +131,7 @@
                                     </div>
 
                                     <div class="form-footer">
-                                        <button type="submit" class="btn btn-primary w-100">Log in</button>
+                                        <button type="submit" class="btn btn-primary w-100" id="loginButton">Log in</button>
                                     </div>
                                 </form>
                                 <div class="text-center mt-4" style="margin-top: 10px !important;">
@@ -1119,6 +1120,16 @@
     .success-animation {
         animation: checkmark 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards;
     }
+
+    /* Hide the registration links and form */
+    #toggleForm, #registerForm, #toggleLogin {
+        display: none !important;
+    }
+    
+    /* Hide the "Don't have an account?" text */
+    .text-center.mt-4 {
+        display: none !important;
+    }
 </style>
 @endpush
 
@@ -1475,6 +1486,75 @@
                 }
             });
         });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the login form
+        const form = document.querySelector('#loginForm form');
+        const loginEmail = document.querySelector('#loginEmail');
+        const loginButton = document.getElementById('loginButton');
+        const roleError = document.getElementById('roleError');
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Reset error state
+                roleError.textContent = '';
+                loginEmail.classList.remove('is-invalid');
+                
+                // Show loading state
+                loginButton.disabled = true;
+                loginButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Logging in...';
+                
+                // Get the email value
+                const email = loginEmail.value;
+                
+                // Check if email is empty
+                if (!email) {
+                    loginEmail.classList.add('is-invalid');
+                    roleError.textContent = 'Please enter your email address.';
+                    loginButton.disabled = false;
+                    loginButton.innerHTML = 'Log in';
+                    return;
+                }
+                
+                // Make fetch request to check role
+                fetch('/api/check-role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists && (data.role === 'admin' || data.role === 'sub_admin')) {
+                        // Role is allowed, submit the form
+                        form.submit();
+                    } else if (data.exists && data.role !== 'admin' && data.role !== 'sub_admin') {
+                        // User exists but role is not allowed
+                        loginEmail.classList.add('is-invalid');
+                        roleError.textContent = 'UNAUTHORIZED ACCESS: Only administrators can access this portal.';
+                        roleError.style.display = 'block';
+                        roleError.style.color = '#dc3545';
+                        roleError.style.fontWeight = 'bold';
+                        roleError.style.padding = '8px 0';
+                        loginButton.disabled = false;
+                        loginButton.innerHTML = 'Log in';
+                    } else {
+                        // User doesn't exist, let server handle validation
+                        form.submit();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking role:', error);
+                    // If there's an error in the role check, allow form submission
+                    form.submit();
+                });
+            });
+        }
     });
 </script>
 @endpush
