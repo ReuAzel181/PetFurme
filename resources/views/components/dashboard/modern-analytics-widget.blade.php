@@ -56,19 +56,19 @@
                      data-bs-toggle="tooltip" 
                      title="@switch($title)
                          @case('Total Pets')
-                             {{ abs(number_format($percentage, 1)) }}% {{ $trend === 'up' ? 'increase' : 'decrease' }} in pet registrations this month
+                             {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% {{ $trend === 'up' ? 'increase' : 'decrease' }} in pet registrations this month
                              @break
                          @case('Appointments')
-                             {{ abs(number_format($percentage, 1)) }}% {{ $trend === 'up' ? 'more' : 'fewer' }} appointments compared to last month
+                             {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% {{ $trend === 'up' ? 'more' : 'fewer' }} appointments compared to last month
                              @break
                          @case('Pet Owners')
-                             {{ abs(number_format($percentage, 1)) }}% {{ $trend === 'up' ? 'growth' : 'decline' }} in active pet owners
+                             {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% {{ $trend === 'up' ? 'growth' : 'decline' }} in active pet owners
                              @break
                          @case("Today's Orders")
-                             {{ abs(number_format($percentage, 1)) }}% {{ $trend === 'up' ? 'higher' : 'lower' }} than daily average
+                             {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% {{ $trend === 'up' ? 'higher' : 'lower' }} than daily average
                              @break
                      @endswitch">
-                    <span class="percentage">{{ number_format($percentage, 1) }}%</span>
+                    <span class="percentage">{{ is_numeric($percentage) ? number_format($percentage, 1) : 0 }}%</span>
                     <i class="fas fa-arrow-{{ $trend === 'up' ? 'up' : 'down' }}"></i>
                 </div>
             @endif
@@ -78,37 +78,37 @@
                 @case('Total Pets')
                     @if($trend === 'up')
                         {{ $value == 1 ? 'One pet is' : "{$value} pets are" }} registered in the system. 
-                        Pet registrations {{ abs(number_format($percentage, 1)) }}% higher than last month.
+                        Pet registrations {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% higher than last month.
                     @else
                         Currently managing {{ $value == 1 ? 'one pet' : "{$value} pets" }}. 
-                        {{ abs(number_format($percentage, 1)) }}% decrease in registrations from previous month.
+                        {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% decrease in registrations from previous month.
                     @endif
                     @break
                 @case('Appointments')
                     @if($trend === 'up')
                         {{ $value == 1 ? 'One appointment' : "{$value} appointments" }} in the system. 
-                        Booking volume up {{ abs(number_format($percentage, 1)) }}% from last month.
+                        Booking volume up {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% from last month.
                     @else
                         {{ $value == 1 ? 'One active appointment' : "{$value} active appointments" }}. 
-                        {{ abs(number_format($percentage, 1)) }}% reduction in bookings compared to last month.
+                        {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% reduction in bookings compared to last month.
                     @endif
                     @break
                 @case('Pet Owners')
                     @if($trend === 'up')
                         {{ $value == 1 ? 'One active pet owner' : "{$value} active pet owners" }} registered. 
-                        {{ abs(number_format($percentage, 1)) }}% increase in client base this month.
+                        {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% increase in client base this month.
                     @else
                         {{ $value == 1 ? 'One registered owner' : "{$value} registered owners" }} in database. 
-                        {{ abs(number_format($percentage, 1)) }}% decrease in new registrations.
+                        {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% decrease in new registrations.
                     @endif
                     @break
                 @case("Today's Orders")
                     @if($trend === 'up')
                         {{ $value == 1 ? 'One order processed' : "{$value} orders processed" }} today. 
-                        Performance {{ abs(number_format($percentage, 1)) }}% above 30-day average.
+                        Performance {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% above 30-day average.
                     @else
                         {{ $value == 1 ? 'One order received' : "{$value} orders received" }} today. 
-                        {{ abs(number_format($percentage, 1)) }}% below typical daily volume.
+                        {{ is_numeric($percentage) ? number_format(abs($percentage), 1) : 0 }}% below typical daily volume.
                     @endif
                     @break
             @endswitch

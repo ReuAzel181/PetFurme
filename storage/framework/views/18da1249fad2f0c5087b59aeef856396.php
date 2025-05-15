@@ -785,14 +785,32 @@ function deletePet(petId) {
         </div>
     `;
 
+    // Create form data with _method=DELETE for Laravel method spoofing
+    const formData = new FormData();
+    formData.append('_method', 'DELETE');
+    
     fetch(`/pets/${petId}`, {
-        method: 'DELETE',
+        method: 'POST', // Use POST with _method=DELETE for method spoofing
         headers: {
-            'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: formData
+    })
+    .then(response => {
+        // Store response for later use
+        const contentType = response.headers.get('content-type');
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+        
+        // Check if response is JSON before trying to parse it
+        if (contentType && contentType.includes('application/json')) {
+            return response.json();
+        } else {
+            // If not JSON, just return a success object
+            return { success: true };
         }
     })
-    .then(response => response.json())
     .then(data => {
         // Show success toast with pet name
         const toast = document.createElement('div');
@@ -820,29 +838,26 @@ function deletePet(petId) {
         button.disabled = false;
         button.innerHTML = originalContent;
         
-        // Show error toast but still refresh since deletion might have succeeded
+        console.error('Error:', error);
+        
+        // Show error toast
         const toast = document.createElement('div');
         toast.className = 'toast position-fixed top-0 end-0 m-3';
         toast.setAttribute('role', 'alert');
         toast.innerHTML = `
-            <div class="toast-header bg-warning text-white">
-                <strong class="me-auto">Notice</strong>
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">Error</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
             </div>
             <div class="toast-body">
-                <i class="fas fa-sync-alt me-2"></i>
-                The page will refresh to show updated pet list.
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Failed to delete pet. Please try again.
             </div>
         `;
         document.body.appendChild(toast);
         
         const bsToast = new bootstrap.Toast(toast);
         bsToast.show();
-        
-        console.error('Error:', error);
-        
-        // Still refresh the page as the deletion might have succeeded
-        setTimeout(() => window.location.reload(), 2000);
     });
 }
 </script>

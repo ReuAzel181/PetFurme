@@ -89,19 +89,19 @@
                      data-bs-toggle="tooltip" 
                      title="<?php switch($title):
                          case ('Total Pets'): ?>
-                             <?php echo e(abs(number_format($percentage, 1))); ?>% <?php echo e($trend === 'up' ? 'increase' : 'decrease'); ?> in pet registrations this month
+                             <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% <?php echo e($trend === 'up' ? 'increase' : 'decrease'); ?> in pet registrations this month
                              <?php break; ?>
                          <?php case ('Appointments'): ?>
-                             <?php echo e(abs(number_format($percentage, 1))); ?>% <?php echo e($trend === 'up' ? 'more' : 'fewer'); ?> appointments compared to last month
+                             <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% <?php echo e($trend === 'up' ? 'more' : 'fewer'); ?> appointments compared to last month
                              <?php break; ?>
                          <?php case ('Pet Owners'): ?>
-                             <?php echo e(abs(number_format($percentage, 1))); ?>% <?php echo e($trend === 'up' ? 'growth' : 'decline'); ?> in active pet owners
+                             <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% <?php echo e($trend === 'up' ? 'growth' : 'decline'); ?> in active pet owners
                              <?php break; ?>
                          <?php case ("Today's Orders"): ?>
-                             <?php echo e(abs(number_format($percentage, 1))); ?>% <?php echo e($trend === 'up' ? 'higher' : 'lower'); ?> than daily average
+                             <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% <?php echo e($trend === 'up' ? 'higher' : 'lower'); ?> than daily average
                              <?php break; ?>
                      <?php endswitch; ?>">
-                    <span class="percentage"><?php echo e(number_format($percentage, 1)); ?>%</span>
+                    <span class="percentage"><?php echo e(is_numeric($percentage) ? number_format($percentage, 1) : 0); ?>%</span>
                     <i class="fas fa-arrow-<?php echo e($trend === 'up' ? 'up' : 'down'); ?>"></i>
                 </div>
             <?php endif; ?>
@@ -111,37 +111,37 @@
                 case ('Total Pets'): ?>
                     <?php if($trend === 'up'): ?>
                         <?php echo e($value == 1 ? 'One pet is' : "{$value} pets are"); ?> registered in the system. 
-                        Pet registrations <?php echo e(abs(number_format($percentage, 1))); ?>% higher than last month.
+                        Pet registrations <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% higher than last month.
                     <?php else: ?>
                         Currently managing <?php echo e($value == 1 ? 'one pet' : "{$value} pets"); ?>. 
-                        <?php echo e(abs(number_format($percentage, 1))); ?>% decrease in registrations from previous month.
+                        <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% decrease in registrations from previous month.
                     <?php endif; ?>
                     <?php break; ?>
                 <?php case ('Appointments'): ?>
                     <?php if($trend === 'up'): ?>
                         <?php echo e($value == 1 ? 'One appointment' : "{$value} appointments"); ?> in the system. 
-                        Booking volume up <?php echo e(abs(number_format($percentage, 1))); ?>% from last month.
+                        Booking volume up <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% from last month.
                     <?php else: ?>
                         <?php echo e($value == 1 ? 'One active appointment' : "{$value} active appointments"); ?>. 
-                        <?php echo e(abs(number_format($percentage, 1))); ?>% reduction in bookings compared to last month.
+                        <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% reduction in bookings compared to last month.
                     <?php endif; ?>
                     <?php break; ?>
                 <?php case ('Pet Owners'): ?>
                     <?php if($trend === 'up'): ?>
                         <?php echo e($value == 1 ? 'One active pet owner' : "{$value} active pet owners"); ?> registered. 
-                        <?php echo e(abs(number_format($percentage, 1))); ?>% increase in client base this month.
+                        <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% increase in client base this month.
                     <?php else: ?>
                         <?php echo e($value == 1 ? 'One registered owner' : "{$value} registered owners"); ?> in database. 
-                        <?php echo e(abs(number_format($percentage, 1))); ?>% decrease in new registrations.
+                        <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% decrease in new registrations.
                     <?php endif; ?>
                     <?php break; ?>
                 <?php case ("Today's Orders"): ?>
                     <?php if($trend === 'up'): ?>
                         <?php echo e($value == 1 ? 'One order processed' : "{$value} orders processed"); ?> today. 
-                        Performance <?php echo e(abs(number_format($percentage, 1))); ?>% above 30-day average.
+                        Performance <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% above 30-day average.
                     <?php else: ?>
                         <?php echo e($value == 1 ? 'One order received' : "{$value} orders received"); ?> today. 
-                        <?php echo e(abs(number_format($percentage, 1))); ?>% below typical daily volume.
+                        <?php echo e(is_numeric($percentage) ? number_format(abs($percentage), 1) : 0); ?>% below typical daily volume.
                     <?php endif; ?>
                     <?php break; ?>
             <?php endswitch; ?>

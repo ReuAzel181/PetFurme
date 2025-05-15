@@ -206,6 +206,19 @@
                         <div class="col-lg-12">
                             <div class="table-responsive">
                                 <input type="text" id="productSearch" class="form-control mb-3" placeholder="Search products...">
+                                
+                                <!-- Add horizontal scrollable categories -->
+                                <div class="categories-scroll-container mb-3">
+                                    <div class="categories-wrapper">
+                                        <button class="category-btn active" data-category="all">All</button>
+                                        <button class="category-btn" data-category="food">Food</button>
+                                        <button class="category-btn" data-category="medicine">Medicine</button>
+                                        <button class="category-btn" data-category="accessories">Accessories</button>
+                                        <button class="category-btn" data-category="grooming">Grooming</button>
+                                        <button class="category-btn" data-category="toys">Toys</button>
+                                    </div>
+                                </div>
+                                
                                 <table class="table table-striped table-bordered align-middle">
                                     <thead class="thead-light">
                                         <tr>
@@ -222,7 +235,8 @@
                                             draggable="true" 
                                             data-product-id="{{ $product->id }}"
                                             data-product-name="{{ $product->name }}"
-                                            data-product-price="{{ $product->selling_price }}">
+                                            data-product-price="{{ $product->selling_price }}"
+                                            data-category="{{ $product->category->name ?? 'other' }}">
                                             <td class="text-center">{{ $product->name }}</td>
                                             <td class="text-center">{{ $product->quantity }}</td>
                                             <td class="text-center">{{ $product->unit->name }}</td>
@@ -456,6 +470,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const productsContainer = document.getElementById('products-container');
     const dragPreview = document.getElementById('drag-preview');
     let draggedProduct = null;
+
+    // Category filter functionality
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to the clicked button
+            this.classList.add('active');
+            
+            const category = this.dataset.category;
+            const products = productsContainer.getElementsByClassName('product-item');
+            
+            // Filter products based on category
+            Array.from(products).forEach(product => {
+                if (category === 'all') {
+                    product.style.display = '';
+                } else {
+                    const productCategory = product.dataset.category || '';
+                    product.style.display = productCategory.toLowerCase() === category.toLowerCase() ? '' : 'none';
+                }
+            });
+        });
+    });
 
     // Product search functionality
     productSearch?.addEventListener('input', function(e) {
@@ -849,6 +889,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
 @keyframes spinner-border {
     to { transform: rotate(360deg); }
+}
+
+/* Horizontal scrollable categories */
+.categories-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.categories-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+}
+
+.categories-wrapper {
+    display: inline-flex;
+    padding: 0 4px;
+}
+
+.category-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-right: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    background-color: #f9f9f9;
+    color: #495057;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.category-btn.active {
+    background-color: #7952b3;
+    color: white;
+    border-color: #7952b3;
+}
+
+.category-btn:hover:not(.active) {
+    background-color: #e9ecef;
 }
 </style>
 
