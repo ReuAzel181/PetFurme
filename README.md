@@ -2,9 +2,10 @@
 
 A comprehensive pet management system built with Laravel 10, featuring pet profiles, appointments, products, orders, and user management.
 
-![Dashboard](https://github.com/ReuAzel181/PetFurme/blob/main/public/assets/img2/image8.png)
+![Dashboard](https://github.com/ReuAzel181/PetFurme/blob/main/public/assets/img2/image%208.png)
 
-![Dashboard](https://github.com/ReuAzel181/PetFurme/blob/main/public/assets/img2/image9.png)
+
+![Dashboard](https://github.com/ReuAzel181/PetFurme/blob/main/public/assets/img2/image%209.png)
 
 ## 🚀 Features
 
